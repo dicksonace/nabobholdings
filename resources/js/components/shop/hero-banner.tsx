@@ -31,7 +31,7 @@ export default function HeroBanner({ slides }: HeroBannerProps) {
                         <div className="text-white">
                             <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur-sm sm:mb-4">
                                 <Sparkles className="h-3.5 w-3.5" />
-                                Ghana&apos;s Trusted Marketplace
+                                Your Trusted Marketplace
                             </div>
                             <h1 className="text-2xl font-extrabold leading-tight tracking-tight transition-all sm:text-3xl md:text-5xl">{slide.title}</h1>
                             <p className="mt-3 max-w-lg text-sm text-white/85 sm:mt-4 sm:text-base md:text-lg">{slide.subtitle}</p>

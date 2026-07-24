@@ -19,7 +19,7 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
                     <NabobBrand showText size="lg" inverted />
                 </div>
                 <p className="relative z-20 mt-6 max-w-sm text-blue-100">
-                    Ghana&apos;s trusted marketplace for buyers and sellers. Shop with confidence.
+                    Your trusted marketplace for buyers and sellers. Shop with confidence.
                 </p>
                 {quote && (
                     <div className="relative z-20 mt-auto">

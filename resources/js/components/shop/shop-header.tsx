@@ -252,13 +252,22 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
-                            <Link
-                                href={route('login')}
-                                className="hidden items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 md:flex"
-                            >
-                                <LogIn className="h-4 w-4" />
-                                Login
-                            </Link>
+                            <div className="hidden items-center gap-2 md:flex">
+                                <Link
+                                    href={route('login')}
+                                    className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    <LogIn className="h-4 w-4" />
+                                    Login
+                                </Link>
+                                <Link
+                                    href={route('register.buyer')}
+                                    className="flex items-center gap-1 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                                >
+                                    <Store className="h-3.5 w-3.5" />
+                                    Register
+                                </Link>
+                            </div>
                         )}
 
                         {auth.user && !isStaff && (
@@ -331,15 +340,6 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
 
                 <nav className="mt-2 hidden items-center gap-6 border-t border-gray-50 pt-2 md:mt-3 md:flex md:pt-3">
                     {activeNavLinks.map((link) => renderNavLink(link))}
-                    {!auth.user && (
-                        <Link
-                            href={route('register.buyer')}
-                            className="ml-auto flex items-center gap-1 rounded-full bg-blue-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-600"
-                        >
-                            <Store className="h-3.5 w-3.5" />
-                            Register
-                        </Link>
-                    )}
                 </nav>
             </div>
 
@@ -355,13 +355,22 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                     )}
                     {activeNavLinks.map((link) => renderNavLink(link, () => setMobileMenuOpen(false), true))}
                     {!auth.user && (
-                        <Link
-                            href={route('login')}
-                            className="mt-2 block rounded-lg border border-gray-200 py-2.5 text-center text-sm font-medium text-gray-700"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Login
-                        </Link>
+                        <div className="mt-2 grid grid-cols-2 gap-2">
+                            <Link
+                                href={route('login')}
+                                className="block rounded-lg border border-gray-200 py-2.5 text-center text-sm font-medium text-gray-700"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Login
+                            </Link>
+                            <Link
+                                href={route('register.buyer')}
+                                className="block rounded-lg bg-blue-500 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-600"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Register
+                            </Link>
+                        </div>
                     )}
                     {auth.user && (
                         <>

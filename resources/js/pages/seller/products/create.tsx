@@ -392,7 +392,7 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
                                 )}
                                 <label className="flex items-center gap-2 text-sm">
                                     <input type="checkbox" checked={data.in_ghana} onChange={(e) => setData('in_ghana', e.target.checked)} />
-                                    Product ships within Ghana
+                                    Product ships locally
                                 </label>
                             </div>
                         )}

@@ -62,7 +62,7 @@ export default function SellerLogin({ canResetPassword, status, defaultLogin = '
                         <div>
                             <h2 className="text-3xl font-bold leading-tight">Grow your business on Nabob Holdings</h2>
                             <p className="mt-3 max-w-md text-emerald-100">
-                                Sign in to manage your store, fulfill orders, and reach buyers across Ghana.
+                                Sign in to manage your store, fulfill orders, and reach more buyers.
                             </p>
                         </div>
                         <ul className="space-y-4">

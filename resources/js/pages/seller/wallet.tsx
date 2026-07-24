@@ -359,7 +359,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                 <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-1">
                     <h3 className="font-semibold text-gray-900">Quick tips</h3>
                     <ul className="mt-4 space-y-3 text-sm text-gray-600">
-                        <li className="rounded-lg bg-gray-50 p-3"><strong className="text-gray-900">MTN MoMo</strong> is the most used network in Ghana.</li>
+                        <li className="rounded-lg bg-gray-50 p-3"><strong className="text-gray-900">MTN MoMo</strong> is the most used mobile money network.</li>
                         <li className="rounded-lg bg-gray-50 p-3">Use the name registered on your MoMo account.</li>
                         <li className="rounded-lg bg-gray-50 p-3">Withdrawals are reviewed and paid within 1 hour.</li>
                     </ul>

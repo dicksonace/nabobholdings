@@ -239,8 +239,8 @@ class BulkProductsSeeder extends Seeder
     private function randomDescription(): string
     {
         $sentences = [
-            'High quality product with excellent reviews from Ghanaian buyers.',
-            'Trusted seller with fast delivery across Greater Accra and nationwide.',
+            'High quality product with excellent reviews from verified buyers.',
+            'Trusted seller with fast delivery nationwide.',
             'Built to last with dependable performance for everyday use.',
             'Popular choice on Nabob Holdings with strong value for money.',
         ];

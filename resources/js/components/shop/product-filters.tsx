@@ -236,7 +236,7 @@ export default function ProductFilters({ filters, categories, brands, priceRange
 
             <FilterSection title="Delivery & Offers">
                 {[
-                    { key: 'in_ghana' as const, label: 'In Ghana', desc: 'Seller delivers locally' },
+                    { key: 'in_ghana' as const, label: 'Local Delivery', desc: 'Seller delivers locally' },
                     { key: 'free_ship' as const, label: 'Free Delivery', desc: 'Seller delivers free' },
                 ].map((item) => (
                     <label
@@ -284,7 +284,7 @@ export function ActiveFilterChips({ filters, categories }: Pick<ProductFiltersPr
     if (filters.rating) {
         chips.push({ label: `${filters.rating}★ & up`, onRemove: () => applyFilters({ rating: '' }, filters) });
     }
-    if (filters.in_ghana) chips.push({ label: 'In Ghana', onRemove: () => applyFilters({ in_ghana: false }, filters) });
+    if (filters.in_ghana) chips.push({ label: 'Local Delivery', onRemove: () => applyFilters({ in_ghana: false }, filters) });
     if (filters.free_ship) chips.push({ label: 'Free Delivery', onRemove: () => applyFilters({ free_ship: false }, filters) });
 
     if (chips.length === 0) return null;

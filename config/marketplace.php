@@ -49,11 +49,11 @@ return [
             'items' => [
                 [
                     'question' => 'Who handles delivery?',
-                    'answer' => 'Sellers deliver items directly to buyers. Each seller arranges their own delivery or courier within Ghana — Nabob Holdings does not ship orders itself.',
+                    'answer' => 'Sellers deliver items directly to buyers. Each seller arranges their own delivery or courier — Nabob Holdings does not ship orders itself.',
                 ],
                 [
                     'question' => 'How long does delivery take?',
-                    'answer' => 'Delivery times vary by seller and location. Items marked "In Ghana" typically arrive within 1–5 business days in Greater Accra and 3–10 days nationwide.',
+                    'answer' => 'Delivery times vary by seller and location. Items marked "Local Delivery" typically arrive within 1–5 business days locally and 3–10 days nationwide.',
                 ],
                 [
                     'question' => 'What does "Free Delivery" mean?',

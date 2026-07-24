@@ -85,7 +85,7 @@ export default function HomeCategoryShortcuts({
         },
         {
             key: 'in_ghana',
-            label: 'In Ghana',
+            label: 'Local Delivery',
             icon: MapPin,
             color: 'bg-emerald-100 text-emerald-700',
             onClick: () => applyFilters({ in_ghana: !filters.in_ghana }, filters),

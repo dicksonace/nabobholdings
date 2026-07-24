@@ -67,7 +67,7 @@ export default function ShopLayout({ children, hideHeaderSearch = false, hideChr
                                 {brandFirst}
                                 {brandRest && <span className="text-orange-500">&nbsp;{brandRest}</span>}
                             </h3>
-                            <p className="mt-2 text-sm text-gray-500">Ghana&apos;s trusted online marketplace.</p>
+                            <p className="mt-2 text-sm text-gray-500">Your trusted online marketplace.</p>
                         </div>
                         <div>
                             <h4 className="font-semibold text-gray-900">Buy</h4>

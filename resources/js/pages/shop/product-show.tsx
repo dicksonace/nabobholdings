@@ -213,7 +213,7 @@ export default function ProductShow({ product, related, reviews, reviewable }: P
                                             <MapPin className="h-4 w-4" strokeWidth={2} />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-semibold text-indigo-800">Ships nationwide across Ghana</p>
+                                            <p className="text-sm font-semibold text-indigo-800">Ships nationwide</p>
                                             <p className="text-xs text-indigo-700/80">Available beyond the seller&apos;s local area</p>
                                         </div>
                                     </div>

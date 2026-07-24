@@ -47,7 +47,7 @@ export default function Contact({ contact, subjects, defaults }: ContactProps) {
             <div className="mx-auto max-w-6xl px-4 py-10">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-gray-900">Contact Us</h1>
-                    <p className="mt-2 text-gray-500">We&apos;re here to help buyers and sellers across Ghana.</p>
+                    <p className="mt-2 text-gray-500">We&apos;re here to help buyers and sellers.</p>
                 </div>
 
                 {flash.info && (

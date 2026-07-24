@@ -42,7 +42,7 @@ const sortOptions = [
 ];
 
 const quickFilters = [
-    { key: 'in_ghana', label: 'In Ghana', param: { in_ghana: true } },
+    { key: 'in_ghana', label: 'Local Delivery', param: { in_ghana: true } },
     { key: 'free_ship', label: 'Free Delivery', param: { free_ship: true } },
 ];
 
@@ -83,7 +83,7 @@ export default function Home({ products, categories, brands, priceRange, filters
                     <span className="hidden md:inline">|</span>
                     <span><strong className="text-emerald-600">{counts.free_ship}</strong> with free delivery</span>
                     <span className="hidden md:inline">|</span>
-                    <span><strong className="text-blue-500">{counts.in_ghana}</strong> in Ghana</span>
+                    <span><strong className="text-blue-500">{counts.in_ghana}</strong> local delivery</span>
                 </div>
             </div>
 
