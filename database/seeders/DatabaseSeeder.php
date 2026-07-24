@@ -17,15 +17,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        PlatformSetting::create(['key' => 'commission_rate', 'value' => '0']);
+        PlatformSetting::updateOrCreate(['key' => 'commission_rate'], ['value' => '0']);
 
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@nabobholdings.com',
-            'mobile' => '0200000000',
-            'password' => Hash::make('password'),
-            'role' => UserRole::Admin,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@nabobholdings.com'],
+            [
+                'name' => 'Super Admin',
+                'mobile' => '0200000000',
+                'password' => Hash::make('password'),
+                'role' => UserRole::Admin,
+            ],
+        );
 
         $categorySpecs = config('category_specs', []);
         $categoryNames = [
@@ -55,14 +57,16 @@ class DatabaseSeeder extends Seeder
         $sort = 1;
         foreach ($categoryNames as $slug => $name) {
             $config = $categorySpecs[$slug] ?? null;
-            Category::create([
-                'name' => $name,
-                'slug' => $slug,
-                'icon' => $config['icon'] ?? null,
-                'spec_schema' => $config ? ['fields' => $config['fields']] : null,
-                'is_active' => true,
-                'sort_order' => $sort++,
-            ]);
+            Category::updateOrCreate(
+                ['slug' => $slug],
+                [
+                    'name' => $name,
+                    'icon' => $config['icon'] ?? null,
+                    'spec_schema' => $config ? ['fields' => $config['fields']] : null,
+                    'is_active' => true,
+                    'sort_order' => $sort++,
+                ],
+            );
         }
     }
 }
