@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-$HOME/domains/nabobholdings.com/nabob}"
+APP_DIR="${APP_DIR:-$HOME/domains/nabobholdings.com}"
 PHP_BIN="${PHP_BIN:-php}"
 
 echo "==> WARNING: This deletes ALL Nabob Holdings data on the server."
@@ -31,6 +31,6 @@ $PHP_BIN artisan view:cache
 chmod -R 775 storage bootstrap/cache
 
 echo "==> Done."
-echo "    Admin: https://cityunlock.net/admin/login"
+echo "    Admin: https://nabobholdings.com/admin/login"
 echo "    Email: admin@nabobholdings.com"
 echo "    Password: password (change immediately)"

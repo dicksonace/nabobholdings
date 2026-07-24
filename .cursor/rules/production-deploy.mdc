@@ -7,32 +7,35 @@ alwaysApply: true
 
 When the user asks to push, deploy, or update production, **always** include these server commands after a successful push.
 
-**App path:** `~/domains/nabobholdings.com/nabob`  
+**SSH:** `ssh nabob` (host `82.29.185.77`, port `65002`, user `u774243561`, key `~/.ssh/nabob_hostinger`)  
+**App path:** `~/domains/nabobholdings.com`  
+**Docroot:** `~/domains/nabobholdings.com/public_html` (separate copy — `public/build` must be synced into `public_html/build` on every deploy)  
 **Site:** https://nabobholdings.com  
 **Admin login (not linked publicly):** `/admin/login`
 
 ## One command (recommended)
 
 ```bash
-cd ~/domains/nabobholdings.com/nabob && bash scripts/deploy-production.sh
+cd ~/domains/nabobholdings.com && bash scripts/deploy-production.sh
 ```
 
 ## Manual steps (if script unavailable)
 
 ```bash
-cd ~/domains/nabobholdings.com/nabob
+cd ~/domains/nabobholdings.com
 git pull origin main
 php -d memory_limit=-1 composer.phar install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan products:index-image-colors
 php artisan storage:link 2>/dev/null || true
+rm -rf public_html/build && cp -r public/build public_html/build
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 chmod -R 775 storage bootstrap/cache
 ```
 
-Vite assets are committed in the repo — **no `npm run build` on the server** unless frontend was edited directly on the server.
+Vite assets are committed in the repo — **no `npm run build` on the server** unless frontend was edited directly on the server. The docroot is `public_html` (a separate folder), so built assets in `public/build` must be copied into `public_html/build` — the deploy script does this automatically.
 
 ## Fresh database reset (wipes ALL data)
 
@@ -45,7 +48,7 @@ php artisan nabob:reset --force
 
 **Server:**
 ```bash
-cd ~/domains/nabobholdings.com/nabob && bash scripts/reset-production.sh
+cd ~/domains/nabobholdings.com && bash scripts/reset-production.sh
 ```
 
 Default admin after reset: `admin@nabobholdings.com` / `password` at `/admin/login` — change password immediately.

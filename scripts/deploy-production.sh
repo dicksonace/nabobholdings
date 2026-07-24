@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-$HOME/domains/nabobholdings.com/nabob}"
+APP_DIR="${APP_DIR:-$HOME/domains/nabobholdings.com}"
+PUBLIC_HTML="${PUBLIC_HTML:-$APP_DIR/public_html}"
 PHP_BIN="${PHP_BIN:-php}"
 COMPOSER_BIN="${COMPOSER_BIN:-composer.phar}"
 
@@ -30,6 +31,12 @@ $PHP_BIN artisan products:index-image-colors
 echo "==> Storage link (safe if already exists)"
 $PHP_BIN artisan storage:link 2>/dev/null || true
 
+echo "==> Sync built assets into public_html docroot"
+if [[ -d "$APP_DIR/public/build" ]]; then
+    rm -rf "$PUBLIC_HTML/build"
+    cp -r "$APP_DIR/public/build" "$PUBLIC_HTML/build"
+fi
+
 echo "==> Cache for production"
 $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
@@ -38,4 +45,4 @@ $PHP_BIN artisan view:cache
 echo "==> Fix permissions"
 chmod -R 775 storage bootstrap/cache
 
-echo "==> Done. Open https://cityunlock.net"
+echo "==> Done. Open https://nabobholdings.com"
