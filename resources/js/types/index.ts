@@ -31,10 +31,17 @@ export interface Currency {
     symbol: string;
 }
 
+export interface ContactInfo {
+    address: string;
+    phone: string;
+    email: string;
+}
+
 export interface SharedData {
     name: string;
     brand: Brand;
     currency: Currency;
+    contact: ContactInfo;
     csrfToken?: string;
     quote: { message: string; author: string };
     auth: Auth;

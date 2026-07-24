@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
+use App\Services\PlatformSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,8 +16,16 @@ class ContactController extends Controller
     {
         $user = $request->user();
 
+        $contactSettings = PlatformSettings::contact();
+        $contact = array_merge(config('marketplace.contact'), [
+            'address' => $contactSettings['address'],
+            'phone' => $contactSettings['phone'],
+            'email' => $contactSettings['email'],
+            'whatsapp' => $contactSettings['phone'],
+        ]);
+
         return Inertia::render('shop/contact', [
-            'contact' => config('marketplace.contact'),
+            'contact' => $contact,
             'subjects' => [
                 'general' => 'General Inquiry',
                 'order' => 'Order Issue',

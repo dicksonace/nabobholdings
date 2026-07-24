@@ -65,6 +65,7 @@ class HandleInertiaRequests extends Middleware
             'name' => $brand['name'],
             'brand' => $brand,
             'currency' => PlatformSettings::currency(),
+            'contact' => PlatformSettings::contact(),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $user ? $user->load('sellerProfile') : null,

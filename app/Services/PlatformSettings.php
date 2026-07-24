@@ -22,6 +22,16 @@ class PlatformSettings
 
     public const DEFAULT_CURRENCY_SYMBOL = '$';
 
+    public const CONTACT_ADDRESS_KEY = 'contact_address';
+
+    public const CONTACT_PHONE_KEY = 'contact_phone';
+
+    public const CONTACT_EMAIL_KEY = 'contact_email';
+
+    public const DEFAULT_CONTACT_ADDRESS = 'No.204/2/A, Gramasanwardhana Mawatha, Kiula, Hungama, Ambalantota';
+
+    public const DEFAULT_CONTACT_PHONE = '+94 70 321 7775';
+
     /**
      * The single source of truth for the site brand name.
      * Falls back to config/app.name (seeded from the APP_NAME env var).
@@ -105,6 +115,61 @@ class PlatformSettings
     public static function formatMoney(float|int|string $amount): string
     {
         return static::currencySymbol().number_format((float) $amount, 2);
+    }
+
+    /**
+     * Public company address shown in the footer and contact page.
+     */
+    public static function contactAddress(): string
+    {
+        $value = static::get(self::CONTACT_ADDRESS_KEY);
+        $value = is_string($value) ? trim($value) : '';
+
+        return $value !== '' ? $value : self::DEFAULT_CONTACT_ADDRESS;
+    }
+
+    /**
+     * Public company phone number shown in the footer and contact page.
+     */
+    public static function contactPhone(): string
+    {
+        $value = static::get(self::CONTACT_PHONE_KEY);
+        $value = is_string($value) ? trim($value) : '';
+
+        return $value !== '' ? $value : self::DEFAULT_CONTACT_PHONE;
+    }
+
+    /**
+     * Public support email shown in the footer and contact page.
+     */
+    public static function contactEmail(): string
+    {
+        $value = static::get(self::CONTACT_EMAIL_KEY);
+        $value = is_string($value) ? trim($value) : '';
+
+        if ($value !== '') {
+            return $value;
+        }
+
+        $fallback = config('mail.from.address');
+
+        return is_string($fallback) && trim($fallback) !== ''
+            ? trim($fallback)
+            : (string) config('marketplace.contact.email', 'support@nabobholdings.com');
+    }
+
+    /**
+     * Contact payload shared with every page (address + phone + email).
+     *
+     * @return array{address: string, phone: string, email: string}
+     */
+    public static function contact(): array
+    {
+        return [
+            'address' => static::contactAddress(),
+            'phone' => static::contactPhone(),
+            'email' => static::contactEmail(),
+        ];
     }
 
     public static function get(string $key, mixed $default = null): mixed

@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { ReactNode, useEffect } from 'react';
 
 import BuyerMobileNav from '@/components/shop/buyer-mobile-nav';
@@ -14,7 +15,7 @@ interface ShopLayoutProps {
 
 export default function ShopLayout({ children, hideHeaderSearch = false, hideChrome = false }: ShopLayoutProps) {
     const page = usePage<SharedData>();
-    const { auth, flash, brand } = page.props;
+    const { auth, flash, brand, contact } = page.props;
     const brandName = brand?.name ?? 'Nabob Holdings';
     const brandParts = brandName.trim().split(/\s+/);
     const brandFirst = brandParts[0] ?? brandName;
@@ -61,7 +62,7 @@ export default function ShopLayout({ children, hideHeaderSearch = false, hideChr
             {!hideChrome && (
             <footer className="mt-12 border-t border-gray-200 bg-white py-8 print:hidden">
                 <div className="mx-auto w-full max-w-7xl px-4">
-                    <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
                         <div>
                             <h3 className="text-lg font-bold">
                                 {brandFirst}
@@ -121,6 +122,33 @@ export default function ShopLayout({ children, hideHeaderSearch = false, hideChr
                                             <Link href={route('register.buyer')}>Create Account</Link>
                                         </li>
                                     </>
+                                )}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-gray-900">Contact</h4>
+                            <ul className="mt-2 space-y-2 text-sm text-gray-500">
+                                {contact?.address && (
+                                    <li className="flex items-start gap-2">
+                                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                                        <span>{contact.address}</span>
+                                    </li>
+                                )}
+                                {contact?.phone && (
+                                    <li className="flex items-start gap-2">
+                                        <Phone className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                                        <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} className="hover:text-orange-500">
+                                            {contact.phone}
+                                        </a>
+                                    </li>
+                                )}
+                                {contact?.email && (
+                                    <li className="flex items-start gap-2">
+                                        <Mail className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                                        <a href={`mailto:${contact.email}`} className="break-all hover:text-orange-500">
+                                            {contact.email}
+                                        </a>
+                                    </li>
                                 )}
                             </ul>
                         </div>

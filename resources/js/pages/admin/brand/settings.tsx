@@ -18,6 +18,11 @@ interface Props {
         code: string;
         symbol: string;
     };
+    contact: {
+        address: string;
+        phone: string;
+        email: string;
+    };
 }
 
 const CURRENCY_PRESETS = [
@@ -32,7 +37,7 @@ const CURRENCY_PRESETS = [
     { code: 'AED', symbol: 'د.إ', label: 'UAE Dirham' },
 ];
 
-export default function BrandSettings({ brand, currency }: Props) {
+export default function BrandSettings({ brand, currency, contact }: Props) {
     const { flash } = usePage<SharedData>().props;
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -42,12 +47,18 @@ export default function BrandSettings({ brand, currency }: Props) {
         remove_logo: boolean;
         currency_code: string;
         currency_symbol: string;
+        contact_address: string;
+        contact_phone: string;
+        contact_email: string;
     }>({
         name: brand.name,
         logo: null,
         remove_logo: false,
         currency_code: currency.code,
         currency_symbol: currency.symbol,
+        contact_address: contact.address,
+        contact_phone: contact.phone,
+        contact_email: contact.email,
     });
 
     const nameParts = form.data.name.trim().split(/\s+/);
@@ -76,8 +87,9 @@ export default function BrandSettings({ brand, currency }: Props) {
             <div className="mb-4">
                 <h1 className="text-lg font-bold text-gray-900">Brand &amp; Currency</h1>
                 <p className="mt-1 text-sm text-gray-500">
-                    This is the single place that controls the brand name, logo and currency across the whole site — the
-                    header, footer, page titles, prices, invoices and emails all follow what you set here.
+                    This is the single place that controls the brand name, logo, currency and contact details across the
+                    whole site — the header, footer, page titles, prices, invoices, the contact page and emails all follow
+                    what you set here.
                 </p>
             </div>
 
@@ -238,6 +250,63 @@ export default function BrandSettings({ brand, currency }: Props) {
                         </span>{' '}
                         <span className="text-gray-400">({form.data.currency_code})</span>
                     </p>
+                </div>
+
+                <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+                    <Label>Contact details</Label>
+                    <p className="mt-1 text-xs text-gray-500">
+                        Shown in the site footer and on the Contact page. Leave a field empty to hide it.
+                    </p>
+
+                    <div className="mt-4 space-y-4">
+                        <div>
+                            <Label htmlFor="contact-address" className="text-xs text-gray-500">
+                                Address
+                            </Label>
+                            <Input
+                                id="contact-address"
+                                value={form.data.contact_address}
+                                onChange={(e) => form.setData('contact_address', e.target.value)}
+                                className="mt-1"
+                                maxLength={255}
+                                placeholder="No.204/2/A, Gramasanwardhana Mawatha, Kiula, Hungama, Ambalantota"
+                            />
+                            <InputError message={form.errors.contact_address} />
+                        </div>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <Label htmlFor="contact-phone" className="text-xs text-gray-500">
+                                    Phone
+                                </Label>
+                                <Input
+                                    id="contact-phone"
+                                    value={form.data.contact_phone}
+                                    onChange={(e) => form.setData('contact_phone', e.target.value)}
+                                    className="mt-1"
+                                    maxLength={40}
+                                    placeholder="+94 70 321 7775"
+                                />
+                                <InputError message={form.errors.contact_phone} />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="contact-email" className="text-xs text-gray-500">
+                                    Email
+                                </Label>
+                                <Input
+                                    id="contact-email"
+                                    type="email"
+                                    value={form.data.contact_email}
+                                    onChange={(e) => form.setData('contact_email', e.target.value)}
+                                    className="mt-1"
+                                    maxLength={120}
+                                    placeholder="support@nabobholdings.com"
+                                />
+                                <InputError message={form.errors.contact_email} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <Button type="submit" disabled={form.processing} className="bg-blue-600 hover:bg-blue-700">
