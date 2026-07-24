@@ -12,6 +12,7 @@ import FloatingChatWidget from './components/chat/floating-chat-widget';
 import ChatSoundListener from './components/chat/chat-sound-listener';
 import FlashToastListener from './components/shop/flash-toast-listener';
 import { setCsrfToken } from './lib/csrf';
+import { setCurrencySymbol } from '@/types/marketplace';
 
 declare global {
     const route: typeof routeFn;
@@ -37,13 +38,20 @@ createInertiaApp({
         }),
     setup({ el, App, props }) {
         const root = createRoot(el);
-        const initialProps = props.initialPage.props as { csrfToken?: string; brand?: { name?: string } };
+        const initialProps = props.initialPage.props as {
+            csrfToken?: string;
+            brand?: { name?: string };
+            currency?: { symbol?: string };
+        };
         const initialToken = initialProps.csrfToken;
         if (initialToken) {
             setCsrfToken(initialToken);
         }
         if (initialProps.brand?.name) {
             appName = initialProps.brand.name;
+        }
+        if (initialProps.currency?.symbol) {
+            setCurrencySymbol(initialProps.currency.symbol);
         }
 
         root.render(
@@ -60,12 +68,19 @@ createInertiaApp({
 });
 
 router.on('success', (event) => {
-    const props = event.detail.page.props as { csrfToken?: string; brand?: { name?: string } };
+    const props = event.detail.page.props as {
+        csrfToken?: string;
+        brand?: { name?: string };
+        currency?: { symbol?: string };
+    };
     if (props.csrfToken) {
         setCsrfToken(props.csrfToken);
     }
     if (props.brand?.name) {
         appName = props.brand.name;
+    }
+    if (props.currency?.symbol) {
+        setCurrencySymbol(props.currency.symbol);
     }
 });
 

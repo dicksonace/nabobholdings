@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Services\PlatformSettings;
 use App\Services\WalletService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -106,7 +107,7 @@ class WalletFundingController extends Controller
 
                 return back()->with(
                     'success',
-                    'GH₵'.number_format($amount, 2).' removed from '.$target->name."'s wallet.",
+                    PlatformSettings::formatMoney($amount).' removed from '.$target->name."'s wallet.",
                 );
             }
 
@@ -119,7 +120,7 @@ class WalletFundingController extends Controller
 
             return back()->with(
                 'success',
-                'GH₵'.number_format($amount, 2).' added to '.$target->name."'s wallet.",
+                PlatformSettings::formatMoney($amount).' added to '.$target->name."'s wallet.",
             );
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());

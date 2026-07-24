@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { formatPrice } from '@/types/marketplace';
+import { formatPrice, getCurrencySymbol } from '@/types/marketplace';
 
 interface WalletBalanceCardProps {
     balance: number;
@@ -202,7 +202,7 @@ export default function WalletBalanceCard({
                         ) : (
                             <form onSubmit={submitPaystack} className="mt-5 space-y-4">
                                 <div>
-                                    <Label htmlFor="topup-amount">Amount (GH₵)</Label>
+                                    <Label htmlFor="topup-amount">Amount ({getCurrencySymbol()})</Label>
                                     <Input
                                         id="topup-amount"
                                         type="number"

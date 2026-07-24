@@ -26,9 +26,15 @@ export interface Brand {
     logo: string | null;
 }
 
+export interface Currency {
+    code: string;
+    symbol: string;
+}
+
 export interface SharedData {
     name: string;
     brand: Brand;
+    currency: Currency;
     csrfToken?: string;
     quote: { message: string; author: string };
     auth: Auth;

@@ -159,7 +159,7 @@
         $order->digital_address,
         collect([$order->city, $order->region])->filter()->implode(', '),
     ]));
-    $money = fn (float $n) => 'GHS '.number_format($n, 2);
+    $money = fn (float $n) => \App\Services\PlatformSettings::formatMoney($n);
     $storeAddress = $storeAddress ?? null;
     $storeLocation = $storeLocation ?? null;
 @endphp

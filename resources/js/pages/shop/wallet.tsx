@@ -13,6 +13,7 @@ import ShopLayout from '@/layouts/shop-layout';
 import {
     formatPrice,
     formatWalletTransactionType,
+    getCurrencySymbol,
     Paginated,
     Wallet,
     WalletTransaction,
@@ -106,7 +107,7 @@ export default function BuyerWallet({ wallet, transactions, paystackConfigured, 
                         <p className="mt-1 text-sm text-gray-500">Top up via Paystack (MoMo or card).</p>
                         <div className="mt-4 space-y-3">
                             <div>
-                                <Label>Amount (GH₵)</Label>
+                                <Label>Amount ({getCurrencySymbol()})</Label>
                                 <Input
                                     type="number"
                                     step="0.01"
@@ -175,7 +176,7 @@ export default function BuyerWallet({ wallet, transactions, paystackConfigured, 
                                 <InputError message={withdrawForm.errors.account_name} />
                             </div>
                             <div>
-                                <Label>Amount (GH₵)</Label>
+                                <Label>Amount ({getCurrencySymbol()})</Label>
                                 <Input
                                     type="number"
                                     step="0.01"

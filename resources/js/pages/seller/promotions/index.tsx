@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import SellerLayout from '@/layouts/seller-layout';
-import { formatPrice, Paginated } from '@/types/marketplace';
+import { formatPrice, getCurrencySymbol, Paginated } from '@/types/marketplace';
 
 interface Coupon {
     id: number;
@@ -65,14 +65,14 @@ export default function PromotionsIndex({ coupons, types }: PromotionsProps) {
                                 </select>
                             </div>
                             <div>
-                                <Label>Value {form.data.type === 'percentage' ? '(%)' : '(GH₵)'}</Label>
+                                <Label>Value {form.data.type === 'percentage' ? '(%)' : `(${getCurrencySymbol()})`}</Label>
                                 <Input type="number" step="0.01" value={form.data.value} onChange={(e) => form.setData('value', e.target.value)} required className="mt-1" />
                                 <InputError message={form.errors.value} />
                             </div>
                         </div>
                         <div className="grid gap-3 sm:grid-cols-2">
                             <div>
-                                <Label>Min order (GH₵)</Label>
+                                <Label>Min order ({getCurrencySymbol()})</Label>
                                 <Input type="number" step="0.01" value={form.data.min_order_amount} onChange={(e) => form.setData('min_order_amount', e.target.value)} className="mt-1" />
                             </div>
                             <div>

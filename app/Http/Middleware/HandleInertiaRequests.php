@@ -64,6 +64,7 @@ class HandleInertiaRequests extends Middleware
             'csrfToken' => csrf_token(),
             'name' => $brand['name'],
             'brand' => $brand,
+            'currency' => PlatformSettings::currency(),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $user ? $user->load('sellerProfile') : null,

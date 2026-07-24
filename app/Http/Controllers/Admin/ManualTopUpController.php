@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\WalletTopUpStatus;
 use App\Http\Controllers\Controller;
 use App\Models\WalletTopUpRequest;
+use App\Services\PlatformSettings;
 use App\Services\WalletService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -105,7 +106,7 @@ class ManualTopUpController extends Controller
 
         return back()->with(
             'success',
-            'Approved. GH₵'.number_format((float) $topUp->amount, 2).' credited to the user’s wallet.',
+            'Approved. '.PlatformSettings::formatMoney((float) $topUp->amount).' credited to the user’s wallet.',
         );
     }
 

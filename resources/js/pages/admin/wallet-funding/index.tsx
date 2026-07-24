@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin-layout';
-import { formatPrice, Paginated } from '@/types/marketplace';
+import { formatPrice, getCurrencySymbol, Paginated } from '@/types/marketplace';
 import { SharedData } from '@/types';
 
 interface WalletUser {
@@ -327,7 +327,7 @@ export default function AdminWalletFunding({ users, role, search, recentFundings
                                 </div>
                             </div>
                             <div>
-                                <Label htmlFor="amount">Amount (GH₵) *</Label>
+                                <Label htmlFor="amount">Amount ({getCurrencySymbol()}) *</Label>
                                 <Input
                                     id="amount"
                                     type="number"

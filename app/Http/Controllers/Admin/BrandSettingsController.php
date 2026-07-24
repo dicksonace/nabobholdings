@@ -16,6 +16,7 @@ class BrandSettingsController extends Controller
     {
         return Inertia::render('admin/brand/settings', [
             'brand' => PlatformSettings::brand(),
+            'currency' => PlatformSettings::currency(),
         ]);
     }
 
@@ -25,9 +26,13 @@ class BrandSettingsController extends Controller
             'name' => ['required', 'string', 'max:100'],
             'logo' => ['nullable', 'image', 'max:5120'],
             'remove_logo' => ['boolean'],
+            'currency_code' => ['required', 'string', 'max:10'],
+            'currency_symbol' => ['required', 'string', 'max:8'],
         ]);
 
         PlatformSettings::set(PlatformSettings::BRAND_NAME_KEY, trim($validated['name']));
+        PlatformSettings::set(PlatformSettings::CURRENCY_CODE_KEY, strtoupper(trim($validated['currency_code'])));
+        PlatformSettings::set(PlatformSettings::CURRENCY_SYMBOL_KEY, trim($validated['currency_symbol']));
 
         $currentLogo = PlatformSettings::brandLogoPath();
 

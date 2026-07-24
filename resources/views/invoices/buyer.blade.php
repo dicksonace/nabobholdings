@@ -160,14 +160,14 @@
                     <td class="center mid">{{ $line['quantity'] ?? 1 }}</td>
                     <td class="right mid">
                         @if (isset($line['unit_price']))
-                            GH₵{{ number_format((float) $line['unit_price'], 2) }}
+                            {{ \App\Services\PlatformSettings::formatMoney((float) $line['unit_price']) }}
                         @else
                             —
                         @endif
                     </td>
                     <td class="right mid" style="font-weight: bold;">
                         @if (isset($line['total']))
-                            GH₵{{ number_format((float) $line['total'], 2) }}
+                            {{ \App\Services\PlatformSettings::formatMoney((float) $line['total']) }}
                         @else
                             —
                         @endif
@@ -180,17 +180,17 @@
     <table class="totals">
         <tr>
             <td>Subtotal</td>
-            <td class="right">GH₵{{ number_format((float) $invoice->subtotal, 2) }}</td>
+            <td class="right">{{ \App\Services\PlatformSettings::formatMoney((float) $invoice->subtotal) }}</td>
         </tr>
         @if ((float) $invoice->shipping_cost > 0)
             <tr>
                 <td>Shipping</td>
-                <td class="right">GH₵{{ number_format((float) $invoice->shipping_cost, 2) }}</td>
+                <td class="right">{{ \App\Services\PlatformSettings::formatMoney((float) $invoice->shipping_cost) }}</td>
             </tr>
         @endif
         <tr class="grand">
             <td>Total</td>
-            <td class="right amount">GH₵{{ number_format((float) $invoice->total, 2) }}</td>
+            <td class="right amount">{{ \App\Services\PlatformSettings::formatMoney((float) $invoice->total) }}</td>
         </tr>
     </table>
 

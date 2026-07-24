@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Channels\SmsChannel;
 use App\Models\Checkout;
 use App\Models\Order;
+use App\Services\PlatformSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -39,7 +40,7 @@ class OrderPlacedNotification extends Notification implements ShouldQueue
             ->subject("Order {$number} placed")
             ->greeting('Hello '.$notifiable->name.'!')
             ->line($message)
-            ->line('Order total: GH₵'.number_format((float) $total, 2))
+            ->line('Order total: '.PlatformSettings::formatMoney((float) $total))
             ->action('View Order', $checkout ? route('checkouts.show', $checkout) : route('orders.show', $this->order));
     }
 
@@ -49,6 +50,6 @@ class OrderPlacedNotification extends Notification implements ShouldQueue
         $number = $checkout?->checkout_number ?? $this->order->order_number;
         $total = $checkout?->total ?? $this->order->total;
 
-        return "Nabob Holdings: Order {$number} placed. Total GH₵".number_format((float) $total, 2).'.';
+        return "Nabob Holdings: Order {$number} placed. Total ".PlatformSettings::formatMoney((float) $total).'.';
     }
 }

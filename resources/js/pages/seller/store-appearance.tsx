@@ -12,7 +12,7 @@ import SellerLayout from '@/layouts/seller-layout';
 import { publishStore, resetStore, submitStoreDraft } from '@/lib/store-customization-form';
 import { Paginated, Product, SellerProfile } from '@/types/marketplace';
 import { SECTION_LABELS, StoreCustomizationSettings, ThemePreset } from '@/types/store-customization';
-import { productImageUrl } from '@/types/marketplace';
+import { getCurrencySymbol, productImageUrl } from '@/types/marketplace';
 import { SharedData } from '@/types';
 
 interface StoreAppearanceProps {
@@ -318,7 +318,7 @@ export default function StoreAppearance({
                         {tab === 'announcement' && (
                             <div className="space-y-4">
                                 <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={settings.announcement.enabled} onChange={(e) => setSettings({ ...settings, announcement: { ...settings.announcement, enabled: e.target.checked } })} /> Enable announcement bar</label>
-                                <div><Label>Message</Label><Input value={settings.announcement.text} onChange={(e) => setSettings({ ...settings, announcement: { ...settings.announcement, text: e.target.value } })} className="mt-1" placeholder="Free delivery on orders above GHS 200" /></div>
+                                <div><Label>Message</Label><Input value={settings.announcement.text} onChange={(e) => setSettings({ ...settings, announcement: { ...settings.announcement, text: e.target.value } })} className="mt-1" placeholder={`Free delivery on orders above ${getCurrencySymbol()}200`} /></div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div><Label>Background</Label><Input type="color" value={settings.announcement.background_color} onChange={(e) => setSettings({ ...settings, announcement: { ...settings.announcement, background_color: e.target.value } })} className="mt-1 h-9" /></div>
                                     <div><Label>Text color</Label><Input type="color" value={settings.announcement.text_color} onChange={(e) => setSettings({ ...settings, announcement: { ...settings.announcement, text_color: e.target.value } })} className="mt-1 h-9" /></div>

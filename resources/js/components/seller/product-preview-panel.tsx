@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import ProductCard from '@/components/shop/product-card';
-import { Category, Product, SellerProfile, productImageUrl } from '@/types/marketplace';
+import { Category, getCurrencySymbol, Product, SellerProfile, productImageUrl } from '@/types/marketplace';
 
 export interface ProductPreviewData {
     name: string;
@@ -110,16 +110,16 @@ export default function ProductPreviewPanel({
                             {category && <p className="text-xs font-semibold uppercase text-blue-500">{category.name}</p>}
                             <h2 className="text-lg font-bold text-gray-900">{data.name || 'Product name'}</h2>
                             <p className="mt-2 text-2xl font-bold text-orange-500">
-                                GH₵ {(discount && discount < price ? discount : price).toFixed(2)}
+                                {getCurrencySymbol()} {(discount && discount < price ? discount : price).toFixed(2)}
                             </p>
                             {discount && discount < price && (
-                                <p className="text-sm text-gray-400 line-through">GH₵ {price.toFixed(2)}</p>
+                                <p className="text-sm text-gray-400 line-through">{getCurrencySymbol()} {price.toFixed(2)}</p>
                             )}
                         </div>
                         {data.free_shipping ? (
                             <p className="text-sm text-emerald-600">✓ Free delivery</p>
                         ) : data.delivery_fee ? (
-                            <p className="text-sm text-gray-600">Delivery: GH₵ {parseFloat(data.delivery_fee).toFixed(2)}</p>
+                            <p className="text-sm text-gray-600">Delivery: {getCurrencySymbol()} {parseFloat(data.delivery_fee).toFixed(2)}</p>
                         ) : null}
                         {data.delivery_days && (
                             <p className="text-xs text-gray-500">Est. delivery: {data.delivery_days} days</p>

@@ -14,6 +14,14 @@ class PlatformSettings
 
     public const BRAND_LOGO_KEY = 'brand_logo';
 
+    public const CURRENCY_CODE_KEY = 'currency_code';
+
+    public const CURRENCY_SYMBOL_KEY = 'currency_symbol';
+
+    public const DEFAULT_CURRENCY_CODE = 'USD';
+
+    public const DEFAULT_CURRENCY_SYMBOL = '$';
+
     /**
      * The single source of truth for the site brand name.
      * Falls back to config/app.name (seeded from the APP_NAME env var).
@@ -54,6 +62,49 @@ class PlatformSettings
             'name' => static::brandName(),
             'logo' => static::brandLogoUrl(),
         ];
+    }
+
+    /**
+     * The ISO-style currency code shown across the app (e.g. USD, GHS, NGN).
+     */
+    public static function currencyCode(): string
+    {
+        $code = static::get(self::CURRENCY_CODE_KEY);
+        $code = is_string($code) ? strtoupper(trim($code)) : '';
+
+        return $code !== '' ? $code : self::DEFAULT_CURRENCY_CODE;
+    }
+
+    /**
+     * The currency symbol prefixed to every amount (e.g. $, GH₵, ₦).
+     */
+    public static function currencySymbol(): string
+    {
+        $symbol = static::get(self::CURRENCY_SYMBOL_KEY);
+        $symbol = is_string($symbol) ? trim($symbol) : '';
+
+        return $symbol !== '' ? $symbol : self::DEFAULT_CURRENCY_SYMBOL;
+    }
+
+    /**
+     * Currency payload shared with every page.
+     *
+     * @return array{code: string, symbol: string}
+     */
+    public static function currency(): array
+    {
+        return [
+            'code' => static::currencyCode(),
+            'symbol' => static::currencySymbol(),
+        ];
+    }
+
+    /**
+     * Format an amount with the configured currency symbol, e.g. "$1,200.00".
+     */
+    public static function formatMoney(float|int|string $amount): string
+    {
+        return static::currencySymbol().number_format((float) $amount, 2);
     }
 
     public static function get(string $key, mixed $default = null): mixed

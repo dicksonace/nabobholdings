@@ -6,6 +6,7 @@ use App\Enums\FundsReleaseStatus;
 use App\Http\Controllers\Controller;
 use App\Models\OrderItem;
 use App\Services\OrderService;
+use App\Services\PlatformSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -126,14 +127,14 @@ class PendingFundController extends Controller
         }
 
         $total = round(($released['product'] ?? 0) + ($released['shipping'] ?? 0), 2);
-        $parts = ['product GH₵'.number_format((float) $released['product'], 2)];
+        $parts = ['product '.PlatformSettings::formatMoney((float) $released['product'])];
         if (($released['shipping'] ?? 0) > 0) {
-            $parts[] = 'shipping GH₵'.number_format((float) $released['shipping'], 2);
+            $parts[] = 'shipping '.PlatformSettings::formatMoney((float) $released['shipping']);
         }
 
         return back()->with(
             'success',
-            'Funds released to seller Available balance (GH₵'.number_format($total, 2).': '.implode(' + ', $parts).'). Buyer still confirms delivery to complete the order (no second release).',
+            'Funds released to seller Available balance ('.PlatformSettings::formatMoney($total).': '.implode(' + ', $parts).'). Buyer still confirms delivery to complete the order (no second release).',
         );
     }
 

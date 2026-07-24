@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import SellerLayout from '@/layouts/seller-layout';
-import { Category, Product } from '@/types/marketplace';
+import { Category, getCurrencySymbol, Product } from '@/types/marketplace';
 
 interface EditProductProps {
     product: Product;
@@ -173,7 +173,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
                         </select>
                     </div>
                     <div>
-                        <Label>Price (GH₵)</Label>
+                        <Label>Price ({getCurrencySymbol()})</Label>
                         <Input type="number" step="0.01" value={data.price} onChange={(e) => setData('price', e.target.value)} required className="mt-1" />
                     </div>
                     <div>
@@ -230,7 +230,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
                     {shippingType === 'paid' && (
                         <div className="grid gap-3 sm:grid-cols-2">
                             <div>
-                                <Label>Delivery fee (GH₵) *</Label>
+                                <Label>Delivery fee ({getCurrencySymbol()}) *</Label>
                                 <Input
                                     type="number"
                                     step="0.01"

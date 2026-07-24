@@ -270,7 +270,7 @@ class PendingFundReleaseTest extends TestCase
         $this->actingAs($admin)
             ->post(route('admin.pending-funds.approve', $item->id))
             ->assertRedirect()
-            ->assertSessionHas('success', fn ($msg) => str_contains($msg, 'GH₵200.00'));
+            ->assertSessionHas('success', fn ($msg) => str_contains($msg, '$200.00'));
 
         $wallet->refresh();
         $this->assertEquals(0.0, (float) $wallet->pending_balance);

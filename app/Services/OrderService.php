@@ -1711,7 +1711,7 @@ class OrderService
             $seller,
             $amount,
             'Not enough Nabob Holdings wallet balance to cancel this Pay-to-seller order. '
-            .'You need GH₵'.number_format($amount, 2).' available. '
+            .'You need '.PlatformSettings::formatMoney($amount).' available. '
             .'Top up your seller wallet first, then try again.',
         );
 
@@ -1741,7 +1741,7 @@ class OrderService
         WalletService::debitAvailable(
             $seller,
             $amount,
-            'Not enough Nabob Holdings wallet balance to refund shipping (GH₵'.number_format($amount, 2).'). '
+            'Not enough Nabob Holdings wallet balance to refund shipping ('.PlatformSettings::formatMoney($amount).'). '
             .'Top up your seller wallet first, then cancel again.',
         );
 

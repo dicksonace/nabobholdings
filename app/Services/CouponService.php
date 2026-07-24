@@ -29,7 +29,7 @@ class CouponService
 
         if ($subtotal < (float) $coupon->min_order_amount) {
             throw ValidationException::withMessages([
-                'coupon' => 'Minimum order amount of GH₵'.number_format($coupon->min_order_amount, 2).' required.',
+                'coupon' => 'Minimum order amount of '.PlatformSettings::formatMoney($coupon->min_order_amount).' required.',
             ]);
         }
 

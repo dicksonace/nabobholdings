@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import {
     formatPrice,
     formatWalletTransactionType,
+    getCurrencySymbol,
     Paginated,
     Wallet,
     WalletTransaction,
@@ -155,7 +156,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                 subtitle={
                     wallet.available_balance >= 10
                         ? `You can withdraw up to ${formatPrice(wallet.available_balance)} to your MoMo wallet. Pick your network first — MTN MoMo is most common.`
-                        : 'Add a MoMo payout method below. Minimum withdrawal is GH₵10.'
+                        : `Add a MoMo payout method below. Minimum withdrawal is ${getCurrencySymbol()}10.`
                 }
                 className="mb-6"
             >
@@ -232,7 +233,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                                     <p className="text-gray-600">{selectedMethod.account_number} · {selectedMethod.account_name}</p>
                                 </div>
                                 <div>
-                                    <Label className="text-base font-semibold">2. Enter amount (GH₵)</Label>
+                                    <Label className="text-base font-semibold">2. Enter amount ({getCurrencySymbol()})</Label>
                                     <Input
                                         type="number"
                                         step="0.01"
@@ -251,7 +252,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                                     >
                                         Withdraw all ({formatPrice(wallet.available_balance)})
                                     </button>
-                                    <p className="mt-2 text-xs text-gray-500">Minimum withdrawal: GH₵10</p>
+                                    <p className="mt-2 text-xs text-gray-500">Minimum withdrawal: {getCurrencySymbol()}10</p>
                                 </div>
                             </div>
                         )}

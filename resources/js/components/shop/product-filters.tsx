@@ -5,7 +5,7 @@ import { ReactNode, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { formatPrice } from '@/types/marketplace';
+import { formatPrice, getCurrencySymbol } from '@/types/marketplace';
 
 export interface ShopFilters {
     search?: string;
@@ -58,13 +58,17 @@ function FilterSection({ title, defaultOpen = true, children }: { title: string;
     );
 }
 
-const pricePresets = [
-    { label: 'Under GH₵100', min: '', max: '100' },
-    { label: 'GH₵100 – GH₵500', min: '100', max: '500' },
-    { label: 'GH₵500 – GH₵2,000', min: '500', max: '2000' },
-    { label: 'GH₵2,000 – GH₵5,000', min: '2000', max: '5000' },
-    { label: 'Over GH₵5,000', min: '5000', max: '' },
-];
+function pricePresets() {
+    const c = getCurrencySymbol();
+
+    return [
+        { label: `Under ${c}100`, min: '', max: '100' },
+        { label: `${c}100 – ${c}500`, min: '100', max: '500' },
+        { label: `${c}500 – ${c}2,000`, min: '500', max: '2000' },
+        { label: `${c}2,000 – ${c}5,000`, min: '2000', max: '5000' },
+        { label: `Over ${c}5,000`, min: '5000', max: '' },
+    ];
+}
 
 export function applyFilters(updates: Partial<ShopFilters>, current: ShopFilters) {
     const merged = { ...current, ...updates };
@@ -178,7 +182,7 @@ export default function ProductFilters({ filters, categories, brands, priceRange
                     Apply
                 </Button>
                 <div className="mt-2 space-y-1">
-                    {pricePresets.map((preset) => (
+                    {pricePresets().map((preset) => (
                         <button
                             key={preset.label}
                             type="button"

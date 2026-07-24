@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Channels\SmsChannel;
 use App\Models\OrderItem;
+use App\Services\PlatformSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -50,7 +51,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
         }
 
         if ($this->refunded && $this->refundAmount > 0) {
-            $mail->line('GH₵'.number_format($this->refundAmount, 2).' has been credited to your Nabob Holdings wallet.');
+            $mail->line(PlatformSettings::formatMoney($this->refundAmount).' has been credited to your Nabob Holdings wallet.');
         }
 
         if ($this->orderItem->tracking_number) {
@@ -68,7 +69,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
         $message = "Nabob Holdings: {$this->orderItem->product_name} is now {$statusLabel}. Order {$this->orderItem->order->order_number}.";
 
         if ($this->refunded && $this->refundAmount > 0) {
-            $message .= ' GH₵'.number_format($this->refundAmount, 2).' refunded to your wallet.';
+            $message .= ' '.PlatformSettings::formatMoney($this->refundAmount).' refunded to your wallet.';
         }
 
         return $message;

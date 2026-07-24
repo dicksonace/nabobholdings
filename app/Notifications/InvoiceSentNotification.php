@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Channels\SmsChannel;
 use App\Models\Invoice;
+use App\Services\PlatformSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -32,16 +33,16 @@ class InvoiceSentNotification extends Notification implements ShouldQueue
 
         foreach ($invoice->line_items as $line) {
             $message->line(sprintf(
-                '%s × %d — GH₵%s',
+                '%s × %d — %s',
                 $line['product_name'],
                 $line['quantity'],
-                number_format($line['total'], 2),
+                PlatformSettings::formatMoney($line['total']),
             ));
         }
 
         return $message
-            ->line('Subtotal: GH₵'.number_format((float) $invoice->subtotal, 2))
-            ->line('Total: GH₵'.number_format((float) $invoice->total, 2))
+            ->line('Subtotal: '.PlatformSettings::formatMoney((float) $invoice->subtotal))
+            ->line('Total: '.PlatformSettings::formatMoney((float) $invoice->total))
             ->line('Payment status: '.ucfirst($invoice->payment_status ?? 'pending'))
             ->line('Invoice date: '.$invoice->issued_at->format('d M Y'))
             ->action('View on Nabob Holdings', route('checkouts.show', $checkout));
@@ -49,6 +50,6 @@ class InvoiceSentNotification extends Notification implements ShouldQueue
 
     public function toSms(object $notifiable): string
     {
-        return "Nabob Holdings: Invoice {$this->invoice->invoice_number} for GH₵".number_format((float) $this->invoice->total, 2).'. Payment: '.($this->invoice->payment_status ?? 'pending').'.';
+        return "Nabob Holdings: Invoice {$this->invoice->invoice_number} for ".PlatformSettings::formatMoney((float) $this->invoice->total).'. Payment: '.($this->invoice->payment_status ?? 'pending').'.';
     }
 }

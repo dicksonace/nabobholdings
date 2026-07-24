@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import SellerLayout from '@/layouts/seller-layout';
-import { Category, SellerProfile } from '@/types/marketplace';
+import { Category, getCurrencySymbol, SellerProfile } from '@/types/marketplace';
 import { SharedData } from '@/types';
 
 interface CreateProductProps {
@@ -316,7 +316,7 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
                         {step === 1 && (
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <Label>Price (GH₵) *</Label>
+                                    <Label>Price ({getCurrencySymbol()}) *</Label>
                                     <Input
                                         type="number"
                                         step="0.01"
@@ -374,7 +374,7 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
                                 {shippingType === 'paid' && (
                                     <div className="grid gap-4 sm:grid-cols-2">
                                         <div>
-                                            <Label>Delivery fee (GH₵) *</Label>
+                                            <Label>Delivery fee ({getCurrencySymbol()}) *</Label>
                                             <Input type="number" step="0.01" min="0.01" inputMode="decimal" value={data.delivery_fee} onChange={(e) => setData('delivery_fee', e.target.value)} className="mt-1" />
                                             <InputError message={errors.delivery_fee} />
                                         </div>
@@ -401,7 +401,7 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
                             <div className="space-y-4">
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div>
-                                        <Label>Wholesale price (GH₵)</Label>
+                                        <Label>Wholesale price ({getCurrencySymbol()})</Label>
                                         <Input type="number" step="0.01" inputMode="decimal" value={data.wholesale_price} onChange={(e) => setData('wholesale_price', e.target.value)} className="mt-1" />
                                     </div>
                                     <div>

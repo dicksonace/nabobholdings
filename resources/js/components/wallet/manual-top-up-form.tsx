@@ -19,7 +19,7 @@ import { Label } from '@/components/ui/label';
 import MomoNetworkLogo from '@/components/wallet/momo-network-logo';
 import { MOMO_NETWORKS, momoNetworkLabel, normalizeMomoNetworkId } from '@/lib/momo-networks';
 import { cn } from '@/lib/utils';
-import { formatPrice } from '@/types/marketplace';
+import { formatPrice, getCurrencySymbol } from '@/types/marketplace';
 import { SharedData } from '@/types';
 
 export type FundingAccount = {
@@ -234,7 +234,7 @@ export default function ManualTopUpForm({ settings, requests, walletRoute, submi
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div>
-                        <Label>Amount sent (GH₵)</Label>
+                        <Label>Amount sent ({getCurrencySymbol()})</Label>
                         <Input
                             type="number"
                             step="0.01"

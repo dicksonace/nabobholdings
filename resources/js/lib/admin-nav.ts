@@ -183,7 +183,7 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
             label: 'Settings',
             icon: Settings,
             defaultOpen: section === 'settings',
-            items: [{ key: 'brand', label: 'Brand & Logo', href: route('admin.brand.settings') }],
+            items: [{ key: 'brand', label: 'Brand & Currency', href: route('admin.brand.settings') }],
         },
     ];
 }

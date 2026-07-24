@@ -217,8 +217,22 @@ export interface ProductReview {
     user?: { name: string };
 }
 
+// Currency symbol is admin-configurable and injected from shared Inertia props
+// (see resources/js/app.tsx). Defaults to USD until the real value is set.
+let currencySymbol = '$';
+
+export function setCurrencySymbol(symbol: string): void {
+    if (symbol && symbol.trim() !== '') {
+        currencySymbol = symbol.trim();
+    }
+}
+
+export function getCurrencySymbol(): string {
+    return currencySymbol;
+}
+
 export function formatPrice(amount: number): string {
-    return `GH₵${Number(amount).toFixed(2)}`;
+    return `${currencySymbol}${Number(amount).toFixed(2)}`;
 }
 
 export const orderStatusLabels: Record<string, string> = {

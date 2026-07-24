@@ -48,8 +48,8 @@ class WalletService
             $available = (float) $wallet->available_balance;
             if ($available + 0.0001 < $amount) {
                 throw new \RuntimeException(
-                    'Insufficient available balance. '.$target->name.' has GH₵'.number_format($available, 2)
-                    .' but this debit needs GH₵'.number_format($amount, 2).'.'
+                    'Insufficient available balance. '.$target->name.' has '.PlatformSettings::formatMoney($available)
+                    .' but this debit needs '.PlatformSettings::formatMoney($amount).'.'
                 );
             }
 
