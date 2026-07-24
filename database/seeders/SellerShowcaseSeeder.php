@@ -26,6 +26,8 @@ class SellerShowcaseSeeder extends Seeder
 {
     private const SELLER_EMAIL = 'showcase.seller@nabobholdings.com';
 
+    private const BUYER_EMAIL = 'demo.buyer@nabobholdings.com';
+
     /**
      * @var array<int, array{name: string, category: string, brand: string, price: float}>
      */
@@ -45,12 +47,40 @@ class SellerShowcaseSeeder extends Seeder
     public function run(): void
     {
         $seller = $this->ensureSeller();
+        $this->ensureBuyer();
 
         foreach ($this->products as $definition) {
             $this->createProduct($seller, $definition);
         }
 
         $this->command?->info('Showcase seller ready with '.$seller->products()->count().' products.');
+        $this->command?->info('Demo buyer ready: '.self::BUYER_EMAIL);
+    }
+
+    private function ensureBuyer(): User
+    {
+        $buyer = User::firstOrCreate(
+            ['email' => self::BUYER_EMAIL],
+            [
+                'name' => 'Demo Buyer',
+                'first_name' => 'Demo',
+                'last_name' => 'Buyer',
+                'mobile' => '0246000020',
+                'whatsapp' => '0246000020',
+                'password' => Hash::make('password'),
+                'role' => UserRole::Buyer,
+                'region' => 'Greater Accra',
+                'city' => 'Accra',
+            ],
+        );
+
+        if ($buyer->role !== UserRole::Buyer) {
+            $buyer->update(['role' => UserRole::Buyer]);
+        }
+
+        Wallet::firstOrCreate(['user_id' => $buyer->id]);
+
+        return $buyer;
     }
 
     private function ensureSeller(): User
