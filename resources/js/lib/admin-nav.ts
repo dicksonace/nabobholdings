@@ -1,4 +1,5 @@
 import {
+    BookOpen,
     LayoutDashboard,
     MessageSquare,
     Package,
@@ -35,7 +36,8 @@ export type AdminNavKey =
     | 'seller-reports'
     | 'announcements'
     | 'buyer-announcements'
-    | 'brand';
+    | 'brand'
+    | 'guide';
 
 const sectionMap: Record<AdminNavKey, string> = {
     dashboard: 'dashboard',
@@ -62,6 +64,7 @@ const sectionMap: Record<AdminNavKey, string> = {
     announcements: 'support',
     'buyer-announcements': 'support',
     brand: 'settings',
+    guide: 'guide',
 };
 
 export function adminNavSection(active: AdminNavKey): string {
@@ -184,6 +187,13 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
             icon: Settings,
             defaultOpen: section === 'settings',
             items: [{ key: 'brand', label: 'Brand & Currency', href: route('admin.brand.settings') }],
+        },
+        {
+            key: 'guide',
+            label: 'Help',
+            icon: BookOpen,
+            defaultOpen: section === 'guide',
+            items: [{ key: 'guide', label: 'How it works', href: route('admin.guide') }],
         },
     ];
 }

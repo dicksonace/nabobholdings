@@ -4,12 +4,14 @@ namespace App\Models;
 
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -22,6 +24,7 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'avatar',
         'mobile',
         'whatsapp',
         'password',
@@ -138,5 +141,15 @@ class User extends Authenticatable
         }
 
         return $this->name;
+    }
+
+    /**
+     * Return the avatar as a public URL while storing only the relative path.
+     */
+    protected function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? Storage::disk('public')->url($value) : null,
+        );
     }
 }

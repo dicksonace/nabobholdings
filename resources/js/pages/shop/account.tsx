@@ -19,9 +19,17 @@ export default function BuyerAccount() {
             <Head title="Profile" />
             <div className="mx-auto max-w-lg px-3 py-4 sm:px-4 sm:py-8">
                 <div className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-xl font-bold text-orange-600">
-                        {auth.user?.name?.charAt(0)?.toUpperCase() ?? '?'}
-                    </div>
+                    {auth.user?.avatar ? (
+                        <img
+                            src={auth.user.avatar}
+                            alt={auth.user?.name ?? 'Profile'}
+                            className="h-14 w-14 shrink-0 rounded-full object-cover ring-1 ring-orange-100"
+                        />
+                    ) : (
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xl font-bold text-orange-600">
+                            {auth.user?.name?.charAt(0)?.toUpperCase() ?? '?'}
+                        </div>
+                    )}
                     <div className="min-w-0">
                         <p className="truncate text-lg font-semibold text-gray-900">{auth.user?.name}</p>
                         <p className="truncate text-sm text-gray-500">{auth.user?.email}</p>

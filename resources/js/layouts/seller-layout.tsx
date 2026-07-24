@@ -16,9 +16,11 @@ import NotificationBell from '@/components/shop/notification-bell';
 import PanelSidebarNav from '@/components/panel/panel-sidebar-nav';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useInitials } from '@/hooks/use-initials';
 import { SellerNavKey, sellerMobileNavItems, sellerNavGroups, sellerNavSection } from '@/lib/seller-nav';
 import { isNavSubItemActive } from '@/lib/panel-nav-utils';
 import { cn } from '@/lib/utils';
+import { SharedData } from '@/types';
 
 const mobileIcons: Record<string, typeof LayoutDashboard> = {
     overview: LayoutDashboard,
@@ -79,7 +81,9 @@ function SellerSidebar({
 }
 
 export default function SellerLayout({ children, title, active, showFab = false }: SellerLayoutProps) {
-    const { url } = usePage();
+    const { url, props } = usePage<SharedData>();
+    const user = props.auth?.user;
+    const getInitials = useInitials();
     const mobileNav = sellerMobileNavItems(active);
     const [menuOpen, setMenuOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
@@ -125,6 +129,23 @@ export default function SellerLayout({ children, title, active, showFab = false 
                                         <Plus className="mr-1 h-4 w-4" />
                                         Add
                                     </Button>
+                                </Link>
+                                <Link
+                                    href={route('profile.edit')}
+                                    aria-label="Profile settings"
+                                    className="ml-1 shrink-0 rounded-full transition hover:opacity-90"
+                                >
+                                    {user?.avatar ? (
+                                        <img
+                                            src={user.avatar}
+                                            alt={user.name}
+                                            className="h-9 w-9 rounded-full object-cover ring-2 ring-orange-100"
+                                        />
+                                    ) : (
+                                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600 ring-2 ring-orange-100">
+                                            {getInitials(user?.name ?? '')}
+                                        </span>
+                                    )}
                                 </Link>
                             </div>
                         </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SellerAnnouncementController as AdminSellerAnnoun
 use App\Http\Controllers\Admin\SellerReportController as AdminSellerReportController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DisputeController as AdminDisputeController;
+use App\Http\Controllers\Admin\GuideController as AdminGuideController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SellerController as AdminSellerController;
@@ -205,6 +206,8 @@ Route::prefix('seller')->name('seller.')->middleware(['auth', 'role:seller'])->g
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/guide', AdminGuideController::class)->name('guide');
 
     Route::get('/brand', [AdminBrandSettingsController::class, 'edit'])->name('brand.settings');
     Route::post('/brand', [AdminBrandSettingsController::class, 'update'])->name('brand.settings.update');

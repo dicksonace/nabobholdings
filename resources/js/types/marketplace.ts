@@ -249,7 +249,6 @@ export const orderStatusLabels: Record<string, string> = {
 
 export const orderFulfillmentSteps = [
     { key: 'processing', label: 'Processing' },
-    { key: 'call_confirmed', label: 'Call buyer' },
     { key: 'packed', label: 'Packing' },
     { key: 'shipped', label: 'Out for delivery' },
     { key: 'awaiting_confirmation', label: 'Delivered' },
