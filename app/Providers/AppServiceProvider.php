@@ -30,7 +30,12 @@ class AppServiceProvider extends ServiceProvider
         // which feeds the page <title>, mail "from" name, and every backend brand reference.
         // Guarded so console/migration/no-DB boots never fail.
         try {
-            config(['app.name' => PlatformSettings::brandName()]);
+            $brandName = PlatformSettings::brandName();
+            config([
+                'app.name' => $brandName,
+                // Keep the outgoing email sender name in sync with the brand.
+                'mail.from.name' => $brandName,
+            ]);
         } catch (Throwable) {
             // Settings table not available yet (e.g. first migration) — keep the env default.
         }
