@@ -39,7 +39,7 @@ class WithdrawalPayoutService
                 $recipientCode,
                 (float) $withdrawal->amount,
                 $reference,
-                'CityShop wallet withdrawal #'.$withdrawal->id,
+                'Nabob Holdings wallet withdrawal #'.$withdrawal->id,
             );
 
             $transferStatus = (string) ($transfer['status'] ?? 'pending');

@@ -34,7 +34,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
             'awaiting_confirmation' => 'Your order was delivered — please confirm receipt',
             'delivered' => 'Your order is complete',
             'cancelled' => $this->isAdminCancel()
-                ? 'Your order was cancelled by CityShop support'
+                ? 'Your order was cancelled by Nabob Holdings support'
                 : 'Your order was cancelled by the seller',
         ];
 
@@ -50,7 +50,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
         }
 
         if ($this->refunded && $this->refundAmount > 0) {
-            $mail->line('GH₵'.number_format($this->refundAmount, 2).' has been credited to your CityShop wallet.');
+            $mail->line('GH₵'.number_format($this->refundAmount, 2).' has been credited to your Nabob Holdings wallet.');
         }
 
         if ($this->orderItem->tracking_number) {
@@ -65,7 +65,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
         $this->orderItem->loadMissing('order');
 
         $statusLabel = $this->statusLabel();
-        $message = "CityShop: {$this->orderItem->product_name} is now {$statusLabel}. Order {$this->orderItem->order->order_number}.";
+        $message = "Nabob Holdings: {$this->orderItem->product_name} is now {$statusLabel}. Order {$this->orderItem->order->order_number}.";
 
         if ($this->refunded && $this->refundAmount > 0) {
             $message .= ' GH₵'.number_format($this->refundAmount, 2).' refunded to your wallet.';
@@ -82,7 +82,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
             'shipped' => 'out for delivery',
             'awaiting_confirmation' => 'delivered — confirm receipt',
             'delivered' => 'complete',
-            'cancelled' => $this->isAdminCancel() ? 'cancelled by CityShop support' : 'cancelled',
+            'cancelled' => $this->isAdminCancel() ? 'cancelled by Nabob Holdings support' : 'cancelled',
             default => $this->status,
         };
     }

@@ -2,6 +2,7 @@ import {
     LayoutDashboard,
     MessageSquare,
     Package,
+    Settings,
     ShoppingCart,
     Store,
     Users,
@@ -33,7 +34,8 @@ export type AdminNavKey =
     | 'chats'
     | 'seller-reports'
     | 'announcements'
-    | 'buyer-announcements';
+    | 'buyer-announcements'
+    | 'brand';
 
 const sectionMap: Record<AdminNavKey, string> = {
     dashboard: 'dashboard',
@@ -59,6 +61,7 @@ const sectionMap: Record<AdminNavKey, string> = {
     'seller-reports': 'support',
     announcements: 'support',
     'buyer-announcements': 'support',
+    brand: 'settings',
 };
 
 export function adminNavSection(active: AdminNavKey): string {
@@ -174,6 +177,13 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
                 { key: 'seller-reports', label: 'Seller Reports', href: route('admin.seller-reports.index'), badgeKey: 'open_seller_reports' },
                 { key: 'messages', label: 'Contact Messages', href: route('admin.contact-messages.index'), badgeKey: 'unread_messages' },
             ],
+        },
+        {
+            key: 'settings',
+            label: 'Settings',
+            icon: Settings,
+            defaultOpen: section === 'settings',
+            items: [{ key: 'brand', label: 'Brand & Logo', href: route('admin.brand.settings') }],
         },
     ];
 }

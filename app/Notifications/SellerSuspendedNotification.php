@@ -22,15 +22,15 @@ class SellerSuspendedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Your CityShop seller account has been suspended')
+            ->subject('Your Nabob Holdings seller account has been suspended')
             ->greeting('Hello '.$notifiable->name.',')
-            ->line('Your seller account has been blocked by CityShop admin. Your products are no longer visible to buyers.')
+            ->line('Your seller account has been blocked by Nabob Holdings admin. Your products are no longer visible to buyers.')
             ->line("Reason: {$this->reason}")
             ->line('Contact support if you believe this was a mistake.');
     }
 
     public function toSms(object $notifiable): string
     {
-        return 'CityShop: Your seller account has been suspended. Your products are hidden. Check your email for details.';
+        return 'Nabob Holdings: Your seller account has been suspended. Your products are hidden. Check your email for details.';
     }
 }

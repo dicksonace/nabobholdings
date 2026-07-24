@@ -72,8 +72,8 @@ export default function ImageSearchPage({
                     <p className="mt-2 text-center text-sm text-gray-500">
                         {hasSearched
                             ? scopedStore
-                                ? `Matches from ${store_name || 'this store'} using CityShop Deep Search`
-                                : 'Products matched from your photo using CityShop Deep Search'
+                                ? `Matches from ${store_name || 'this store'} using Nabob Holdings Deep Search`
+                                : 'Products matched from your photo using Nabob Holdings Deep Search'
                             : scopedStore
                               ? `Upload a photo — we only search products in ${store_name || 'this store'}`
                               : 'Upload a product photo — we only show items that look like your image, not random guesses'}

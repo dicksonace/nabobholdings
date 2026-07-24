@@ -28,7 +28,7 @@ class InvoiceSentNotification extends Notification implements ShouldQueue
         $message = (new MailMessage)
             ->subject("Invoice {$invoice->invoice_number} — {$checkout->checkout_number}")
             ->greeting('Hello '.$notifiable->name.'!')
-            ->line('Thank you for your purchase on CityShop.');
+            ->line('Thank you for your purchase on Nabob Holdings.');
 
         foreach ($invoice->line_items as $line) {
             $message->line(sprintf(
@@ -44,11 +44,11 @@ class InvoiceSentNotification extends Notification implements ShouldQueue
             ->line('Total: GH₵'.number_format((float) $invoice->total, 2))
             ->line('Payment status: '.ucfirst($invoice->payment_status ?? 'pending'))
             ->line('Invoice date: '.$invoice->issued_at->format('d M Y'))
-            ->action('View on CityShop', route('checkouts.show', $checkout));
+            ->action('View on Nabob Holdings', route('checkouts.show', $checkout));
     }
 
     public function toSms(object $notifiable): string
     {
-        return "CityShop: Invoice {$this->invoice->invoice_number} for GH₵".number_format((float) $this->invoice->total, 2).'. Payment: '.($this->invoice->payment_status ?? 'pending').'.';
+        return "Nabob Holdings: Invoice {$this->invoice->invoice_number} for GH₵".number_format((float) $this->invoice->total, 2).'. Payment: '.($this->invoice->payment_status ?? 'pending').'.';
     }
 }

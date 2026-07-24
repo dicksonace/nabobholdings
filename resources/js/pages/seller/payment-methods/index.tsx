@@ -78,7 +78,7 @@ export default function PaymentMethodsIndex({ profile, methods, types }: Payment
                 <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
                     <p className="flex items-center gap-2 font-semibold">
                         <ShieldBan className="h-4 w-4" />
-                        Payment setup locked by CityShop admin
+                        Payment setup locked by Nabob Holdings admin
                     </p>
                     <p className="mt-1">
                         {profile.payment_methods_lock_reason
@@ -100,7 +100,7 @@ export default function PaymentMethodsIndex({ profile, methods, types }: Payment
                             />
                             <div>
                                 <p className="font-medium">Marketplace payments (default)</p>
-                                <p className="text-sm text-gray-500">Buyer pays CityShop via Paystack. You withdraw from your wallet.</p>
+                                <p className="text-sm text-gray-500">Buyer pays Nabob Holdings via Paystack. You withdraw from your wallet.</p>
                             </div>
                         </label>
                         <label className="flex items-start gap-3 rounded-lg border p-3">

@@ -311,7 +311,7 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
                                             <div className="mt-2 rounded-lg border border-red-100 bg-red-50 p-3 text-xs text-red-900">
                                                 <p className="font-semibold">
                                                     {item.cancelled_by === 'admin'
-                                                        ? 'Cancelled by CityShop support'
+                                                        ? 'Cancelled by Nabob Holdings support'
                                                         : 'Cancelled by seller'}
                                                 </p>
                                                 {item.rejection_reason && (
@@ -319,7 +319,7 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
                                                 )}
                                                 {item.refund_status === 'completed' && (
                                                     <p className="mt-1 font-medium text-emerald-700">
-                                                        Refund completed — credited to your CityShop wallet.
+                                                        Refund completed — credited to your Nabob Holdings wallet.
                                                     </p>
                                                 )}
                                                 {item.refund_status === 'not_applicable' && (
@@ -329,7 +329,7 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
                                                 )}
                                                 {item.refund_status === 'failed' && (
                                                     <p className="mt-1 font-medium text-red-700">
-                                                        Refund failed — please contact CityShop support.
+                                                        Refund failed — please contact Nabob Holdings support.
                                                     </p>
                                                 )}
                                             </div>

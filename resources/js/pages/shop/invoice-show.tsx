@@ -248,7 +248,7 @@ export default function InvoiceShow({ invoice, sellerContacts, sellerContact }: 
                     </div>
 
                     <p className="mt-4 text-center text-xs text-gray-400">
-                        Thank you for shopping on CityShop.
+                        Thank you for shopping on Nabob Holdings.
                     </p>
                 </article>
             </div>

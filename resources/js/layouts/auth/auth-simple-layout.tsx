@@ -1,4 +1,4 @@
-import CityShopBrand from '@/components/cityshop-brand';
+import NabobBrand from '@/components/nabob-brand';
 
 interface AuthLayoutProps {
     children: React.ReactNode;
@@ -13,7 +13,7 @@ export default function AuthSimpleLayout({ children, title, description }: AuthL
             <div className="w-full max-w-sm">
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col items-center gap-4">
-                        <CityShopBrand showText size="lg" />
+                        <NabobBrand showText size="lg" />
 
                         <div className="space-y-2 text-center">
                             <h1 className="text-xl font-semibold text-gray-900">{title}</h1>

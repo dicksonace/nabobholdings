@@ -79,7 +79,7 @@ export default function AdminBuyerShow({ buyer, orders, conversations, wallet, t
                     <p className="mt-1 text-sm text-white/70">Available balance</p>
                     <p className="mt-2 text-3xl font-bold">{formatPrice(wallet.available_balance)}</p>
                     <p className="mt-4 text-xs text-white/60">
-                        Buyers fund their wallet to shop on CityShop. Refunds from approved returns are credited here.
+                        Buyers fund their wallet to shop on Nabob Holdings. Refunds from approved returns are credited here.
                     </p>
                 </div>
 

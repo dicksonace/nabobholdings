@@ -45,7 +45,7 @@ export default function ChatIndex({ conversations }: ChatIndexProps) {
                     </Link>
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-                        <p className="text-sm text-gray-500">Chat with buyers and sellers on CityShop</p>
+                        <p className="text-sm text-gray-500">Chat with buyers and sellers on Nabob Holdings</p>
                     </div>
                 </div>
 

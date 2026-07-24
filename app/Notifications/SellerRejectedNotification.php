@@ -31,6 +31,6 @@ class SellerRejectedNotification extends Notification implements ShouldQueue
 
     public function toSms(object $notifiable): string
     {
-        return 'CityShop: Your seller application was not approved. Check your email for details.';
+        return 'Nabob Holdings: Your seller application was not approved. Check your email for details.';
     }
 }

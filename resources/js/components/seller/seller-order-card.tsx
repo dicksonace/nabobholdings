@@ -62,8 +62,8 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
                 ? 'Paid to seller'
                 : 'Pay to seller'
             : isPaid
-                ? 'Paid · CityShop secured'
-                : 'CityShop secured';
+                ? 'Paid · Nabob Holdings secured'
+                : 'Nabob Holdings secured';
 
     const rejectPayment = () => {
         const reason = window.prompt(

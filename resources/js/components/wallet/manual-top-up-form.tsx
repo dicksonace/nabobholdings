@@ -130,7 +130,7 @@ export default function ManualTopUpForm({ settings, requests, walletRoute, submi
             <div>
                 <h1 className="text-2xl font-bold text-gray-900">Manual deposit</h1>
                 <p className="mt-1 text-sm text-gray-500">
-                    Choose MTN, Telecel, or AirtelTigo — we show the CityShop number to pay. Then submit proof.
+                    Choose MTN, Telecel, or AirtelTigo — we show the Nabob Holdings number to pay. Then submit proof.
                 </p>
             </div>
 

@@ -328,7 +328,7 @@ export default function Checkout({
                                             <p className="text-sm text-gray-500">
                                                 Balance: {formatPrice(walletBalance)}
                                                 {marketplaceTotal > 0 && (
-                                                    <> · CityShop portion: {formatPrice(marketplaceTotal)}</>
+                                                    <> · Nabob Holdings portion: {formatPrice(marketplaceTotal)}</>
                                                 )}
                                             </p>
                                             {!walletCoversMarketplace && (
@@ -490,7 +490,7 @@ export default function Checkout({
                                                         }`}
                                                     >
                                                         <PaymentMethodIcon method="card" />
-                                                        <span className="min-w-0 flex-1 font-medium text-gray-900">Pay via CityShop (secure)</span>
+                                                        <span className="min-w-0 flex-1 font-medium text-gray-900">Pay via Nabob Holdings (secure)</span>
                                                         <input type="radio" checked={choice.channel === 'marketplace'} onChange={() => setSellerChannel(group.seller_id, 'marketplace')} />
                                                     </label>
                                                 )}

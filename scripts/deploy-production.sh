@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-$HOME/domains/cityunlock.net/cityshop}"
+APP_DIR="${APP_DIR:-$HOME/domains/nabobholdings.com/nabob}"
 PHP_BIN="${PHP_BIN:-php}"
 COMPOSER_BIN="${COMPOSER_BIN:-composer.phar}"
 
-echo "==> Deploying CityShop in $APP_DIR"
+echo "==> Deploying Nabob Holdings in $APP_DIR"
 cd "$APP_DIR"
 
 echo "==> Pull latest code"

@@ -25,17 +25,17 @@ class AdminBuyerAnnouncementNotification extends Notification implements ShouldQ
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('CityShop: '.$this->title)
+            ->subject('Nabob Holdings: '.$this->title)
             ->greeting('Hello '.$notifiable->name.'!')
             ->line($this->body)
-            ->action('Open CityShop', url('/'))
-            ->line('Thank you for shopping on CityShop.');
+            ->action('Open Nabob Holdings', url('/'))
+            ->line('Thank you for shopping on Nabob Holdings.');
     }
 
     public function toSms(object $notifiable): string
     {
         $snippet = mb_substr($this->body, 0, 120);
 
-        return "CityShop: {$this->title}. {$snippet}";
+        return "Nabob Holdings: {$this->title}. {$snippet}";
     }
 }

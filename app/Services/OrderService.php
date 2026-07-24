@@ -566,7 +566,7 @@ class OrderService
 
         if ($marketplaceTotal <= 0) {
             throw ValidationException::withMessages([
-                'payment_method' => 'Wallet payment only applies to CityShop marketplace orders.',
+                'payment_method' => 'Wallet payment only applies to Nabob Holdings marketplace orders.',
             ]);
         }
 
@@ -917,7 +917,7 @@ class OrderService
         }
 
         if ($item->order->payment_channel !== PaymentChannel::Marketplace) {
-            throw new \RuntimeException('Only marketplace (CityShop secured) sales use pending fund release.');
+            throw new \RuntimeException('Only marketplace (Nabob Holdings secured) sales use pending fund release.');
         }
 
         if (in_array($item->status, [OrderStatus::Cancelled, OrderStatus::Refunded, OrderStatus::Pending], true)) {
@@ -1173,7 +1173,7 @@ class OrderService
     }
 
     /**
-     * Once the seller starts processing a CityShop-secured sale, admin can release funds.
+     * Once the seller starts processing a Nabob Holdings-secured sale, admin can release funds.
      */
     private function markMarketplaceFundsPendingWhenProcessing(OrderItem $item): void
     {
@@ -1693,7 +1693,7 @@ class OrderService
     }
 
     /**
-     * Pay-to-seller: claw back from seller CityShop available → credit buyer wallet.
+     * Pay-to-seller: claw back from seller Nabob Holdings available → credit buyer wallet.
      * Seller must keep enough available balance (manual top-up / earnings) to cancel.
      */
     private function clawbackDirectPaymentToBuyer(OrderItem $item, float $amount): void
@@ -1710,7 +1710,7 @@ class OrderService
         WalletService::debitAvailable(
             $seller,
             $amount,
-            'Not enough CityShop wallet balance to cancel this Pay-to-seller order. '
+            'Not enough Nabob Holdings wallet balance to cancel this Pay-to-seller order. '
             .'You need GH₵'.number_format($amount, 2).' available. '
             .'Top up your seller wallet first, then try again.',
         );
@@ -1741,7 +1741,7 @@ class OrderService
         WalletService::debitAvailable(
             $seller,
             $amount,
-            'Not enough CityShop wallet balance to refund shipping (GH₵'.number_format($amount, 2).'). '
+            'Not enough Nabob Holdings wallet balance to refund shipping (GH₵'.number_format($amount, 2).'). '
             .'Top up your seller wallet first, then cancel again.',
         );
 

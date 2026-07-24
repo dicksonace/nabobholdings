@@ -131,7 +131,7 @@ class BulkProductsSeeder extends Seeder
                 'seller_id' => $seller->id,
                 'category_id' => $category->id,
                 'name' => $name,
-                'description' => $this->randomDescription().' Available on CityShop with verified seller guarantee.',
+                'description' => $this->randomDescription().' Available on Nabob Holdings with verified seller guarantee.',
                 'specifications' => CategorySpecService::generateSpecs($category->slug),
                 'brand' => $this->randomElement($this->brands[$category->slug] ?? ['Generic']),
                 'price' => $price,
@@ -242,7 +242,7 @@ class BulkProductsSeeder extends Seeder
             'High quality product with excellent reviews from Ghanaian buyers.',
             'Trusted seller with fast delivery across Greater Accra and nationwide.',
             'Built to last with dependable performance for everyday use.',
-            'Popular choice on CityShop with strong value for money.',
+            'Popular choice on Nabob Holdings with strong value for money.',
         ];
         shuffle($sentences);
 

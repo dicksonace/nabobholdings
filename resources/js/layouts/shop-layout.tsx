@@ -14,7 +14,11 @@ interface ShopLayoutProps {
 
 export default function ShopLayout({ children, hideHeaderSearch = false, hideChrome = false }: ShopLayoutProps) {
     const page = usePage<SharedData>();
-    const { auth, flash } = page.props;
+    const { auth, flash, brand } = page.props;
+    const brandName = brand?.name ?? 'Nabob Holdings';
+    const brandParts = brandName.trim().split(/\s+/);
+    const brandFirst = brandParts[0] ?? brandName;
+    const brandRest = brandParts.slice(1).join(' ');
     const showBuyerNav = !hideChrome && auth.user?.role === 'buyer';
     const component = typeof page.component === 'string' ? page.component : '';
     const hasValidationErrors = Object.keys(page.props.errors ?? {}).length > 0;
@@ -60,7 +64,8 @@ export default function ShopLayout({ children, hideHeaderSearch = false, hideChr
                     <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
                         <div>
                             <h3 className="text-lg font-bold">
-                                City<span className="text-orange-500">Shop</span>
+                                {brandFirst}
+                                {brandRest && <span className="text-orange-500">&nbsp;{brandRest}</span>}
                             </h3>
                             <p className="mt-2 text-sm text-gray-500">Ghana&apos;s trusted online marketplace.</p>
                         </div>
@@ -120,7 +125,7 @@ export default function ShopLayout({ children, hideHeaderSearch = false, hideChr
                             </ul>
                         </div>
                     </div>
-                    <p className="mt-8 text-center text-xs text-gray-400">&copy; {new Date().getFullYear()} CityShop. All rights reserved.</p>
+                    <p className="mt-8 text-center text-xs text-gray-400">&copy; {new Date().getFullYear()} {brandName}. All rights reserved.</p>
                 </div>
             </footer>
             )}

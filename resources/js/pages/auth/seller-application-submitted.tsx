@@ -20,7 +20,7 @@ const steps = [
     },
     {
         title: 'Admin review',
-        description: 'CityShop verifies your identity and business information (24–48 hours).',
+        description: 'Nabob Holdings verifies your identity and business information (24–48 hours).',
         active: true,
     },
     {

@@ -1,26 +1,26 @@
 ---
-description: CityShop production deploy — always include server commands after git push
+description: Nabob Holdings production deploy — always include server commands after git push
 alwaysApply: true
 ---
 
-# CityShop production deploy
+# Nabob Holdings production deploy
 
 When the user asks to push, deploy, or update production, **always** include these server commands after a successful push.
 
-**App path:** `~/domains/cityunlock.net/cityshop`  
-**Site:** https://cityunlock.net  
+**App path:** `~/domains/nabobholdings.com/nabob`  
+**Site:** https://nabobholdings.com  
 **Admin login (not linked publicly):** `/admin/login`
 
 ## One command (recommended)
 
 ```bash
-cd ~/domains/cityunlock.net/cityshop && bash scripts/deploy-production.sh
+cd ~/domains/nabobholdings.com/nabob && bash scripts/deploy-production.sh
 ```
 
 ## Manual steps (if script unavailable)
 
 ```bash
-cd ~/domains/cityunlock.net/cityshop
+cd ~/domains/nabobholdings.com/nabob
 git pull origin main
 php -d memory_limit=-1 composer.phar install --no-dev --optimize-autoloader
 php artisan migrate --force
@@ -40,12 +40,12 @@ Use when starting real testing with **admin only** — no demo products, sellers
 
 **Local:**
 ```bash
-php artisan cityshop:reset --force
+php artisan nabob:reset --force
 ```
 
 **Server:**
 ```bash
-cd ~/domains/cityunlock.net/cityshop && bash scripts/reset-production.sh
+cd ~/domains/nabobholdings.com/nabob && bash scripts/reset-production.sh
 ```
 
-Default admin after reset: `admin@cityshop.com` / `password` at `/admin/login` — change password immediately.
+Default admin after reset: `admin@nabobholdings.com` / `password` at `/admin/login` — change password immediately.

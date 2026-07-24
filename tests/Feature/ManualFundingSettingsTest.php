@@ -18,11 +18,11 @@ class ManualFundingSettingsTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.manual-funding.settings.update'), [
             'enabled' => true,
-            'instructions' => 'Send payment to CityShop MoMo, then upload proof.',
+            'instructions' => 'Send payment to Nabob Holdings MoMo, then upload proof.',
             'accounts' => [
                 [
                     'type' => 'momo',
-                    'label' => 'CITY SHOP MOMO',
+                    'label' => 'NABOB MOMO',
                     'account_name' => 'CITY UNLOCK VENTURES',
                     'account_number' => '0539790093',
                     'network' => 'mtn',
@@ -36,11 +36,11 @@ class ManualFundingSettingsTest extends TestCase
 
         $settings = PlatformSettings::manualFundingAccounts();
         $this->assertTrue($settings['enabled']);
-        $this->assertSame('CITY SHOP MOMO', $settings['accounts'][0]['label']);
+        $this->assertSame('NABOB MOMO', $settings['accounts'][0]['label']);
         $this->assertSame('mtn', $settings['accounts'][0]['network']);
         $this->assertSame('0539790093', $settings['accounts'][0]['account_number']);
-        // Known CityShop receive numbers always surface business + Robert Asare.
-        $this->assertSame('City Unlock Ventures / Robert Asare', $settings['accounts'][0]['account_name']);
+        // Known Nabob Holdings receive numbers always surface business + Robert Asare.
+        $this->assertSame('Nabob Holdings / Robert Asare', $settings['accounts'][0]['account_name']);
     }
 
     public function test_admin_momo_account_requires_network(): void
@@ -55,7 +55,7 @@ class ManualFundingSettingsTest extends TestCase
                 'accounts' => [
                     [
                         'type' => 'momo',
-                        'label' => 'CITY SHOP MOMO',
+                        'label' => 'NABOB MOMO',
                         'account_name' => 'CITY UNLOCK VENTURES',
                         'account_number' => '0539790093',
                         'network' => '',
@@ -95,7 +95,7 @@ class ManualFundingSettingsTest extends TestCase
 
         $telecel = collect($settings['accounts'])->firstWhere('network', 'telecel');
         $this->assertSame('513014', $telecel['account_number']);
-        $this->assertSame('City Unlock Ventures / Robert Asare', $telecel['account_name']);
+        $this->assertSame('Nabob Holdings / Robert Asare', $telecel['account_name']);
     }
 
     public function test_normalize_momo_network_accepts_legacy_labels(): void

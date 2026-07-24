@@ -187,9 +187,9 @@
     --chart-4: hsl(43, 74%, 66%);
     --chart-5: hsl(27, 87%, 67%);
     --radius: 0.625rem;
-    --cityshop-orange: hsl(24, 95%, 53%);
-    --cityshop-blue: hsl(214, 84%, 56%);
-    --cityshop-green: hsl(142, 71%, 45%);
+    --nabob-orange: hsl(24, 95%, 53%);
+    --nabob-blue: hsl(214, 84%, 56%);
+    --nabob-green: hsl(142, 71%, 45%);
     --sidebar-background: hsl(0, 0%, 98%);
     --sidebar-foreground: hsl(240, 5.3%, 30%);
     --sidebar-primary: hsl(0, 0%, 10%);
@@ -260,7 +260,7 @@
 
     /*
      * iOS Safari applies dark native input styling when the device uses dark mode
-     * and color-scheme is dark. CityShop forms are light-themed — force readable fields.
+     * and color-scheme is dark. Nabob Holdings forms are light-themed — force readable fields.
      */
     input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='file']):not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']),
     textarea,

@@ -2,7 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { LogOut, Menu } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
-import CityShopBrand from '@/components/cityshop-brand';
+import NabobBrand from '@/components/nabob-brand';
 import PanelSidebarNav from '@/components/panel/panel-sidebar-nav';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -39,7 +39,7 @@ function PanelShell({
     return (
         <div className={cn('flex h-full flex-col', className)}>
             <div className="border-b border-gray-100 p-5">
-                <CityShopBrand showText size="md" href={brandHref} />
+                <NabobBrand showText size="md" href={brandHref} />
                 <p className="mt-2 text-xs font-medium uppercase tracking-wider text-gray-500">{panelTitle}</p>
             </div>
             <PanelSidebarNav

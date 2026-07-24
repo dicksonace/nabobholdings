@@ -1,4 +1,4 @@
-import CityShopBrand from '@/components/cityshop-brand';
+import NabobBrand from '@/components/nabob-brand';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
@@ -16,7 +16,7 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
             <div className="relative hidden h-full flex-col p-10 text-white lg:flex">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-orange-600" />
                 <div className="relative z-20">
-                    <CityShopBrand showText size="lg" inverted />
+                    <NabobBrand showText size="lg" inverted />
                 </div>
                 <p className="relative z-20 mt-6 max-w-sm text-blue-100">
                     Ghana&apos;s trusted marketplace for buyers and sellers. Shop with confidence.
@@ -32,7 +32,7 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
             </div>
             <div className="w-full bg-white lg:p-8">
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <CityShopBrand showText size="lg" className="justify-center lg:hidden" />
+                    <NabobBrand showText size="lg" className="justify-center lg:hidden" />
 
                     <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center">
                         <h1 className="text-xl font-semibold text-gray-900">{title}</h1>

@@ -21,7 +21,7 @@ export default function StoreShareCard({ slug, storeName, storeUrl }: StoreShare
     };
 
     const shareWhatsApp = () => {
-        const text = encodeURIComponent(`Shop at ${storeName} on CityShop! ${storeUrl}`);
+        const text = encodeURIComponent(`Shop at ${storeName} on Nabob Holdings! ${storeUrl}`);
         window.open(`https://wa.me/?text=${text}`, '_blank');
     };
 

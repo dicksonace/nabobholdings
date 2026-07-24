@@ -89,7 +89,7 @@ export default function PendingFundsIndex({ items, status, counts }: Props) {
             <div className="mb-4">
                 <h1 className="text-lg font-bold text-gray-900">Pending fund releases</h1>
                 <p className="mt-1 text-sm text-gray-500">
-                    After the seller starts processing a CityShop-secured order, release earnings to Available anytime.
+                    After the seller starts processing a Nabob Holdings-secured order, release earnings to Available anytime.
                     If you have not released yet, the buyer’s Confirm delivery also releases funds once. If you release first, the buyer still confirms to complete the order — funds are not released twice.
                 </p>
             </div>

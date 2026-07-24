@@ -74,7 +74,7 @@ class AppNotificationService
             $pendingOrder => "Order {$order->order_number}: {$productName} (awaiting payment)",
             $cashOnDelivery => "Order {$order->order_number}: {$productName} — call the buyer, then pack & deliver.",
             $order->payment_channel === PaymentChannel::Direct => "Order {$order->order_number}: {$productName} — buyer paid you directly.",
-            default => "Order {$order->order_number}: {$productName} — paid via CityShop secured.",
+            default => "Order {$order->order_number}: {$productName} — paid via Nabob Holdings secured.",
         };
 
         static::send($seller, 'new_order', $title, $body, [
@@ -114,7 +114,7 @@ class AppNotificationService
             $pendingOrder => 'New order awaiting payment',
             $cashOnDelivery => 'New Order (Cash on Delivery)',
             $order->payment_channel === PaymentChannel::Direct => 'New order received (Paid to seller)',
-            default => 'New order received (Paid · CityShop secured)',
+            default => 'New order received (Paid · Nabob Holdings secured)',
         };
     }
 }

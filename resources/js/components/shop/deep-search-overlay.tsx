@@ -22,7 +22,7 @@ const STEPS = [
     {
         id: 'match',
         title: 'Finding matching products',
-        detail: 'Comparing your image with items live in CityShop.',
+        detail: 'Comparing your image with items live in Nabob Holdings.',
     },
     {
         id: 'rank',

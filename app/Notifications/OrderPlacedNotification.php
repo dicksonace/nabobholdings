@@ -49,6 +49,6 @@ class OrderPlacedNotification extends Notification implements ShouldQueue
         $number = $checkout?->checkout_number ?? $this->order->order_number;
         $total = $checkout?->total ?? $this->order->total;
 
-        return "CityShop: Order {$number} placed. Total GH₵".number_format((float) $total, 2).'.';
+        return "Nabob Holdings: Order {$number} placed. Total GH₵".number_format((float) $total, 2).'.';
     }
 }

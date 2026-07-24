@@ -37,7 +37,7 @@ export default function BuyerRegister() {
             <div className="mx-auto max-w-md px-4 py-12">
                 <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
                     <h1 className="text-2xl font-bold text-gray-900">Create Account</h1>
-                    <p className="mt-1 text-sm text-gray-500">Join CityShop and start shopping today.</p>
+                    <p className="mt-1 text-sm text-gray-500">Join Nabob Holdings and start shopping today.</p>
 
                     {hasErrors && (
                         <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -78,7 +78,7 @@ export default function BuyerRegister() {
                     </form>
 
                     <p className="mt-4 text-center text-sm text-gray-500">
-                        Want to sell on CityShop?{' '}
+                        Want to sell on Nabob Holdings?{' '}
                         <TextLink href={route('contact')}>Contact support</TextLink>
                     </p>
                     <p className="mt-2 text-center text-sm text-gray-500">

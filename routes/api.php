@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| CityShop Mobile API (v1)
+| Nabob Holdings Mobile API (v1)
 |--------------------------------------------------------------------------
 |
 | Token auth via Laravel Sanctum. Send:
@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::get('/health', fn () => response()->json([
         'ok' => true,
-        'app' => 'CityShop',
+        'app' => 'Nabob Holdings',
         'version' => 'v1',
     ]));
 

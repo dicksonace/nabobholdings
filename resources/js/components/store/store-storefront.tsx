@@ -209,7 +209,7 @@ export default function StoreStorefront({
         about: customization.sections.enabled.about ? (
             <section className="mb-10 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                 <h2 className="text-lg font-bold" style={{ color: theme.text_color }}>About {storeName}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-gray-600">{description || 'Welcome to our store on CityShop.'}</p>
+                <p className="mt-3 text-sm leading-relaxed text-gray-600">{description || 'Welcome to our store on Nabob Holdings.'}</p>
                 {branding.business_category && (
                     <p className="mt-2 text-sm text-gray-500">Category: {branding.business_category}</p>
                 )}

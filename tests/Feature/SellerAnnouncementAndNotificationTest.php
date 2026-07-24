@@ -96,7 +96,7 @@ class SellerAnnouncementAndNotificationTest extends TestCase
         AppNotification::create([
             'user_id' => $seller->id,
             'type' => 'new_order',
-            'title' => 'New order received (Paid · CityShop secured)',
+            'title' => 'New order received (Paid · Nabob Holdings secured)',
             'body' => 'Order CS-1: Phone',
             'data' => ['order_id' => 1],
         ]);

@@ -155,7 +155,7 @@ export default function HomeCategoryShortcuts({
                     >
                         <div>
                             <p className="text-[10px] font-bold tracking-wider text-white/90 uppercase sm:text-xs">Big Sale</p>
-                            <p className="text-sm font-extrabold text-white sm:text-lg">Shop top deals on CityShop</p>
+                            <p className="text-sm font-extrabold text-white sm:text-lg">Shop top deals on Nabob Holdings</p>
                         </div>
                         <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-orange-600 shadow-sm">
                             <ShoppingBag className="h-3.5 w-3.5" />

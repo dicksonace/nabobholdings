@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'cityshop_chat_state';
+const STORAGE_KEY = 'nabob_chat_state';
 
 export interface PersistedChatState {
     activeConversationId: number | null;

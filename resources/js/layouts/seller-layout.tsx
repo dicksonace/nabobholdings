@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
-import CityShopBrand from '@/components/cityshop-brand';
+import NabobBrand from '@/components/nabob-brand';
 import NotificationBell from '@/components/shop/notification-bell';
 import PanelSidebarNav from '@/components/panel/panel-sidebar-nav';
 import { Button } from '@/components/ui/button';
@@ -47,7 +47,7 @@ function SellerSidebar({
     return (
         <div className={cn('flex h-full flex-col', className)}>
             <div className="border-b border-gray-100 p-5">
-                <CityShopBrand showText size="md" href={route('seller.dashboard')} />
+                <NabobBrand showText size="md" href={route('seller.dashboard')} />
                 <p className="mt-2 text-xs font-medium uppercase tracking-wider text-gray-400">Seller Hub</p>
             </div>
             <PanelSidebarNav
@@ -115,7 +115,7 @@ export default function SellerLayout({ children, title, active, showFab = false 
                                 >
                                     <Menu className="h-5 w-5" />
                                 </Button>
-                                <CityShopBrand size="sm" href={route('seller.dashboard')} />
+                                <NabobBrand size="sm" href={route('seller.dashboard')} />
                             </div>
                             <h1 className="min-w-0 flex-1 truncate text-base font-semibold text-gray-900 sm:text-lg lg:text-xl">{title}</h1>
                             <div className="flex shrink-0 items-center gap-1">

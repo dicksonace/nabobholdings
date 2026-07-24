@@ -13,7 +13,7 @@ import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, LayoutGrid, Menu, Search, ShoppingBag } from 'lucide-react';
 import AppLogo from './app-logo';
-import CityShopBrand from './cityshop-brand';
+import NabobBrand from './nabob-brand';
 
 const mainNavItems: NavItem[] = [
     {
@@ -61,7 +61,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <SheetContent side="left" className="flex h-full w-64 flex-col items-stretch justify-between bg-sidebar">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
-                                    <CityShopBrand showText asLink={false} />
+                                    <NabobBrand showText asLink={false} />
                                 </SheetHeader>
                                 <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
                                     <div className="flex h-full flex-col justify-between text-sm">

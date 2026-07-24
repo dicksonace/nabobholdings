@@ -194,6 +194,6 @@
         </tr>
     </table>
 
-    <div class="footer">Thank you for shopping on CityShop.</div>
+    <div class="footer">Thank you for shopping on Nabob Holdings.</div>
 </body>
 </html>

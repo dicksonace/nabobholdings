@@ -81,7 +81,7 @@ export default function ReportSellerButton({ sellerId, productId, storeName, cla
                     <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
                         <h3 className="text-lg font-semibold text-gray-900">Report seller account</h3>
                         <p className="mt-1 text-sm text-gray-500">
-                            Report {storeName ? <strong>{storeName}</strong> : 'this seller'} for review by CityShop admin.
+                            Report {storeName ? <strong>{storeName}</strong> : 'this seller'} for review by Nabob Holdings admin.
                         </p>
 
                         <form onSubmit={submit} className="mt-4 space-y-4">

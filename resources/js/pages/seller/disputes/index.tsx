@@ -59,7 +59,7 @@ function statusMeta(status: string) {
         case 'open':
             return {
                 label: 'Open',
-                hint: 'Waiting for CityShop review',
+                hint: 'Waiting for Nabob Holdings review',
                 badge: 'bg-amber-100 text-amber-800 ring-amber-200',
                 accent: 'from-amber-500/15 via-orange-50 to-white border-amber-100',
                 icon: Inbox,
@@ -184,7 +184,7 @@ export default function SellerDisputesIndex({
                         <p className="text-sm font-medium text-orange-200">Buyer returns</p>
                         <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Refund requests</h1>
                         <p className="mt-2 max-w-xl text-sm text-slate-300">
-                            Track buyer refund claims here. CityShop reviews each one before money is returned.
+                            Track buyer refund claims here. Nabob Holdings reviews each one before money is returned.
                         </p>
                     </div>
                     <div className="rounded-2xl bg-white/10 px-5 py-4 backdrop-blur">

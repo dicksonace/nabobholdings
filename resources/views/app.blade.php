@@ -6,7 +6,7 @@
         <meta name="color-scheme" content="light">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title inertia>{{ config('app.name', 'CityShop') }}</title>
+        <title inertia>{{ config('app.name', 'Nabob Holdings') }}</title>
 
         <link rel="icon" href="/images/logo.png" type="image/png">
 

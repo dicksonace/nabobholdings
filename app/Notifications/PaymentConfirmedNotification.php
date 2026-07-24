@@ -43,7 +43,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
                 $this->paymentClaim => "Buyer submitted payment for: {$this->orderItem->product_name}",
                 $this->pendingOrder => "You have a new order awaiting payment: {$this->orderItem->product_name}",
                 $this->order->payment_channel === PaymentChannel::Direct => "New order received (Paid to seller): {$this->orderItem->product_name}",
-                default => "New order received (Paid · CityShop secured): {$this->orderItem->product_name}",
+                default => "New order received (Paid · Nabob Holdings secured): {$this->orderItem->product_name}",
             };
 
             return (new MailMessage)
@@ -64,7 +64,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
                 )
                 ->when(
                     ! $this->cashOnDelivery && ! $this->pendingOrder && ! $this->paymentClaim && $this->order->payment_channel !== PaymentChannel::Direct,
-                    fn (MailMessage $mail) => $mail->line('Buyer paid via CityShop secured. Funds settle through your seller wallet.')
+                    fn (MailMessage $mail) => $mail->line('Buyer paid via Nabob Holdings secured. Funds settle through your seller wallet.')
                 )
                 ->action(
                     'View Order',
@@ -89,24 +89,24 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
     {
         if ($this->orderItem) {
             if ($this->cashOnDelivery) {
-                return "CityShop: New Order (Cash on Delivery) {$this->order->order_number} — {$this->orderItem->product_name}. Call buyer, then pack & deliver.";
+                return "Nabob Holdings: New Order (Cash on Delivery) {$this->order->order_number} — {$this->orderItem->product_name}. Call buyer, then pack & deliver.";
             }
 
             if ($this->paymentClaim) {
-                return "CityShop: Buyer submitted payment for {$this->order->order_number} — {$this->orderItem->product_name}. Confirm only if received.";
+                return "Nabob Holdings: Buyer submitted payment for {$this->order->order_number} — {$this->orderItem->product_name}. Confirm only if received.";
             }
 
             if ($this->pendingOrder) {
-                return "CityShop: New order awaiting payment {$this->order->order_number} — {$this->orderItem->product_name}.";
+                return "Nabob Holdings: New order awaiting payment {$this->order->order_number} — {$this->orderItem->product_name}.";
             }
 
             if ($this->order->payment_channel === PaymentChannel::Direct) {
-                return "CityShop: New order received (Paid to seller) {$this->order->order_number} — {$this->orderItem->product_name}.";
+                return "Nabob Holdings: New order received (Paid to seller) {$this->order->order_number} — {$this->orderItem->product_name}.";
             }
 
-            return "CityShop: New order received (Paid · CityShop secured) {$this->order->order_number} — {$this->orderItem->product_name}.";
+            return "Nabob Holdings: New order received (Paid · Nabob Holdings secured) {$this->order->order_number} — {$this->orderItem->product_name}.";
         }
 
-        return "CityShop: Payment confirmed for order {$this->order->order_number}.";
+        return "Nabob Holdings: Payment confirmed for order {$this->order->order_number}.";
     }
 }

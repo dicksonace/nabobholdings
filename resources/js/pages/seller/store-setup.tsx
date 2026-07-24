@@ -116,7 +116,7 @@ export default function StoreSetup({ customization: initial, presets, storeUrl, 
             <Head title="Set Up Your Store" />
             <div className="mx-auto max-w-3xl px-4 py-10">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900">Welcome to CityShop, {storeName}!</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Welcome to Nabob Holdings, {storeName}!</h1>
                     <p className="mt-2 text-gray-500">Customize your storefront before you start selling.</p>
                     <p className="mt-1 text-xs text-gray-400">You can skip and customize later from your dashboard.</p>
                 </div>

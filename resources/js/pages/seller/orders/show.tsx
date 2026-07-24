@@ -454,7 +454,7 @@ export default function SellerOrderShow({
                                     <p className="mt-1">Reason: {orderItem.rejection_reason}</p>
                                 )}
                                 {orderItem.refund_status === 'completed' && (
-                                    <p className="mt-1 text-red-700">Buyer refunded to CityShop wallet.</p>
+                                    <p className="mt-1 text-red-700">Buyer refunded to Nabob Holdings wallet.</p>
                                 )}
                                 {orderItem.refund_status === 'not_applicable' && (
                                     <p className="mt-1 text-red-700">No automatic wallet refund (direct payment or unpaid).</p>
@@ -492,8 +492,8 @@ export default function SellerOrderShow({
                                         <p className="text-sm font-medium text-gray-900">Can&apos;t fulfill this order?</p>
                                         <p className="mt-1 text-xs text-gray-500">
                                             Cancel before shipping if you&apos;re out of stock or unable to fulfill.
-                                            Paid CityShop (marketplace) orders refund the buyer from escrow.
-                                            Paid Pay-to-seller orders debit your CityShop wallet available balance and refund the buyer.
+                                            Paid Nabob Holdings (marketplace) orders refund the buyer from escrow.
+                                            Paid Pay-to-seller orders debit your Nabob Holdings wallet available balance and refund the buyer.
                                         </p>
                                         <Button
                                             type="button"
@@ -537,10 +537,10 @@ export default function SellerOrderShow({
                                         <p className="text-xs text-gray-500">
                                             {order.payment_channel === 'direct'
                                                 ? order.payment_status === 'paid'
-                                                    ? 'Pay-to-seller: cancelling debits your CityShop wallet available balance and refunds the buyer. Top up first if your balance is too low.'
+                                                    ? 'Pay-to-seller: cancelling debits your Nabob Holdings wallet available balance and refunds the buyer. Top up first if your balance is too low.'
                                                     : 'Pay-to-seller: order is not paid yet — no wallet debit.'
                                                 : order.payment_status === 'paid'
-                                                    ? 'Buyer will get a full product refund in their CityShop wallet.'
+                                                    ? 'Buyer will get a full product refund in their Nabob Holdings wallet.'
                                                     : 'Order is not paid yet — no wallet refund needed.'}
                                         </p>
                                         <div className="flex flex-wrap gap-2">
@@ -659,10 +659,10 @@ export default function SellerOrderShow({
                             <>
                                 <h3 className="font-semibold text-gray-900">Automatic Pay</h3>
                                 <p className="mt-2 text-sm text-gray-600">
-                                    Secured payment to CityShop · <span className="capitalize">{order.payment_status}</span>
+                                    Secured payment to Nabob Holdings · <span className="capitalize">{order.payment_status}</span>
                                 </p>
                                 <p className="mt-1 text-xs text-emerald-700">
-                                    Buyer paid through CityShop (Paystack / wallet). Funds settle via your seller wallet.
+                                    Buyer paid through Nabob Holdings (Paystack / wallet). Funds settle via your seller wallet.
                                 </p>
                             </>
                         )}

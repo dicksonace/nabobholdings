@@ -94,7 +94,7 @@ export default function Login({ canResetPassword, status, defaultLogin = '' }: L
                             New here? <TextLink href={route('register.buyer')}>Create shopper account</TextLink>
                         </p>
                         <p>
-                            Sell on CityShop? <TextLink href={route('seller.login')}>Seller login</TextLink>
+                            Sell on Nabob Holdings? <TextLink href={route('seller.login')}>Seller login</TextLink>
                         </p>
                     </div>
                 </div>

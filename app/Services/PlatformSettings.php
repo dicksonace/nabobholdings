@@ -4,10 +4,57 @@ namespace App\Services;
 
 use App\Models\PlatformSetting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class PlatformSettings
 {
     public const FUNDING_ACCOUNTS_KEY = 'manual_funding_accounts';
+
+    public const BRAND_NAME_KEY = 'brand_name';
+
+    public const BRAND_LOGO_KEY = 'brand_logo';
+
+    /**
+     * The single source of truth for the site brand name.
+     * Falls back to config/app.name (seeded from the APP_NAME env var).
+     */
+    public static function brandName(): string
+    {
+        $name = static::get(self::BRAND_NAME_KEY);
+        $name = is_string($name) ? trim($name) : '';
+
+        return $name !== '' ? $name : (string) config('app.name', 'Nabob Holdings');
+    }
+
+    /**
+     * Stored disk path of the uploaded brand logo (public disk), or null for the text logo.
+     */
+    public static function brandLogoPath(): ?string
+    {
+        $path = static::get(self::BRAND_LOGO_KEY);
+
+        return is_string($path) && trim($path) !== '' ? $path : null;
+    }
+
+    public static function brandLogoUrl(): ?string
+    {
+        $path = static::brandLogoPath();
+
+        return $path ? Storage::disk('public')->url($path) : null;
+    }
+
+    /**
+     * Brand payload shared with every page (name + optional logo url).
+     *
+     * @return array{name: string, logo: ?string}
+     */
+    public static function brand(): array
+    {
+        return [
+            'name' => static::brandName(),
+            'logo' => static::brandLogoUrl(),
+        ];
+    }
 
     public static function get(string $key, mixed $default = null): mixed
     {
@@ -64,8 +111,8 @@ class PlatformSettings
             $accountNumber = (string) ($account['account_number'] ?? '');
             $accountName = (string) ($account['account_name'] ?? '');
 
-            // CityShop receive numbers should always show business + Robert Asare.
-            $canonical = static::cityShopReceiveAccountName($accountNumber);
+            // Nabob Holdings receive numbers should always show business + Robert Asare.
+            $canonical = static::nabobReceiveAccountName($accountNumber);
             if ($canonical !== null) {
                 $accountName = $canonical;
             }
@@ -83,7 +130,7 @@ class PlatformSettings
         }, $decoded['accounts'] ?? []));
 
         $accounts = array_values(array_filter($accounts));
-        $accounts = static::ensureCityShopMomoAccounts($accounts);
+        $accounts = static::ensureNabobMomoAccounts($accounts);
 
         return [
             'enabled' => (bool) ($decoded['enabled'] ?? false),
@@ -93,14 +140,14 @@ class PlatformSettings
     }
 
     /**
-     * Canonical MoMo account name for CityShop’s public receive numbers.
+     * Canonical MoMo account name for Nabob Holdings’s public receive numbers.
      */
-    public static function cityShopReceiveAccountName(string $accountNumber): ?string
+    public static function nabobReceiveAccountName(string $accountNumber): ?string
     {
         $digits = preg_replace('/\D+/', '', $accountNumber) ?? '';
 
         return match ($digits) {
-            '0539790093', '513014', '0273706541' => 'City Unlock Ventures / Robert Asare',
+            '0539790093', '513014', '0273706541' => 'Nabob Holdings / Robert Asare',
             default => null,
         };
     }
@@ -110,13 +157,13 @@ class PlatformSettings
      *
      * @return list<array<string, mixed>>
      */
-    public static function defaultCityShopMomoAccounts(): array
+    public static function defaultNabobMomoAccounts(): array
     {
         return [
             [
                 'type' => 'momo',
                 'label' => 'MTN Mobile Money',
-                'account_name' => 'City Unlock Ventures / Robert Asare',
+                'account_name' => 'Nabob Holdings / Robert Asare',
                 'account_number' => '0539790093',
                 'network' => 'mtn',
                 'bank_name' => null,
@@ -124,7 +171,7 @@ class PlatformSettings
             [
                 'type' => 'momo',
                 'label' => 'Telecel Cash',
-                'account_name' => 'City Unlock Ventures / Robert Asare',
+                'account_name' => 'Nabob Holdings / Robert Asare',
                 'account_number' => '513014',
                 'network' => 'telecel',
                 'bank_name' => null,
@@ -132,7 +179,7 @@ class PlatformSettings
             [
                 'type' => 'momo',
                 'label' => 'AirtelTigo Cash',
-                'account_name' => 'City Unlock Ventures / Robert Asare',
+                'account_name' => 'Nabob Holdings / Robert Asare',
                 'account_number' => '0273706541',
                 'network' => 'airteltigo',
                 'bank_name' => null,
@@ -141,12 +188,12 @@ class PlatformSettings
     }
 
     /**
-     * Fill in any missing CityShop MoMo network so buyers never see “Not configured”.
+     * Fill in any missing Nabob Holdings MoMo network so buyers never see “Not configured”.
      *
      * @param  list<array<string, mixed>>  $accounts
      * @return list<array<string, mixed>>
      */
-    public static function ensureCityShopMomoAccounts(array $accounts): array
+    public static function ensureNabobMomoAccounts(array $accounts): array
     {
         $byNetwork = [];
         foreach ($accounts as $account) {
@@ -159,7 +206,7 @@ class PlatformSettings
             }
         }
 
-        foreach (static::defaultCityShopMomoAccounts() as $default) {
+        foreach (static::defaultNabobMomoAccounts() as $default) {
             $network = $default['network'];
             if (! isset($byNetwork[$network])) {
                 $accounts[] = $default;

@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'cityshop_recent_views';
+const STORAGE_KEY = 'nabob_recent_views';
 const MAX_ITEMS = 20;
 
 export type RecentView = {

@@ -77,7 +77,7 @@ export default function AdminUnprocessedOrders({ items, hours, count }: Unproces
             <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
                 <p className="font-semibold">Paid {hours}+ hours ago — not yet out for delivery</p>
                 <p className="mt-1">
-                    Each card shows the current fulfillment stage. You can cancel and refund the buyer’s CityShop wallet at any time if you
+                    Each card shows the current fulfillment stage. You can cancel and refund the buyer’s Nabob Holdings wallet at any time if you
                     suspect the order will not go through (before it is out for delivery).
                 </p>
                 <p className="mt-2 font-medium">{count} waiting</p>
@@ -143,7 +143,7 @@ export default function AdminUnprocessedOrders({ items, hours, count }: Unproces
                         {cancellingId === item.id && (
                             <div className="mt-4 space-y-2 border-t border-gray-100 pt-4">
                                 <p className="text-sm text-gray-600">
-                                    Confirm cancel. Buyer gets <strong>{formatPrice(item.line_total)}</strong> back in their CityShop wallet.
+                                    Confirm cancel. Buyer gets <strong>{formatPrice(item.line_total)}</strong> back in their Nabob Holdings wallet.
                                 </p>
                                 <Input
                                     value={data.reason}

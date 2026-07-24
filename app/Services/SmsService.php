@@ -25,7 +25,7 @@ class SmsService
     {
         $clientId = config('services.sms.hubtel_client_id');
         $clientSecret = config('services.sms.hubtel_client_secret');
-        $sender = config('services.sms.hubtel_sender', 'CityShop');
+        $sender = config('services.sms.hubtel_sender', 'Nabob');
 
         if (! $clientId || ! $clientSecret) {
             Log::warning('Hubtel SMS not configured, logging instead.', compact('phone', 'message'));

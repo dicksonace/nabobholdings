@@ -25,13 +25,13 @@ class SellerApprovedNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Seller application approved!')
             ->greeting('Congratulations '.$notifiable->name.'!')
-            ->line('Your CityShop seller account has been approved.')
+            ->line('Your Nabob Holdings seller account has been approved.')
             ->line('You can now list products and start selling.')
             ->action('Go to Dashboard', route('seller.dashboard'));
     }
 
     public function toSms(object $notifiable): string
     {
-        return 'CityShop: Your seller application has been approved! Log in to start selling.';
+        return 'Nabob Holdings: Your seller application has been approved! Log in to start selling.';
     }
 }

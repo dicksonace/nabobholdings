@@ -76,7 +76,7 @@ export default function AdminAwaitingDirectOrders({
                 <p className="font-semibold">Pay-to-seller orders not marked paid yet</p>
                 <p className="mt-1">
                     These appear for the buyer as soon as they continue to payment. Sellers only see an order after the buyer
-                    submits a transaction ID or proof. This list is for ops visibility — CityShop is not holding these funds.
+                    submits a transaction ID or proof. This list is for ops visibility — Nabob Holdings is not holding these funds.
                 </p>
                 <p className="mt-2 font-medium">{count} awaiting · {awaiting_claim_count} no proof yet · {claimed_count} claimed</p>
             </div>

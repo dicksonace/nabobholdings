@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-$HOME/domains/cityunlock.net/cityshop}"
+APP_DIR="${APP_DIR:-$HOME/domains/nabobholdings.com/nabob}"
 PHP_BIN="${PHP_BIN:-php}"
 
-echo "==> WARNING: This deletes ALL CityShop data on the server."
+echo "==> WARNING: This deletes ALL Nabob Holdings data on the server."
 echo "==> Fresh install: admin account + categories only (no demo products)."
 read -r -p "Type RESET to continue: " confirm
 if [[ "$confirm" != "RESET" ]]; then
@@ -18,7 +18,7 @@ echo "==> Pull latest code"
 git pull origin main
 
 echo "==> Reset database"
-$PHP_BIN artisan cityshop:reset --force
+$PHP_BIN artisan nabob:reset --force
 
 echo "==> Storage link"
 $PHP_BIN artisan storage:link 2>/dev/null || true
@@ -32,5 +32,5 @@ chmod -R 775 storage bootstrap/cache
 
 echo "==> Done."
 echo "    Admin: https://cityunlock.net/admin/login"
-echo "    Email: admin@cityshop.com"
+echo "    Email: admin@nabobholdings.com"
 echo "    Password: password (change immediately)"

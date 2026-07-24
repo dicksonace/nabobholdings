@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SellerController as AdminSellerController;
 use App\Http\Controllers\Admin\SellerInviteController as AdminSellerInviteController;
 use App\Http\Controllers\Admin\StoreOversightController as AdminStoreOversightController;
+use App\Http\Controllers\Admin\BrandSettingsController as AdminBrandSettingsController;
 use App\Http\Controllers\Admin\ManualFundingSettingsController as AdminManualFundingSettingsController;
 use App\Http\Controllers\Admin\ManualTopUpController as AdminManualTopUpController;
 use App\Http\Controllers\Admin\PendingFundController as AdminPendingFundController;
@@ -204,6 +205,9 @@ Route::prefix('seller')->name('seller.')->middleware(['auth', 'role:seller'])->g
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/brand', [AdminBrandSettingsController::class, 'edit'])->name('brand.settings');
+    Route::post('/brand', [AdminBrandSettingsController::class, 'update'])->name('brand.settings.update');
 
     Route::get('/sellers', [AdminSellerController::class, 'index'])->name('sellers.index');
     Route::get('/sellers/{seller}', [AdminSellerController::class, 'show'])->name('sellers.show');

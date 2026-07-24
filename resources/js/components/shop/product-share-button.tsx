@@ -18,7 +18,7 @@ export default function ProductShareButton({ productName, className, size = 'md'
     const share = async () => {
         const url = window.location.href;
         const title = productName;
-        const text = `Check out ${productName} on CityShop`;
+        const text = `Check out ${productName} on Nabob Holdings`;
 
         try {
             if (typeof navigator.share === 'function') {

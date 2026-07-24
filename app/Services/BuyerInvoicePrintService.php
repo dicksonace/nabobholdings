@@ -130,7 +130,7 @@ class BuyerInvoicePrintService
     private function respond(Invoice $invoice, bool $download): Response
     {
         $data = $this->payload($invoice);
-        $filename = 'CityShop-Invoice-'.$invoice->invoice_number.'.pdf';
+        $filename = 'Nabob-Invoice-'.$invoice->invoice_number.'.pdf';
         $binary = $this->renderPdfBinary($data);
 
         return response($binary, 200, [
@@ -167,8 +167,8 @@ class BuyerInvoicePrintService
         ]);
 
         $mpdf->SetTitle('Invoice '.$data['invoice']->invoice_number);
-        $mpdf->SetAuthor('CityShop');
-        $mpdf->SetCreator('CityShop');
+        $mpdf->SetAuthor('Nabob Holdings');
+        $mpdf->SetCreator('Nabob Holdings');
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;
 

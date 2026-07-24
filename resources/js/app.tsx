@@ -17,7 +17,7 @@ declare global {
     const route: typeof routeFn;
 }
 
-const appName = import.meta.env.VITE_APP_NAME || 'CityShop';
+let appName = import.meta.env.VITE_APP_NAME || 'Nabob Holdings';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -37,9 +37,13 @@ createInertiaApp({
         }),
     setup({ el, App, props }) {
         const root = createRoot(el);
-        const initialToken = (props.initialPage.props as { csrfToken?: string }).csrfToken;
+        const initialProps = props.initialPage.props as { csrfToken?: string; brand?: { name?: string } };
+        const initialToken = initialProps.csrfToken;
         if (initialToken) {
             setCsrfToken(initialToken);
+        }
+        if (initialProps.brand?.name) {
+            appName = initialProps.brand.name;
         }
 
         root.render(
@@ -56,9 +60,12 @@ createInertiaApp({
 });
 
 router.on('success', (event) => {
-    const token = (event.detail.page.props as { csrfToken?: string }).csrfToken;
-    if (token) {
-        setCsrfToken(token);
+    const props = event.detail.page.props as { csrfToken?: string; brand?: { name?: string } };
+    if (props.csrfToken) {
+        setCsrfToken(props.csrfToken);
+    }
+    if (props.brand?.name) {
+        appName = props.brand.name;
     }
 });
 

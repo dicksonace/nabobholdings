@@ -20,8 +20,8 @@ class StoreNameSearchTest extends TestCase
         $seller = User::factory()->create(['role' => UserRole::Seller]);
         SellerProfile::create([
             'user_id' => $seller->id,
-            'store_name' => 'City Unlock',
-            'business_name' => 'City Unlock Trading',
+            'store_name' => 'Nabob Holdings',
+            'business_name' => 'Nabob Holdings Trading',
             'slug' => 'city-unlock',
             'status' => SellerStatus::Approved,
             'approved_at' => now(),
@@ -53,19 +53,19 @@ class StoreNameSearchTest extends TestCase
             'status' => ProductStatus::Approved,
         ]);
 
-        $page = $this->get(route('search', ['q' => 'City Unlock']))
+        $page = $this->get(route('search', ['q' => 'Nabob Holdings']))
             ->assertOk();
 
         $page->assertInertia(fn ($assert) => $assert
             ->component('shop/search')
             ->has('stores', 1)
             ->where('stores.0.slug', 'city-unlock')
-            ->where('stores.0.name', 'City Unlock Trading')
+            ->where('stores.0.name', 'Nabob Holdings Trading')
             ->has('products.data', 1)
             ->where('products.data.0.id', $product->id)
         );
 
-        $this->getJson(route('search.suggest', ['q' => 'City Unlock']))
+        $this->getJson(route('search.suggest', ['q' => 'Nabob Holdings']))
             ->assertOk()
             ->assertJsonPath('stores.0.slug', 'city-unlock')
             ->assertJsonPath('products.0.id', $product->id);

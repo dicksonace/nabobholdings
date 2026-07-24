@@ -53,14 +53,14 @@ export default function SellerLogin({ canResetPassword, status, defaultLogin = '
                                 <Store className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-lg font-bold">CityShop</p>
+                                <p className="text-lg font-bold">Nabob Holdings</p>
                                 <p className="text-sm text-emerald-100">Seller Centre</p>
                             </div>
                         </div>
                     </div>
                     <div className="relative z-10 space-y-6">
                         <div>
-                            <h2 className="text-3xl font-bold leading-tight">Grow your business on CityShop</h2>
+                            <h2 className="text-3xl font-bold leading-tight">Grow your business on Nabob Holdings</h2>
                             <p className="mt-3 max-w-md text-emerald-100">
                                 Sign in to manage your store, fulfill orders, and reach buyers across Ghana.
                             </p>
@@ -76,7 +76,7 @@ export default function SellerLogin({ canResetPassword, status, defaultLogin = '
                             ))}
                         </ul>
                     </div>
-                    <p className="relative z-10 text-xs text-emerald-200/80">Seller accounts are invite-only. Need access? Contact CityShop support.</p>
+                    <p className="relative z-10 text-xs text-emerald-200/80">Seller accounts are invite-only. Need access? Contact Nabob Holdings support.</p>
                 </div>
 
                 <div className="flex items-center justify-center bg-gradient-to-b from-emerald-50/50 to-white p-6 sm:p-10">
@@ -87,7 +87,7 @@ export default function SellerLogin({ canResetPassword, status, defaultLogin = '
                             </div>
                             <div>
                                 <p className="font-bold text-gray-900">Seller Centre</p>
-                                <p className="text-xs text-gray-500">CityShop for sellers</p>
+                                <p className="text-xs text-gray-500">Nabob Holdings for sellers</p>
                             </div>
                         </div>
 

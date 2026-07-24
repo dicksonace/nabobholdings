@@ -193,7 +193,7 @@ export default function WalletBalanceCard({
                                         <span>
                                             <span className="block font-semibold text-gray-900">Manual</span>
                                             <span className="mt-0.5 block text-sm text-gray-500">
-                                                Send to CityShop MoMo / bank, then upload proof for admin credit.
+                                                Send to Nabob Holdings MoMo / bank, then upload proof for admin credit.
                                             </span>
                                         </span>
                                     </Link>

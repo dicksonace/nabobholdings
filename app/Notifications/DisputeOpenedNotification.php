@@ -32,6 +32,6 @@ class DisputeOpenedNotification extends Notification implements ShouldQueue
 
     public function toSms(object $notifiable): string
     {
-        return "CityShop: Dispute opened on order {$this->dispute->order->order_number}. Reason: {$this->dispute->reason}.";
+        return "Nabob Holdings: Dispute opened on order {$this->dispute->order->order_number}. Reason: {$this->dispute->reason}.";
     }
 }

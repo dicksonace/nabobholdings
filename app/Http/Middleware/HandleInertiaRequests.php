@@ -6,6 +6,7 @@ use App\Models\CartItem;
 use App\Models\Wishlist;
 use App\Services\ChatService;
 use App\Services\PanelNavService;
+use App\Services\PlatformSettings;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -56,10 +57,13 @@ class HandleInertiaRequests extends Middleware
         $unreadMessages = $user ? ChatService::unreadMessageCount($user) : 0;
         $unreadNotifications = $user ? ChatService::unreadNotificationCount($user) : 0;
 
+        $brand = PlatformSettings::brand();
+
         return [
             ...parent::share($request),
             'csrfToken' => csrf_token(),
-            'name' => config('app.name', 'CityShop'),
+            'name' => $brand['name'],
+            'brand' => $brand,
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $user ? $user->load('sellerProfile') : null,

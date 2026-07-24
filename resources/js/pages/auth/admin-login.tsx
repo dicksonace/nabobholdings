@@ -46,7 +46,7 @@ export default function AdminLogin({ canResetPassword, status, defaultLogin = ''
                         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-700 bg-slate-900 shadow-lg shadow-black/20">
                             <Shield className="h-7 w-7 text-indigo-400" />
                         </div>
-                        <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">CityShop Control</h1>
+                        <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">Nabob Holdings Control</h1>
                         <p className="mt-2 text-sm text-slate-400">Administrator access only</p>
                     </div>
 
@@ -70,7 +70,7 @@ export default function AdminLogin({ canResetPassword, status, defaultLogin = ''
                                     required
                                     autoFocus
                                     className="mt-1 border-slate-700 bg-slate-950 text-white placeholder:text-slate-600 focus-visible:ring-indigo-500"
-                                    placeholder="admin@cityshop.com"
+                                    placeholder="admin@nabobholdings.com"
                                 />
                             </div>
                             <div>

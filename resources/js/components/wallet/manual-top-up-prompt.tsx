@@ -15,7 +15,7 @@ export default function ManualTopUpPrompt({
     href,
     className,
     title = 'Paying a large amount?',
-    description = 'Send money to CityShop MoMo or bank, then submit proof — admin credits your wallet.',
+    description = 'Send money to Nabob Holdings MoMo or bank, then submit proof — admin credits your wallet.',
     cta = 'Use manual payment',
 }: ManualTopUpPromptProps) {
     return (

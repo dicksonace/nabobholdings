@@ -44,6 +44,6 @@ class BuyerRegisterController extends Controller
 
         return redirect()
             ->route('home')
-            ->with('success', 'Welcome to CityShop! Your account was created successfully. Start shopping anytime.');
+            ->with('success', 'Welcome to Nabob Holdings! Your account was created successfully. Start shopping anytime.');
     }
 }

@@ -45,7 +45,7 @@ return [
         'driver' => env('SMS_DRIVER', 'log'),
         'hubtel_client_id' => env('HUBTEL_CLIENT_ID'),
         'hubtel_client_secret' => env('HUBTEL_CLIENT_SECRET'),
-        'hubtel_sender' => env('HUBTEL_SENDER', 'CityShop'),
+        'hubtel_sender' => env('HUBTEL_SENDER', 'Nabob'),
     ],
 
     'openai' => [

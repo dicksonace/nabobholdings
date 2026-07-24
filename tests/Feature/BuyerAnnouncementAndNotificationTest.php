@@ -84,7 +84,7 @@ class BuyerAnnouncementAndNotificationTest extends TestCase
             'user_id' => $buyer->id,
             'type' => 'admin_message',
             'title' => 'Hello buyer',
-            'body' => 'Welcome to CityShop',
+            'body' => 'Welcome to Nabob Holdings',
             'data' => [],
         ]);
 

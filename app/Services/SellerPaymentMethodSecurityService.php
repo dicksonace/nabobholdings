@@ -97,7 +97,7 @@ class SellerPaymentMethodSecurityService
         if ($profile->paymentMethodsAreLocked()) {
             throw new InvalidArgumentException(
                 $profile->payment_methods_lock_reason
-                    ?: 'Your payment methods are locked by CityShop admin. Contact support.'
+                    ?: 'Your payment methods are locked by Nabob Holdings admin. Contact support.'
             );
         }
     }

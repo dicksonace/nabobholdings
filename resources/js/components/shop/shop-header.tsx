@@ -20,7 +20,7 @@ import { useState } from 'react';
 
 import NotificationBell from '@/components/shop/notification-bell';
 import SearchBox from '@/components/shop/search-box';
-import CityShopBrand from '@/components/cityshop-brand';
+import NabobBrand from '@/components/nabob-brand';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useChatOptional } from '@/contexts/chat-context';
@@ -138,7 +138,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
         <header className="sticky top-0 z-50 border-b border-gray-100/80 bg-white/95 shadow-sm backdrop-blur-md">
             <div className="mx-auto max-w-7xl px-3 py-2 sm:px-4 sm:py-3">
                 <div className="flex items-center gap-2 sm:gap-4">
-                    <CityShopBrand size="sm" className="shrink-0" />
+                    <NabobBrand size="sm" className="shrink-0" />
 
                     <div className={`mx-auto hidden max-w-2xl flex-1 md:flex ${hideSearch ? 'md:hidden' : ''}`}>
                         <SearchBox

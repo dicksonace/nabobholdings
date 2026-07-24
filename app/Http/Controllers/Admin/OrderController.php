@@ -169,7 +169,7 @@ class OrderController extends Controller
 
         return back()->with(
             'success',
-            'Order cancelled. The buyer has been refunded to their CityShop wallet.'
+            'Order cancelled. The buyer has been refunded to their Nabob Holdings wallet.'
         );
     }
 

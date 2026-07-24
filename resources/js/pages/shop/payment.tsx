@@ -116,13 +116,13 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
 
                     {marketplaceTotal > 0 && (
                         <div className="mt-6 rounded-xl border border-orange-100 bg-orange-50 p-4">
-                            <p className="font-semibold text-gray-900">CityShop payment</p>
+                            <p className="font-semibold text-gray-900">Nabob Holdings payment</p>
                             <p className="mt-1 text-2xl font-bold text-orange-500">{formatPrice(marketplaceTotal)}</p>
                             <p className="mt-1 text-sm text-gray-500">Pay securely via Paystack for marketplace sellers.</p>
                             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                             <Button onClick={payWithPaystack} disabled={loading} className="mt-4 w-full bg-orange-500 hover:bg-orange-600">
                                 {loading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                                Pay via CityShop
+                                Pay via Nabob Holdings
                             </Button>
                         </div>
                     )}

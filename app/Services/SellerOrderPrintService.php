@@ -127,8 +127,8 @@ class SellerOrderPrintService
         ]);
 
         $mpdf->SetTitle('Packing slip '.$data['order']->order_number);
-        $mpdf->SetAuthor('CityShop');
-        $mpdf->SetCreator('CityShop');
+        $mpdf->SetAuthor('Nabob Holdings');
+        $mpdf->SetCreator('Nabob Holdings');
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;
 
@@ -140,7 +140,7 @@ class SellerOrderPrintService
 
     private function filename(Order $order): string
     {
-        return 'CityShop-Order-'.$order->order_number.'.pdf';
+        return 'Nabob-Order-'.$order->order_number.'.pdf';
     }
 
     private function paymentLabel(Order $order): string
@@ -156,8 +156,8 @@ class SellerOrderPrintService
         }
 
         return $order->payment_status->value === 'paid'
-            ? 'Paid · CityShop secured'
-            : 'CityShop secured (awaiting payment)';
+            ? 'Paid · Nabob Holdings secured'
+            : 'Nabob Holdings secured (awaiting payment)';
     }
 
     /**

@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'cityshop_checkout_draft';
+const STORAGE_KEY = 'nabob_checkout_draft';
 
 export type CheckoutDraftSellerPayment = {
     channel: string;
@@ -61,7 +61,7 @@ export function clearCheckoutDraft(): void {
     }
 }
 
-const PAYMENT_REF_PREFIX = 'cityshop_payment_ref_';
+const PAYMENT_REF_PREFIX = 'nabob_payment_ref_';
 
 export function loadPaymentReference(orderId: number): string | null {
     try {

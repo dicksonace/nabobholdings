@@ -31,18 +31,18 @@ interface Props {
 const emptyAccount = (): Account => ({
     type: 'momo',
     label: 'MTN Mobile Money',
-    account_name: 'City Unlock Ventures / Robert Asare',
+    account_name: 'Nabob Holdings / Robert Asare',
     account_number: '',
     network: 'mtn',
     bank_name: '',
 });
 
-/** Starter receive accounts from CityShop ops — used when none are configured yet. */
-const defaultCityShopAccounts = (): Account[] => [
+/** Starter receive accounts from Nabob Holdings ops — used when none are configured yet. */
+const defaultNabobAccounts = (): Account[] => [
     {
         type: 'momo',
         label: 'MTN Mobile Money',
-        account_name: 'City Unlock Ventures / Robert Asare',
+        account_name: 'Nabob Holdings / Robert Asare',
         account_number: '0539790093',
         network: 'mtn',
         bank_name: '',
@@ -50,7 +50,7 @@ const defaultCityShopAccounts = (): Account[] => [
     {
         type: 'momo',
         label: 'Telecel Cash',
-        account_name: 'City Unlock Ventures / Robert Asare',
+        account_name: 'Nabob Holdings / Robert Asare',
         account_number: '513014',
         network: 'telecel',
         bank_name: '',
@@ -58,7 +58,7 @@ const defaultCityShopAccounts = (): Account[] => [
     {
         type: 'momo',
         label: 'AirtelTigo Cash',
-        account_name: 'City Unlock Ventures / Robert Asare',
+        account_name: 'Nabob Holdings / Robert Asare',
         account_number: '0273706541',
         network: 'airteltigo',
         bank_name: '',
@@ -85,7 +85,7 @@ export default function ManualFundingSettings({ settings }: Props) {
     const form = useForm({
         enabled: settings.enabled,
         instructions: settings.instructions,
-        accounts: (settings.accounts.length > 0 ? settings.accounts : defaultCityShopAccounts()).map(normalizeAccount),
+        accounts: (settings.accounts.length > 0 ? settings.accounts : defaultNabobAccounts()).map(normalizeAccount),
     });
 
     const accounts = form.data.accounts;
@@ -203,7 +203,7 @@ export default function ManualFundingSettings({ settings }: Props) {
                                                 type: e.target.value as 'momo' | 'bank',
                                                 label:
                                                     e.target.value === 'momo'
-                                                        ? account.label || 'CITY SHOP MOMO'
+                                                        ? account.label || 'NABOB MOMO'
                                                         : account.label || 'Bank transfer',
                                                 network: e.target.value === 'momo' ? account.network || 'mtn' : null,
                                             })

@@ -25,7 +25,7 @@ export default function Faq({ faq, contact }: FaqProps) {
                         <HelpCircle className="h-7 w-7 text-orange-500" />
                     </div>
                     <h1 className="mt-4 text-3xl font-bold text-gray-900">Frequently Asked Questions</h1>
-                    <p className="mt-2 text-gray-500">Everything you need to know about buying and selling on CityShop.</p>
+                    <p className="mt-2 text-gray-500">Everything you need to know about buying and selling on Nabob Holdings.</p>
                 </div>
 
                 <div className="mt-10">

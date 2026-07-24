@@ -10,12 +10,12 @@ return [
 
     /*
     | After the seller marks an item delivered (awaiting buyer confirmation),
-    | CityShop auto-confirms receipt if the buyer does not act within this many days.
+    | Nabob Holdings auto-confirms receipt if the buyer does not act within this many days.
     */
     'auto_confirm_delivery_days' => (int) env('AUTO_CONFIRM_DELIVERY_DAYS', 21),
 
     'contact' => [
-        'email' => env('MARKETPLACE_SUPPORT_EMAIL', 'support@cityshop.com'),
+        'email' => env('MARKETPLACE_SUPPORT_EMAIL', 'support@nabobholdings.com'),
         'phone' => env('MARKETPLACE_SUPPORT_PHONE', '+233 24 862 0718'),
         'whatsapp' => env('MARKETPLACE_SUPPORT_WHATSAPP', '+233 24 862 0718'),
         'address' => env('MARKETPLACE_SUPPORT_ADDRESS', 'Sefwi Bekwai, Western North, Ghana'),
@@ -24,7 +24,7 @@ return [
 
     'faq' => [
         [
-            'category' => 'Buying on CityShop',
+            'category' => 'Buying on Nabob Holdings',
             'items' => [
                 [
                     'question' => 'How do I place an order?',
@@ -49,7 +49,7 @@ return [
             'items' => [
                 [
                     'question' => 'Who handles delivery?',
-                    'answer' => 'Sellers deliver items directly to buyers. Each seller arranges their own delivery or courier within Ghana — CityShop does not ship orders itself.',
+                    'answer' => 'Sellers deliver items directly to buyers. Each seller arranges their own delivery or courier within Ghana — Nabob Holdings does not ship orders itself.',
                 ],
                 [
                     'question' => 'How long does delivery take?',
@@ -66,15 +66,15 @@ return [
             ],
         ],
         [
-            'category' => 'Selling on CityShop',
+            'category' => 'Selling on Nabob Holdings',
             'items' => [
                 [
                     'question' => 'How do I become a seller?',
                     'answer' => 'Seller registration is by invitation only. Contact support with the subject "Become a Seller" and tell us about your business. If approved, we will email you a private registration link valid for 24 hours. Upload your Ghana Card, business documents (if applicable), and shop photo. Our team reviews applications within 1–3 business days.',
                 ],
                 [
-                    'question' => 'Does CityShop charge sellers a commission?',
-                    'answer' => 'No. CityShop does not take a commission on sales. When a buyer pays through CityShop, the full product amount (minus any discounts) goes to your seller wallet as Pending Fund. After the buyer confirms delivery, CityShop admin approves the release to your Available balance so you can withdraw.',
+                    'question' => 'Does Nabob Holdings charge sellers a commission?',
+                    'answer' => 'No. Nabob Holdings does not take a commission on sales. When a buyer pays through Nabob Holdings, the full product amount (minus any discounts) goes to your seller wallet as Pending Fund. After the buyer confirms delivery, Nabob Holdings admin approves the release to your Available balance so you can withdraw.',
                 ],
                 [
                     'question' => 'How do I get paid as a seller?',
@@ -82,7 +82,7 @@ return [
                 ],
                 [
                     'question' => 'How do I add product specifications?',
-                    'answer' => 'When creating a product, select a category first. CityShop shows the relevant specification fields for that category — for example RAM and storage for laptops, or size and material for fashion items.',
+                    'answer' => 'When creating a product, select a category first. Nabob Holdings shows the relevant specification fields for that category — for example RAM and storage for laptops, or size and material for fashion items.',
                 ],
             ],
         ],
@@ -99,7 +99,7 @@ return [
                 ],
                 [
                     'question' => 'Can I return a product?',
-                    'answer' => 'Return policies depend on the seller and product category. Contact the seller through your order page first. If unresolved, open a dispute and CityShop support will mediate.',
+                    'answer' => 'Return policies depend on the seller and product category. Contact the seller through your order page first. If unresolved, open a dispute and Nabob Holdings support will mediate.',
                 ],
             ],
         ],
@@ -112,11 +112,11 @@ return [
                 ],
                 [
                     'question' => 'Is my payment information safe?',
-                    'answer' => 'Yes. CityShop does not store your card or Mobile Money PIN. All payments are handled by Paystack, a PCI-DSS compliant payment processor trusted across Africa.',
+                    'answer' => 'Yes. Nabob Holdings does not store your card or Mobile Money PIN. All payments are handled by Paystack, a PCI-DSS compliant payment processor trusted across Africa.',
                 ],
                 [
                     'question' => 'How do I contact support?',
-                    'answer' => 'Visit our Contact page to send a message, email support@cityshop.com, or WhatsApp us during business hours. Include your order number if your question is about a specific purchase.',
+                    'answer' => 'Visit our Contact page to send a message, email support@nabobholdings.com, or WhatsApp us during business hours. Include your order number if your question is about a specific purchase.',
                 ],
             ],
         ],

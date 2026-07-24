@@ -161,7 +161,7 @@ class BuyerInvoiceSellerContactTest extends TestCase
             ->get(route('invoices.pdf', $master))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf')
-            ->assertHeader('content-disposition', 'attachment; filename="CityShop-Invoice-'.$master->invoice_number.'.pdf"');
+            ->assertHeader('content-disposition', 'attachment; filename="Nabob-Invoice-'.$master->invoice_number.'.pdf"');
     }
 
     public function test_seller_invoice_includes_store_name_and_address(): void

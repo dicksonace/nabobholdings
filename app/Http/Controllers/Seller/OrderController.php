@@ -197,7 +197,7 @@ class OrderController extends Controller
         }
 
         $msg = $orderItem->fresh()->refund_status === \App\Support\OrderCancellation::REFUND_COMPLETED
-            ? 'Order cancelled. The buyer was refunded to their CityShop wallet (debited from your available balance).'
+            ? 'Order cancelled. The buyer was refunded to their Nabob Holdings wallet (debited from your available balance).'
             : 'Order cancelled.';
 
         return redirect()->route('seller.orders.stage', 'cancelled')

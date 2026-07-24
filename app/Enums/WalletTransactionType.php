@@ -14,6 +14,6 @@ enum WalletTransactionType: string
     case OrderPayment = 'order_payment';
     case OrderRefund = 'order_refund';
     case SaleReversed = 'sale_reversed';
-    /** Seller CityShop wallet clawback when a paid pay-to-seller order is cancelled. */
+    /** Seller Nabob Holdings wallet clawback when a paid pay-to-seller order is cancelled. */
     case DirectCancelDebit = 'direct_cancel_debit';
 }

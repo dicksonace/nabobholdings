@@ -36,6 +36,6 @@ class DirectPaymentRejectedNotification extends Notification implements ShouldQu
 
     public function toSms(object $notifiable): string
     {
-        return "CityShop: Seller rejected payment claim for order {$this->order->order_number}. Resubmit a valid reference.";
+        return "Nabob Holdings: Seller rejected payment claim for order {$this->order->order_number}. Resubmit a valid reference.";
     }
 }
