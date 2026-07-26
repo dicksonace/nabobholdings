@@ -15,29 +15,29 @@
     --radius-sm: calc(var(--radius) - 4px);
 
     /*
-     * Hex overrides for Tailwind's default oklch palette.
-     * Safari 15 (iPhone 6s/7) ignores oklch(), which made the shop look black-and-white.
+     * Brand palette: amber CTAs + navy trust (online store).
+     * orange-* utilities are remapped to amber so existing classes stay on-brand.
      */
-    --color-orange-50: #fff7ed;
-    --color-orange-100: #ffedd5;
-    --color-orange-200: #fed7aa;
-    --color-orange-300: #fdba74;
-    --color-orange-400: #fb923c;
-    --color-orange-500: #f97316;
-    --color-orange-600: #ea580c;
-    --color-orange-700: #c2410c;
-    --color-orange-800: #9a3412;
-    --color-orange-900: #7c2d12;
-    --color-blue-50: #eff6ff;
-    --color-blue-100: #dbeafe;
-    --color-blue-200: #bfdbfe;
-    --color-blue-300: #93c5fd;
-    --color-blue-400: #60a5fa;
-    --color-blue-500: #3b82f6;
-    --color-blue-600: #2563eb;
-    --color-blue-700: #1d4ed8;
-    --color-blue-800: #1e40af;
-    --color-blue-900: #1e3a8a;
+    --color-orange-50: #fffbeb;
+    --color-orange-100: #fef3c7;
+    --color-orange-200: #fde68a;
+    --color-orange-300: #fcd34d;
+    --color-orange-400: #fbbf24;
+    --color-orange-500: #f59e0b;
+    --color-orange-600: #d97706;
+    --color-orange-700: #b45309;
+    --color-orange-800: #92400e;
+    --color-orange-900: #78350f;
+    --color-blue-50: #f0f4f8;
+    --color-blue-100: #d9e2ec;
+    --color-blue-200: #bcccdc;
+    --color-blue-300: #9fb3c8;
+    --color-blue-400: #627d98;
+    --color-blue-500: #486581;
+    --color-blue-600: #334e68;
+    --color-blue-700: #243b53;
+    --color-blue-800: #1e3a5f;
+    --color-blue-900: #0f2744;
     --color-emerald-50: #ecfdf5;
     --color-emerald-100: #d1fae5;
     --color-emerald-200: #a7f3d0;
@@ -162,42 +162,44 @@
 
 :root {
     color-scheme: light;
-    --background: hsl(0, 0%, 100%);
-    --foreground: hsl(220, 20%, 15%);
+    --background: hsl(210, 20%, 98%);
+    --foreground: hsl(213, 40%, 12%);
     --card: hsl(0, 0%, 100%);
-    --card-foreground: hsl(220, 20%, 15%);
+    --card-foreground: hsl(213, 40%, 12%);
     --popover: hsl(0, 0%, 100%);
-    --popover-foreground: hsl(220, 20%, 15%);
-    --primary: hsl(24, 95%, 53%);
+    --popover-foreground: hsl(213, 40%, 12%);
+    /* Amber CTA */
+    --primary: hsl(38, 92%, 50%);
     --primary-foreground: hsl(0, 0%, 100%);
-    --secondary: hsl(214, 84%, 56%);
+    /* Navy trust */
+    --secondary: hsl(213, 55%, 22%);
     --secondary-foreground: hsl(0, 0%, 100%);
-    --muted: hsl(210, 20%, 96%);
-    --muted-foreground: hsl(220, 10%, 46%);
-    --accent: hsl(214, 84%, 96%);
-    --accent-foreground: hsl(214, 84%, 40%);
+    --muted: hsl(210, 25%, 95%);
+    --muted-foreground: hsl(215, 12%, 42%);
+    --accent: hsl(213, 40%, 95%);
+    --accent-foreground: hsl(213, 55%, 22%);
     --destructive: hsl(0, 84.2%, 60.2%);
     --destructive-foreground: hsl(0, 0%, 98%);
-    --border: hsl(220, 13%, 91%);
-    --input: hsl(220, 13%, 91%);
-    --ring: hsl(24, 95%, 53%);
-    --chart-1: hsl(24, 95%, 53%);
-    --chart-2: hsl(214, 84%, 56%);
-    --chart-3: hsl(142, 71%, 45%);
-    --chart-4: hsl(43, 74%, 66%);
-    --chart-5: hsl(27, 87%, 67%);
+    --border: hsl(214, 20%, 90%);
+    --input: hsl(214, 20%, 90%);
+    --ring: hsl(38, 92%, 45%);
+    --chart-1: hsl(38, 92%, 50%);
+    --chart-2: hsl(213, 55%, 32%);
+    --chart-3: hsl(142, 55%, 40%);
+    --chart-4: hsl(43, 80%, 55%);
+    --chart-5: hsl(28, 80%, 52%);
     --radius: 0.625rem;
-    --nabob-orange: hsl(24, 95%, 53%);
-    --nabob-blue: hsl(214, 84%, 56%);
-    --nabob-green: hsl(142, 71%, 45%);
-    --sidebar-background: hsl(0, 0%, 98%);
-    --sidebar-foreground: hsl(240, 5.3%, 30%);
-    --sidebar-primary: hsl(0, 0%, 10%);
+    --nabob-orange: hsl(38, 92%, 50%);
+    --nabob-blue: hsl(213, 55%, 22%);
+    --nabob-green: hsl(142, 55%, 40%);
+    --sidebar-background: hsl(210, 25%, 98%);
+    --sidebar-foreground: hsl(213, 30%, 25%);
+    --sidebar-primary: hsl(213, 55%, 22%);
     --sidebar-primary-foreground: hsl(0, 0%, 98%);
-    --sidebar-accent: hsl(0, 0%, 94%);
-    --sidebar-accent-foreground: hsl(0, 0%, 30%);
-    --sidebar-border: hsl(0, 0%, 91%);
-    --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+    --sidebar-accent: hsl(38, 90%, 95%);
+    --sidebar-accent-foreground: hsl(213, 55%, 22%);
+    --sidebar-border: hsl(214, 20%, 90%);
+    --sidebar-ring: hsl(38, 92%, 45%);
 }
 
 .dark {

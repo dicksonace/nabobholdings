@@ -110,7 +110,7 @@ export default function Contact({ contact, subjects, defaults }: ContactProps) {
                             </ul>
                         </div>
 
-                        <div className="rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 p-6 text-white">
+                        <div className="rounded-2xl bg-gradient-to-br from-[#0f2744] to-[#d97706] p-6 text-white">
                             <h3 className="font-semibold">Need quick answers?</h3>
                             <p className="mt-2 text-sm text-orange-100">Check our FAQ for help with orders, payments, and selling.</p>
                             <Button asChild variant="secondary" className="mt-4 bg-white text-orange-600 hover:bg-orange-50">

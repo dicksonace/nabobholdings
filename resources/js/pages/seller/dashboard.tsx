@@ -137,7 +137,7 @@ export default function SellerDashboard({
                 </div>
             )}
 
-            <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-orange-600 to-blue-600 p-6 text-white shadow-lg">
+            <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-r from-[#0f2744] via-[#1e3a5f] to-[#d97706] p-6 text-white shadow-lg">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                         <p className="text-sm font-medium text-orange-100">Welcome back</p>

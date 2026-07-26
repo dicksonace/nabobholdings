@@ -124,9 +124,9 @@ class HomeController extends Controller
             ],
             'hasSaleProducts' => Product::visibleInShop()->whereNotNull('discount_price')->whereColumn('discount_price', '<', 'price')->exists(),
             'heroSlides' => [
-                ['title' => 'Shop Nabob Holdings', 'subtitle' => 'Quality products from our store — delivered to your doorstep.', 'accent' => 'from-blue-600 to-orange-500'],
-                ['title' => 'Shop the Best Deals', 'subtitle' => 'Electronics, fashion, and more — carefully selected for you.', 'accent' => 'from-emerald-600 to-teal-500'],
-                ['title' => 'Buy with Confidence', 'subtitle' => 'Secure payments, order tracking, and support on every purchase.', 'accent' => 'from-violet-600 to-indigo-500'],
+                ['title' => 'Shop Nabob Holdings', 'subtitle' => 'Quality products from our store — delivered to your doorstep.', 'accent' => 'from-[#0f2744] to-[#1e3a5f]'],
+                ['title' => 'Shop the Best Deals', 'subtitle' => 'Electronics, fashion, and more — carefully selected for you.', 'accent' => 'from-[#152a45] to-[#d97706]'],
+                ['title' => 'Buy with Confidence', 'subtitle' => 'Secure payments, order tracking, and support on every purchase.', 'accent' => 'from-[#0f2744] via-[#243b53] to-[#b45309]'],
             ],
         ]);
     }

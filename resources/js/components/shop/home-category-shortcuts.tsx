@@ -151,13 +151,13 @@ export default function HomeCategoryShortcuts({
                     <button
                         type="button"
                         onClick={() => applyFilters({ sort: 'popular' }, filters)}
-                        className="mt-4 flex w-full items-center justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 px-4 py-3 text-left shadow-sm sm:px-5 sm:py-4"
+                        className="mt-4 flex w-full items-center justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-[#0f2744] via-[#1e3a5f] to-[#d97706] px-4 py-3 text-left shadow-sm sm:px-5 sm:py-4"
                     >
                         <div>
                             <p className="text-[10px] font-bold tracking-wider text-white/90 uppercase sm:text-xs">Big Sale</p>
                             <p className="text-sm font-extrabold text-white sm:text-lg">Shop top deals on Nabob Holdings</p>
                         </div>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-orange-600 shadow-sm">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#0f2744] shadow-sm">
                             <ShoppingBag className="h-3.5 w-3.5" />
                             Shop Now
                         </span>

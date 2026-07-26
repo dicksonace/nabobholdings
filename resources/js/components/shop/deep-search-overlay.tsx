@@ -77,7 +77,7 @@ export default function DeepSearchOverlay({ open, previewUrl, active = true }: D
                 aria-live="polite"
                 className="relative w-full max-w-lg overflow-hidden rounded-[1.75rem] border border-white/20 bg-white shadow-2xl shadow-orange-900/20"
             >
-                <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-500 px-5 py-4 text-white">
+                <div className="bg-gradient-to-r from-[#0f2744] via-[#1e3a5f] to-[#d97706] px-5 py-4 text-white">
                     <div className="flex items-center gap-2">
                         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
                             <Sparkles className="h-4 w-4" />
