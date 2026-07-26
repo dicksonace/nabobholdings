@@ -33,6 +33,9 @@ $PHP_BIN artisan migrate --force
 echo "==> Ensure single owner store (admin) and claim catalog"
 $PHP_BIN artisan store:claim-owner --claim
 
+echo "==> Release any stuck pending store funds to available"
+$PHP_BIN artisan store:release-pending-funds
+
 echo "==> Index product images for visual search"
 $PHP_BIN artisan products:index-image-colors
 

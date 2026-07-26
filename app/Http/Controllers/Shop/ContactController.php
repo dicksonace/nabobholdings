@@ -30,8 +30,6 @@ class ContactController extends Controller
                 'general' => 'General Inquiry',
                 'order' => 'Order Issue',
                 'payment' => 'Payment Problem',
-                'become_seller' => 'Become a Seller',
-                'seller' => 'Seller Account Support',
                 'technical' => 'Technical Issue',
                 'other' => 'Other',
             ],
@@ -49,8 +47,6 @@ class ContactController extends Controller
             'general' => true,
             'order' => true,
             'payment' => true,
-            'become_seller' => true,
-            'seller' => true,
             'technical' => true,
             'other' => true,
         ]);

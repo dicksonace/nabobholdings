@@ -258,15 +258,15 @@ export default function ProductShow({ product, related, reviews, reviewable }: P
                             {!canShop && auth.user ? (
                                 <>
                                     <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                                        <p className="font-semibold">Seller accounts cannot buy products</p>
+                                        <p className="font-semibold">Store accounts cannot buy products</p>
                                         <p className="mt-1 text-amber-800/90">
-                                            Use a buyer account to shop. You can still manage your store from Seller Centre.
+                                            Use a buyer account to shop. Manage your catalog from the Owner Panel.
                                         </p>
                                         <Link
-                                            href={route('seller.dashboard')}
+                                            href={auth.user?.role === 'admin' ? route('admin.dashboard') : route('seller.dashboard')}
                                             className="mt-2 inline-flex text-sm font-semibold text-orange-600 hover:underline"
                                         >
-                                            Go to Seller Centre →
+                                            Go to Owner Panel →
                                         </Link>
                                     </div>
                                     {product.seller && auth.user.id !== product.seller.id && (

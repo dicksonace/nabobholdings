@@ -224,7 +224,7 @@ class OrderController extends Controller
     {
         try {
             // Admin confirm completes the order (buyer can review) — does not release funds.
-            $this->orders->confirmBuyerDelivery($orderItem, releaseFunds: false);
+            $this->orders->confirmBuyerDelivery($orderItem, releaseFunds: true);
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }

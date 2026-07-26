@@ -48,29 +48,22 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
         { label: 'FAQ', href: route('faq') },
     ];
 
-    const sellerNavLinks = [
-        { label: 'Seller Centre', href: route('seller.dashboard'), highlight: true },
-        { label: 'Products', href: route('seller.products.index') },
-        { label: 'Orders', href: route('seller.orders.index') },
-        { label: 'Earnings', href: route('seller.wallet') },
-        { label: 'Messages', href: route('chat.index'), chat: true },
-        { label: 'Browse marketplace', href: route('home') },
-        { label: 'Contact', href: route('contact') },
-        { label: 'FAQ', href: route('faq') },
-    ];
-
-    const adminNavLinks = [
-        { label: 'Admin Dashboard', href: route('admin.dashboard'), highlight: true },
-        { label: 'Browse marketplace', href: route('home') },
-        { label: 'Contact', href: route('contact') },
-        { label: 'FAQ', href: route('faq') },
-    ];
-
     const role = auth.user?.role as string | undefined;
     const isSeller = role === 'seller';
     const isAdmin = role === 'admin';
     const isStaff = isAdmin || isSeller;
-    const activeNavLinks = isSeller ? sellerNavLinks : isAdmin ? adminNavLinks : navLinks;
+    // Single-store: sellers (legacy) and admin share owner-style links.
+    const activeNavLinks = isAdmin || isSeller
+        ? [
+              { label: 'Owner Panel', href: isAdmin ? route('admin.dashboard') : route('seller.dashboard'), highlight: true },
+              { label: 'Products', href: route('seller.products.index') },
+              { label: 'Orders', href: route('seller.orders.index') },
+              { label: 'Wallet', href: route('seller.wallet') },
+              { label: 'Browse shop', href: route('home') },
+              { label: 'Contact', href: route('contact') },
+              { label: 'FAQ', href: route('faq') },
+          ]
+        : navLinks;
 
     const openMessages = (e?: React.MouseEvent) => {
         e?.preventDefault();
@@ -90,8 +83,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
 
     const dashboardLabel = () => {
         if (!auth.user) return 'Dashboard';
-        if (isAdmin) return 'Admin Dashboard';
-        if (isSeller) return 'Seller Centre';
+        if (isAdmin || isSeller) return 'Owner Panel';
         return 'My Orders';
     };
 

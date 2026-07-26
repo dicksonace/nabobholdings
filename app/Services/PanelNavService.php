@@ -4,16 +4,12 @@ namespace App\Services;
 
 use App\Enums\DisputeStatus;
 use App\Enums\OrderStatus;
-use App\Enums\SellerReportStatus;
-use App\Enums\SellerStatus;
 use App\Enums\UserRole;
 use App\Enums\WithdrawalStatus;
 use App\Enums\WalletTopUpStatus;
 use App\Models\ContactMessage;
 use App\Models\Dispute;
 use App\Models\OrderItem;
-use App\Models\SellerProfile;
-use App\Models\SellerReport;
 use App\Models\User;
 use App\Models\WalletTopUpRequest;
 use App\Models\Withdrawal;
@@ -43,18 +39,12 @@ class PanelNavService
     private static function adminCounts(User $user): array
     {
         return [
-            'pending_sellers' => SellerProfile::where('status', SellerStatus::Pending)->count(),
             'pending_withdrawals' => Withdrawal::where('status', WithdrawalStatus::Pending)->count(),
-            'pending_seller_withdrawals' => Withdrawal::where('status', WithdrawalStatus::Pending)
-                ->whereHas('user', fn ($q) => $q->where('role', UserRole::Seller))
-                ->count(),
             'pending_manual_top_ups' => WalletTopUpRequest::where('status', WalletTopUpStatus::Pending)->count(),
-            'pending_fund_releases' => app(OrderService::class)->pendingFundReleaseItemsQuery()->count(),
             'stale_unprocessed_orders' => app(OrderService::class)->staleUnprocessedItemsQuery(24)->count(),
             'awaiting_direct_payments' => app(OrderService::class)->awaitingDirectPaymentOrdersQuery('all')->count(),
             'awaiting_buyer_confirmation' => OrderItem::where('status', OrderStatus::AwaitingConfirmation)->count(),
             'open_disputes' => Dispute::whereIn('status', [DisputeStatus::Open, DisputeStatus::UnderReview])->count(),
-            'open_seller_reports' => SellerReport::whereIn('status', [SellerReportStatus::Open, SellerReportStatus::Reviewing])->count(),
             'unread_messages' => ContactMessage::where('is_read', false)->count(),
             'unread_chat_messages' => ChatService::unreadMessageCount($user),
         ];

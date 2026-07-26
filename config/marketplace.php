@@ -40,7 +40,7 @@ return [
                 ],
                 [
                     'question' => 'Can I cancel my order?',
-                    'answer' => 'You may cancel before the seller sends your item for delivery. Go to My Orders, open the order, and request cancellation. Once out for delivery, cancellation is no longer available — you may open a dispute if there is a problem.',
+                    'answer' => 'You may cancel before your order is sent for delivery. Go to My Orders, open the order, and request cancellation. Once out for delivery, cancellation is no longer available — you may open a refund request if there is a problem.',
                 ],
             ],
         ],
@@ -49,40 +49,32 @@ return [
             'items' => [
                 [
                     'question' => 'Who handles delivery?',
-                    'answer' => 'Sellers deliver items directly to buyers. Each seller arranges their own delivery or courier — Nabob Holdings does not ship orders itself.',
+                    'answer' => 'Nabob Holdings arranges delivery for your order. Tracking details are added when your package is out for delivery.',
                 ],
                 [
                     'question' => 'How long does delivery take?',
-                    'answer' => 'Delivery times vary by seller and location. Items marked "Local Delivery" typically arrive within 1–5 business days locally and 3–10 days nationwide.',
+                    'answer' => 'Delivery times vary by location. Items marked "Local Delivery" typically arrive within 1–5 business days locally and 3–10 days nationwide.',
                 ],
                 [
                     'question' => 'What does "Free Delivery" mean?',
-                    'answer' => 'Products with a Free Delivery badge are delivered by the seller at no extra charge. You pay only the product price at checkout with no additional delivery fee for that item.',
+                    'answer' => 'Products with a Free Delivery badge are delivered at no extra charge. You pay only the product price at checkout with no additional delivery fee for that item.',
                 ],
                 [
                     'question' => 'How do I track my order?',
-                    'answer' => 'When your order is out for delivery, the seller adds a courier name and tracking number. View these under My Orders → order details. You will also receive SMS and email updates when your order status changes.',
+                    'answer' => 'When your order is out for delivery, courier details and a tracking number appear under My Orders → order details. You will also receive SMS and email updates when your order status changes.',
                 ],
             ],
         ],
         [
-            'category' => 'Selling on Nabob Holdings',
+            'category' => 'Payments & Wallet',
             'items' => [
                 [
-                    'question' => 'How do I become a seller?',
-                    'answer' => 'Seller registration is by invitation only. Contact support with the subject "Become a Seller" and tell us about your business. If approved, we will email you a private registration link valid for 24 hours. Upload your Ghana Card, business documents (if applicable), and shop photo. Our team reviews applications within 1–3 business days.',
+                    'question' => 'When is my payment released?',
+                    'answer' => 'For secured checkout, your payment is held until you confirm delivery (or until auto-confirmation after the waiting period). Then the sale settles in the store wallet.',
                 ],
                 [
-                    'question' => 'Does Nabob Holdings charge sellers a commission?',
-                    'answer' => 'No. Nabob Holdings does not take a commission on sales. When a buyer pays through Nabob Holdings, the full product amount (minus any discounts) goes to your seller wallet as Pending Fund. After the buyer confirms delivery, Nabob Holdings admin approves the release to your Available balance so you can withdraw.',
-                ],
-                [
-                    'question' => 'How do I get paid as a seller?',
-                    'answer' => 'Earnings go to your seller wallet. After admin releases Pending funds to Available, request a withdrawal to your Mobile Money number from the Wallet page. Admin processes payouts manually (Start → send MoMo → Mark paid).',
-                ],
-                [
-                    'question' => 'How do I add product specifications?',
-                    'answer' => 'When creating a product, select a category first. Nabob Holdings shows the relevant specification fields for that category — for example RAM and storage for laptops, or size and material for fashion items.',
+                    'question' => 'What is my buyer wallet for?',
+                    'answer' => 'Your wallet holds refunds and top-ups. You can use wallet balance at checkout or withdraw to Mobile Money after admin approval.',
                 ],
             ],
         ],
@@ -91,15 +83,15 @@ return [
             'items' => [
                 [
                     'question' => 'What if I receive a wrong or damaged item?',
-                    'answer' => 'Open a refund request from your order details page within 2 months of the order date. Describe the issue and our team will investigate. Funds may be held in escrow until the dispute is resolved. Orders older than 2 months no longer appear under My Orders.',
+                    'answer' => 'Open a refund request from your order details page within 2 months of the order date. Describe the issue and our team will investigate. Orders older than 2 months no longer appear under My Orders.',
                 ],
                 [
                     'question' => 'How does buyer protection work?',
-                    'answer' => 'Your payment is held securely until delivery is confirmed. If a seller fails to deliver or sends an item that does not match the listing, you can open a dispute for a refund or replacement.',
+                    'answer' => 'Secured payments are held until delivery is confirmed. If something goes wrong with the order, you can open a refund request for a refund or replacement.',
                 ],
                 [
                     'question' => 'Can I return a product?',
-                    'answer' => 'Return policies depend on the seller and product category. Contact the seller through your order page first. If unresolved, open a dispute and Nabob Holdings support will mediate.',
+                    'answer' => 'Contact us from your order page first. If unresolved, open a refund request and Nabob Holdings support will help resolve it.',
                 ],
             ],
         ],
@@ -112,7 +104,7 @@ return [
                 ],
                 [
                     'question' => 'Is my payment information safe?',
-                    'answer' => 'Yes. Nabob Holdings does not store your card or Mobile Money PIN. All payments are handled by Paystack, a PCI-DSS compliant payment processor trusted across Africa.',
+                    'answer' => 'Yes. Nabob Holdings does not store your card or Mobile Money PIN. All payments are handled by Paystack, a PCI-DSS compliant payment processor.',
                 ],
                 [
                     'question' => 'How do I contact support?',

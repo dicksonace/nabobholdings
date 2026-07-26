@@ -2,7 +2,6 @@ import { Link } from '@inertiajs/react';
 import { ChevronRight, Star } from 'lucide-react';
 
 import MessageSellerButton from '@/components/shop/message-seller-button';
-import ReportSellerButton from '@/components/shop/report-seller-button';
 import { storePageUrl } from '@/components/shop/seller-store-link';
 import { formatCompactCount, productImageUrl, SellerProfile } from '@/types/marketplace';
 
@@ -95,15 +94,9 @@ export default function ProductSellerInfo({ seller, productId, showChatButton = 
                 <MessageSellerButton
                     sellerId={seller.id}
                     productId={productId}
-                    label="Chat with Seller"
+                    label="Chat with store"
                     className="mt-4 w-full py-5 text-sm sm:py-6 sm:text-base"
                 />
-            )}
-
-            {!isOwnProduct && (
-                <div className="mt-3 flex justify-end">
-                    <ReportSellerButton sellerId={seller.id} productId={productId} storeName={storeName} />
-                </div>
             )}
         </div>
     );

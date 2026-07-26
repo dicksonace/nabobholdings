@@ -25,8 +25,8 @@ const subjectLabels: Record<string, string> = {
     general: 'General Inquiry',
     order: 'Order Issue',
     payment: 'Payment Problem',
-    become_seller: 'Become a Seller',
-    seller: 'Seller Account Support',
+    become_seller: 'General',
+    seller: 'Support',
     technical: 'Technical Issue',
     other: 'Other',
 };

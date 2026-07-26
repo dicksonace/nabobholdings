@@ -208,8 +208,8 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
                 { key: 'payment-methods', label: 'Payment Methods', href: route('seller.payment-methods.index') },
                 { key: 'withdrawals-buyers', label: 'Buyer Withdrawals', href: route('admin.withdrawals.index', { status: 'pending', role: 'buyer' }), badgeKey: 'pending_withdrawals' },
                 { key: 'manual-top-ups', label: 'Manual Top-ups', href: route('admin.manual-top-ups.index'), badgeKey: 'pending_manual_top_ups' },
-                { key: 'pending-funds', label: 'Pending Funds', href: route('admin.pending-funds.index'), badgeKey: 'pending_fund_releases' },
                 { key: 'manual-funding-settings', label: 'Receive Accounts', href: route('admin.manual-funding.settings') },
+                { key: 'wallet-funding', label: 'Adjust Buyer Wallets', href: route('admin.wallet-funding.index') },
             ],
         },
         {
