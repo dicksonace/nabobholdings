@@ -28,8 +28,12 @@ class EnsureRole
         $allowed = array_map(fn ($r) => UserRole::from($r), $roles);
 
         if (! in_array($user->role, $allowed, true)) {
+            // Admin is also the store operator in single-seller mode — allow seller routes when listed.
             if (($request->is('seller') || $request->is('seller/*')) && $user->isAdmin()) {
-                return redirect()->route('admin.dashboard');
+                $allowsAdmin = collect($allowed)->contains(fn ($role) => $role === UserRole::Admin);
+                if ($allowsAdmin) {
+                    return $next($request);
+                }
             }
 
             if (($request->is('admin') || $request->is('admin/*')) && $user->isSeller()) {

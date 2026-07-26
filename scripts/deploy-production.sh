@@ -25,6 +25,9 @@ fi
 echo "==> Run migrations"
 $PHP_BIN artisan migrate --force
 
+echo "==> Ensure single owner store (admin) and claim catalog"
+$PHP_BIN artisan store:claim-owner --claim
+
 echo "==> Index product images for visual search"
 $PHP_BIN artisan products:index-image-colors
 

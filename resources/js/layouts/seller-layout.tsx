@@ -17,6 +17,8 @@ import PanelSidebarNav from '@/components/panel/panel-sidebar-nav';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useInitials } from '@/hooks/use-initials';
+import AdminLayout from '@/layouts/admin-layout';
+import { sellerKeyToAdminNavKey } from '@/lib/admin-nav';
 import { SellerNavKey, sellerMobileNavItems, sellerNavGroups, sellerNavSection } from '@/lib/seller-nav';
 import { isNavSubItemActive } from '@/lib/panel-nav-utils';
 import { cn } from '@/lib/utils';
@@ -83,6 +85,16 @@ function SellerSidebar({
 export default function SellerLayout({ children, title, active, showFab = false }: SellerLayoutProps) {
     const { url, props } = usePage<SharedData>();
     const user = props.auth?.user;
+
+    // Single-seller mode: admin uses the unified Owner Panel chrome.
+    if (user?.role === 'admin') {
+        return (
+            <AdminLayout title={title} active={sellerKeyToAdminNavKey(active)}>
+                {children}
+            </AdminLayout>
+        );
+    }
+
     const getInitials = useInitials();
     const mobileNav = sellerMobileNavItems(active);
     const [menuOpen, setMenuOpen] = useState(false);

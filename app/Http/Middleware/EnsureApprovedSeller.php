@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\SellerStatus;
+use App\Services\OwnerStoreService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +14,19 @@ class EnsureApprovedSeller
     {
         $user = $request->user();
 
-        if (! $user?->isSeller()) {
+        if (! $user) {
+            abort(403);
+        }
+
+        // Single-seller mode: admin is the store owner.
+        if ($user->isAdmin()) {
+            app(OwnerStoreService::class)->ensureForAdmin($user);
+            $user->load('sellerProfile');
+
+            return $next($request);
+        }
+
+        if (! $user->isSeller()) {
             abort(403);
         }
 

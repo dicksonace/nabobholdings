@@ -15,14 +15,20 @@ use App\Models\Product;
 use App\Models\SellerProfile;
 use App\Models\User;
 use App\Models\Withdrawal;
+use App\Services\OwnerStoreService;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index(OwnerStoreService $ownerStores): Response
     {
+        $admin = auth()->user();
+        if ($admin) {
+            $ownerStores->ensureForAdmin($admin);
+        }
+
         $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth();
         $startOfToday = $now->copy()->startOfDay();

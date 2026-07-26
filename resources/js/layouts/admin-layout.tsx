@@ -13,7 +13,7 @@ export default function AdminLayout({ children, title, active }: AdminLayoutProp
     return (
         <PanelLayout
             title={title}
-            panelTitle="Admin Panel"
+            panelTitle="Owner Panel"
             panelId="admin"
             navGroups={adminNavGroups(active)}
             fallbackSection={adminNavSection(active)}

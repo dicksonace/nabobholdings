@@ -7,7 +7,6 @@ import {
     PackageCheck,
     ShieldCheck,
     ShoppingBag,
-    Store,
     Truck,
     Wallet,
 } from 'lucide-react';
@@ -15,7 +14,7 @@ import { ComponentType, useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
 
-type RoleKey = 'admin' | 'seller' | 'buyer';
+type RoleKey = 'owner' | 'buyer';
 
 interface Step {
     title: string;
@@ -27,77 +26,43 @@ interface RoleGuide {
     label: string;
     tagline: string;
     icon: ComponentType<{ className?: string }>;
-    accent: string; // tailwind text color
-    chip: string; // tailwind bg/border for active tab
+    accent: string;
+    chip: string;
     steps: Step[];
 }
 
 const ROLES: RoleGuide[] = [
     {
-        key: 'admin',
-        label: 'Admins',
-        tagline: 'Run and moderate the whole marketplace',
+        key: 'owner',
+        label: 'Store owner',
+        tagline: 'One login to run the whole store',
         icon: ShieldCheck,
         accent: 'text-violet-600',
         chip: 'border-violet-300 bg-violet-50 text-violet-700',
         steps: [
             {
-                title: 'Approve sellers',
-                body: 'New sellers apply and appear under Marketplace → Pending Approval. Open an application, review the store and business details, then Approve or Reject. Only approved sellers can list products.',
+                title: 'Sign in to the Owner Panel',
+                body: 'Use /admin/login. You land on the dashboard with sales, orders and product KPIs. The same account owns the store — there is no separate seller login.',
             },
             {
-                title: 'Moderate products',
-                body: 'Every new listing starts as Pending under Products. Review it and Approve to make it live on the storefront, or Reject with a reason. You can also see live, rejected and out-of-stock items.',
+                title: 'Add & manage products',
+                body: 'Under Products, add listings with photos, price, delivery fee and stock. New products go live immediately (no approval queue). Hide drafts or mark items out of stock when needed.',
             },
             {
-                title: 'Oversee orders',
-                body: 'Under Orders you can watch every order, spot ones unprocessed for 24h+, follow orders awaiting direct payment, confirm delivery, and handle seller cancellations.',
+                title: 'Fulfil orders',
+                body: 'Under Orders, work the sales pipeline: new → processing → packing → out for delivery → completed. Confirm cash-on-delivery calls and mark payments received for direct pay.',
             },
             {
-                title: 'Manage finance & payouts',
-                body: 'Under Finance you release pending funds to sellers after delivery, approve and mark withdrawal payouts (MoMo), approve manual wallet top-ups, and set the receiving accounts.',
+                title: 'Finance & wallet',
+                body: 'Use Store Wallet for balances, withdrawals and payment methods. Approve buyer withdrawals and manual top-ups from Finance when needed. Set receive accounts under Settings.',
             },
             {
-                title: 'Handle support',
-                body: 'Refund requests, buyer–seller chats, seller reports and contact messages all live under Support. You can also broadcast announcements to sellers or buyers.',
+                title: 'Customers & support',
+                body: 'View buyers, reply to reviews, handle refund requests, chat with customers, and read contact-form messages. Broadcast announcements to buyers when you need to.',
             },
             {
-                title: 'Configure the platform',
-                body: 'In Settings → Brand & Currency you control the brand name, logo and the currency shown across the whole app. The Dashboard gives you live KPIs and performance charts.',
-            },
-        ],
-    },
-    {
-        key: 'seller',
-        label: 'Sellers',
-        tagline: 'List products, fulfil orders, get paid',
-        icon: Store,
-        accent: 'text-emerald-600',
-        chip: 'border-emerald-300 bg-emerald-50 text-emerald-700',
-        steps: [
-            {
-                title: 'Register & set up the store',
-                body: 'Sellers sign up through a registration invite, complete their store profile (name, description, appearance) and submit for review. An admin then approves the account.',
-            },
-            {
-                title: 'Add products',
-                body: 'Once approved, add products with photos, price, delivery fee and stock. Each product is submitted for admin approval before it goes live on the marketplace.',
-            },
-            {
-                title: 'Receive & process orders',
-                body: 'When a buyer orders, the seller gets an email/SMS alert. Move the order through the stages: confirm → pack → ship → delivered, adding tracking where relevant.',
-            },
-            {
-                title: 'Get paid',
-                body: 'For Nabob-secured payments, funds are held and settle into the seller wallet after the buyer confirms delivery. For pay-to-seller or cash on delivery, the seller confirms once money is received.',
-            },
-            {
-                title: 'Grow sales',
-                body: 'Create coupons and promotions, customise the storefront appearance, and track views and performance from the seller dashboard.',
-            },
-            {
-                title: 'Withdraw earnings',
-                body: 'Sellers withdraw their available wallet balance to Mobile Money. Admin reviews and pays out each request; every movement is recorded in wallet transactions.',
+                title: 'Brand the storefront',
+                body: 'Customize store appearance, and under Settings set brand name, logo, currency and the public address/phone shown in the footer and contact page.',
             },
         ],
     },
@@ -115,19 +80,19 @@ const ROLES: RoleGuide[] = [
             },
             {
                 title: 'Add to cart & checkout',
-                body: 'Add items to the cart or save them to a wishlist, then check out with delivery details. Buyers can order from multiple sellers.',
+                body: 'Add items to the cart or wishlist, then check out with delivery details.',
             },
             {
                 title: 'Pay your way',
-                body: 'Pay online via card or Mobile Money (secured by Nabob), pay the seller directly, or choose cash on delivery where available.',
+                body: 'Pay online via card or Mobile Money (secured by Nabob), pay the store directly, or choose cash on delivery where available.',
             },
             {
                 title: 'Track & confirm delivery',
-                body: 'Follow each order’s status. When the item arrives, confirm delivery — this releases the held funds to the seller and completes the order.',
+                body: 'Follow each order’s status. When the item arrives, confirm delivery — this releases held funds and completes the order.',
             },
             {
                 title: 'Reviews & support',
-                body: 'Leave a rating and review after delivery, chat with sellers, and raise a refund request if something goes wrong. Approved refunds are credited to the buyer wallet.',
+                body: 'Leave a rating after delivery, chat with the store, and raise a refund request if something goes wrong. Approved refunds credit the buyer wallet.',
             },
         ],
     },
@@ -136,14 +101,14 @@ const ROLES: RoleGuide[] = [
 const FLOW: { icon: ComponentType<{ className?: string }>; label: string }[] = [
     { icon: ShoppingBag, label: 'Buyer orders & pays' },
     { icon: ShieldCheck, label: 'Nabob secures funds' },
-    { icon: PackageCheck, label: 'Seller packs & ships' },
+    { icon: PackageCheck, label: 'Store packs & ships' },
     { icon: Truck, label: 'Buyer confirms delivery' },
-    { icon: Wallet, label: 'Funds released to seller' },
-    { icon: Banknote, label: 'Seller withdraws (MoMo)' },
+    { icon: Wallet, label: 'Funds settle in store wallet' },
+    { icon: Banknote, label: 'Owner withdraws (MoMo)' },
 ];
 
 export default function AdminGuide() {
-    const [role, setRole] = useState<RoleKey>('admin');
+    const [role, setRole] = useState<RoleKey>('owner');
     const active = ROLES.find((r) => r.key === role) ?? ROLES[0];
 
     return (
@@ -157,13 +122,12 @@ export default function AdminGuide() {
                 <div>
                     <h1 className="text-lg font-bold text-gray-900">How this app works</h1>
                     <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                        Nabob Holdings is a multi-vendor marketplace. Sellers list products, buyers order and pay,
-                        and admins keep everything running smoothly. Here’s the full picture for each role.
+                        Nabob Holdings runs as a single-store shop. One Owner Panel manages products, orders and finance;
+                        buyers shop on the storefront.
                     </p>
                 </div>
             </div>
 
-            {/* Money & order flow */}
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                 <h3 className="font-semibold text-gray-900">The money &amp; order flow</h3>
                 <p className="text-sm text-gray-500">How a secured order moves from checkout to payout.</p>
@@ -180,8 +144,7 @@ export default function AdminGuide() {
                 </div>
             </div>
 
-            {/* Role tabs */}
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {ROLES.map((r) => {
                     const isActive = r.key === role;
                     return (
@@ -205,7 +168,6 @@ export default function AdminGuide() {
                 })}
             </div>
 
-            {/* Steps for the selected role */}
             <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                 <div className="flex items-center gap-2">
                     <active.icon className={`h-5 w-5 ${active.accent}`} />
@@ -231,8 +193,8 @@ export default function AdminGuide() {
             </div>
 
             <p className="mt-4 text-xs text-gray-400">
-                Payment options vary per product and seller: Nabob-secured (funds held then released), pay-to-seller
-                (direct), or cash on delivery. Sellers arrange their own delivery.
+                Payment options: Nabob-secured (funds held then released), pay-to-store (direct), or cash on delivery.
+                Delivery is arranged by the store.
             </p>
         </AdminLayout>
     );

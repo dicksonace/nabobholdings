@@ -208,7 +208,7 @@ export default function AdminDashboard({
     ];
 
     return (
-        <AdminLayout title="Admin Panel" active="dashboard">
+        <AdminLayout title="Owner Panel" active="dashboard">
             <Head title="Admin Dashboard" />
 
             {/* Hero KPIs */}

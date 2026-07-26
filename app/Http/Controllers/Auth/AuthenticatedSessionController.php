@@ -36,11 +36,9 @@ class AuthenticatedSessionController extends Controller
             return redirect()->to($user->defaultRedirectRoute());
         }
 
-        return Inertia::render('auth/seller-login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => $request->session()->get('status'),
-            'defaultLogin' => old('login', ''),
-        ]);
+        // Single-seller mode: store operators use the admin (owner) login.
+        return redirect()->route('admin.login')
+            ->with('status', 'Store owners sign in here to manage products and orders.');
     }
 
     public function createAdmin(Request $request): Response|RedirectResponse

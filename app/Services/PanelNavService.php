@@ -30,7 +30,8 @@ class PanelNavService
         }
 
         return match ($user->role) {
-            UserRole::Admin => self::adminCounts(),
+            // Seller ops badges first; admin keys win on collisions (e.g. unread_messages = contact form).
+            UserRole::Admin => array_merge(self::sellerCounts($user), self::adminCounts($user)),
             UserRole::Seller => self::sellerCounts($user),
             default => [],
         };
@@ -39,7 +40,7 @@ class PanelNavService
     /**
      * @return array<string, int>
      */
-    private static function adminCounts(): array
+    private static function adminCounts(User $user): array
     {
         return [
             'pending_sellers' => SellerProfile::where('status', SellerStatus::Pending)->count(),
@@ -55,6 +56,7 @@ class PanelNavService
             'open_disputes' => Dispute::whereIn('status', [DisputeStatus::Open, DisputeStatus::UnderReview])->count(),
             'open_seller_reports' => SellerReport::whereIn('status', [SellerReportStatus::Open, SellerReportStatus::Reviewing])->count(),
             'unread_messages' => ContactMessage::where('is_read', false)->count(),
+            'unread_chat_messages' => ChatService::unreadMessageCount($user),
         ];
     }
 

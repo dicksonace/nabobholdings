@@ -36,7 +36,7 @@ export default function AdminLogin({ canResetPassword, status, defaultLogin = ''
 
     return (
         <>
-            <Head title="Admin Login" />
+            <Head title="Owner Login" />
             <div className="relative flex min-h-svh items-center justify-center overflow-hidden bg-slate-950 px-4 py-12">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800/80 via-slate-950 to-slate-950" />
                 <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-indigo-500/10 blur-3xl" />
@@ -46,8 +46,8 @@ export default function AdminLogin({ canResetPassword, status, defaultLogin = ''
                         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-700 bg-slate-900 shadow-lg shadow-black/20">
                             <Shield className="h-7 w-7 text-indigo-400" />
                         </div>
-                        <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">Nabob Holdings Control</h1>
-                        <p className="mt-2 text-sm text-slate-400">Administrator access only</p>
+                        <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">Owner Panel</h1>
+                        <p className="mt-2 text-sm text-slate-400">Manage your store, products and orders</p>
                     </div>
 
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-black/30 backdrop-blur">

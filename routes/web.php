@@ -136,7 +136,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/counts', [ChatNotificationController::class, 'counts'])->name('notifications.counts');
 });
 
-Route::prefix('seller')->name('seller.')->middleware(['auth', 'role:seller'])->group(function () {
+Route::prefix('seller')->name('seller.')->middleware(['auth', 'role:admin,seller'])->group(function () {
     Route::get('/pending', [SellerDashboardController::class, 'pending'])->name('pending');
 
     Route::middleware(['seller.approved'])->group(function () {

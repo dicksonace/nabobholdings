@@ -29,6 +29,11 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
+        $admin = User::where('email', 'admin@nabobholdings.com')->first();
+        if ($admin) {
+            app(\App\Services\OwnerStoreService::class)->ensureForAdmin($admin);
+        }
+
         $categorySpecs = config('category_specs', []);
         $categoryNames = [
             'electronics' => 'Electronics',
