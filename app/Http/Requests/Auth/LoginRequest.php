@@ -72,11 +72,11 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        if ($portal === 'admin' && ! $user->isAdmin()) {
+        if ($portal === 'admin' && ! $user->isBackOffice()) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'login' => 'Administrator access only. Please use the correct login portal.',
+                'login' => 'Owner Panel access only. Please use the correct login portal.',
             ]);
         }
 
@@ -88,11 +88,11 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        if ($portal === 'buyer' && $user->isAdmin()) {
+        if ($portal === 'buyer' && $user->isBackOffice()) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'login' => 'This is an administrator account. Please use the admin login page.',
+                'login' => 'This is a staff account. Please use the Owner Panel login page.',
             ]);
         }
 

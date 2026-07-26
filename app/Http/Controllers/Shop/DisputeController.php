@@ -88,7 +88,7 @@ class DisputeController extends Controller
             ],
         );
 
-        $admins = User::where('role', UserRole::Admin)->get();
+        $admins = User::whereIn('role', [UserRole::Admin, UserRole::Staff])->get();
         Notification::send($admins, new DisputeOpenedNotification($dispute));
 
         return back()->with('success', 'Refund request submitted. Admin will review before any refund is issued.');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\BuyerWelcomeNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,6 +40,8 @@ class BuyerRegisterController extends Controller
         ]);
 
         event(new Registered($user));
+
+        $user->notify(new BuyerWelcomeNotification);
 
         Auth::login($user);
 

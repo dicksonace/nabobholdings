@@ -51,9 +51,11 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
     const role = auth.user?.role as string | undefined;
     const isSeller = role === 'seller';
     const isAdmin = role === 'admin';
-    const isStaff = isAdmin || isSeller;
-    // Single-store: sellers (legacy) and admin share owner-style links.
-    const activeNavLinks = isAdmin || isSeller
+    const isStaffUser = role === 'staff';
+    const isOwnerOps = isAdmin || isSeller;
+    const isBackOffice = isAdmin || isSeller || isStaffUser;
+    // Single-store: sellers (legacy) and admin share owner-style links; staff gets panel only.
+    const activeNavLinks = isOwnerOps
         ? [
               { label: 'Owner Panel', href: isAdmin ? route('admin.dashboard') : route('manage.dashboard'), highlight: true },
               { label: 'Products', href: route('manage.products.index') },
@@ -63,7 +65,14 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
               { label: 'Contact', href: route('contact') },
               { label: 'FAQ', href: route('faq') },
           ]
-        : navLinks;
+        : isStaffUser
+          ? [
+                { label: 'Owner Panel', href: route('admin.dashboard'), highlight: true },
+                { label: 'Browse shop', href: route('home') },
+                { label: 'Contact', href: route('contact') },
+                { label: 'FAQ', href: route('faq') },
+            ]
+          : navLinks;
 
     const openMessages = (e?: React.MouseEvent) => {
         e?.preventDefault();
@@ -76,14 +85,14 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
 
     const dashboardLink = () => {
         if (!auth.user) return route('login');
-        if (isAdmin) return route('admin.dashboard');
+        if (isAdmin || isStaffUser) return route('admin.dashboard');
         if (isSeller) return route('manage.dashboard');
         return route('orders.index');
     };
 
     const dashboardLabel = () => {
         if (!auth.user) return 'Dashboard';
-        if (isAdmin || isSeller) return 'Owner Panel';
+        if (isAdmin || isSeller || isStaffUser) return 'Owner Panel';
         return 'My Orders';
     };
 
@@ -93,7 +102,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
         mobile = false,
     ) => {
         if (link.auth && !auth.user) return null;
-        if (link.buyerOnly && isStaff) return null;
+        if (link.buyerOnly && isBackOffice) return null;
 
         const className = mobile
             ? link.highlight
@@ -157,7 +166,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-52">
-                                    {isStaff && (
+                                    {isBackOffice && (
                                         <DropdownMenuItem asChild>
                                             <Link href={dashboardLink()} className="flex w-full cursor-pointer items-center font-medium text-orange-600">
                                                 <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -187,8 +196,8 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                                             </DropdownMenuItem>
                                         </>
                                     )}
-                                    {isStaff && <DropdownMenuSeparator />}
-                                    {!isStaff && (
+                                    {isBackOffice && <DropdownMenuSeparator />}
+                                    {!isBackOffice && (
                                         <>
                                             <DropdownMenuItem asChild>
                                                 <Link href={route('orders.index')} className="flex w-full cursor-pointer items-center">
@@ -262,7 +271,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                             </div>
                         )}
 
-                        {auth.user && !isStaff && (
+                        {auth.user && !isBackOffice && (
                             <button
                                 type="button"
                                 onClick={openMessages}
@@ -280,7 +289,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
 
                         <NotificationBell />
 
-                        {auth.user && !isStaff && (
+                        {auth.user && !isBackOffice && (
                             <Link
                                 href={route('wishlist.index')}
                                 className="relative hidden rounded-lg p-1.5 hover:bg-gray-50 sm:block sm:p-2"

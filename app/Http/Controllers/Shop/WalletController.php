@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Shop;
 
+use App\Enums\UserRole;
 use App\Enums\WithdrawalStatus;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
 use App\Models\Withdrawal;
+use App\Notifications\WithdrawalSubmittedNotification;
 use App\Services\PaystackService;
 use App\Services\PlatformSettings;
 use App\Services\WalletService;
@@ -15,6 +18,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -162,6 +166,13 @@ class WalletController extends Controller
 
             $wallet->decrement('available_balance', $amount);
             WalletTransactionService::recordWithdrawal($withdrawal);
+
+            $request->user()->notify(new WithdrawalSubmittedNotification($withdrawal));
+
+            $staff = User::query()->whereIn('role', [UserRole::Admin, UserRole::Staff])->get();
+            if ($staff->isNotEmpty()) {
+                Notification::send($staff, new WithdrawalSubmittedNotification($withdrawal));
+            }
 
             return back()->with('success', 'Withdrawal request submitted.');
         });

@@ -91,7 +91,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         return match (true) {
-            $user->isAdmin() => redirect()->intended(route('admin.dashboard', absolute: false)),
+            $user->isAdmin(), $user->isStaff() => redirect()->intended(route('admin.dashboard', absolute: false)),
             default => redirect()->intended(route('home', absolute: false)),
         };
     }

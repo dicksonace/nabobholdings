@@ -102,6 +102,17 @@ class User extends Authenticatable
         return $this->role === UserRole::Admin;
     }
 
+    public function isStaff(): bool
+    {
+        return $this->role === UserRole::Staff;
+    }
+
+    /** Owner Panel access (admin or limited staff). */
+    public function isBackOffice(): bool
+    {
+        return $this->isAdmin() || $this->isStaff();
+    }
+
     public function isSeller(): bool
     {
         return $this->role === UserRole::Seller;
@@ -129,7 +140,7 @@ class User extends Authenticatable
         }
 
         return match (true) {
-            $this->isAdmin() => route('admin.dashboard', absolute: false),
+            $this->isAdmin(), $this->isStaff() => route('admin.dashboard', absolute: false),
             default => route('home', absolute: false),
         };
     }

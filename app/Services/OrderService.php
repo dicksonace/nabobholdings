@@ -1021,7 +1021,7 @@ class OrderService
             $item->seller->notify(new DisputeOpenedNotification($dispute));
             $item->order->buyer->notify(new DisputeOpenedNotification($dispute));
 
-            $admins = User::where('role', UserRole::Admin)->get();
+            $admins = User::whereIn('role', [UserRole::Admin, UserRole::Staff])->get();
             Notification::send($admins, new DisputeOpenedNotification($dispute));
         });
     }

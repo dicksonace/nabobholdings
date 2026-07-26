@@ -6,6 +6,7 @@ use App\Enums\WithdrawalStatus;
 use App\Models\SellerPayoutMethod;
 use App\Models\User;
 use App\Models\Withdrawal;
+use App\Notifications\WithdrawalStatusNotification;
 use Illuminate\Support\Facades\DB;
 
 class WithdrawalPayoutService
@@ -127,6 +128,8 @@ class WithdrawalPayoutService
         $withdrawal->user->wallet?->increment('withdrawn_amount', $withdrawal->amount);
 
         WalletTransactionService::recordWithdrawalCompleted($withdrawal);
+
+        $withdrawal->user?->notify(new WithdrawalStatusNotification($withdrawal->fresh()));
     }
 
     public function startProcessing(Withdrawal $withdrawal, User $admin): void
@@ -140,6 +143,8 @@ class WithdrawalPayoutService
             'processed_by' => $admin->id,
             'payout_channel' => $withdrawal->payout_channel ?? 'manual',
         ]);
+
+        $withdrawal->user?->notify(new WithdrawalStatusNotification($withdrawal->fresh()));
     }
 
     public function markAsFailed(Withdrawal $withdrawal, string $reason): void
@@ -159,6 +164,8 @@ class WithdrawalPayoutService
         $withdrawal->user->wallet?->increment('available_balance', $withdrawal->amount);
 
         WalletTransactionService::recordWithdrawalRefunded($withdrawal);
+
+        $withdrawal->user?->notify(new WithdrawalStatusNotification($withdrawal->fresh()));
     }
 
     public function handleTransferWebhook(array $data): void

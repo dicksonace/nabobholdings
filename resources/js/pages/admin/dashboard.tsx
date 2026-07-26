@@ -1,15 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
 import {
-    AlertTriangle,
     Boxes,
     CheckCircle2,
-    Clock,
     DollarSign,
     Package,
     PackageX,
     Percent,
     ShoppingCart,
-    Store,
     TrendingUp,
     UserPlus,
     Users,
@@ -75,7 +72,7 @@ interface AdminDashboardProps {
     topCategories: { id: number; name: string; products: number }[];
     topSellers: { id: number; name: string; revenue: number; orders: number; products: number }[];
     recentOrders: (Order & { buyer: { name: string } })[];
-    pendingSellers: (SellerProfile & { user: { name: string; email: string } })[];
+    pendingSellers?: (SellerProfile & { user: { name: string; email: string } })[];
     pendingWithdrawals: PendingWithdrawalRow[];
 }
 
@@ -107,7 +104,6 @@ export default function AdminDashboard({
     topCategories,
     topSellers,
     recentOrders,
-    pendingSellers,
     pendingWithdrawals = [],
 }: AdminDashboardProps) {
     const hero: HeroCard[] = [
@@ -155,47 +151,18 @@ export default function AdminDashboard({
         { label: 'New users (mo)', value: stats.new_users_month, icon: UserPlus, color: 'text-sky-500' },
         { label: 'Buyers', value: stats.total_buyers, icon: Users, color: 'text-blue-500', href: route('admin.buyers.index') },
         {
-            label: 'Sellers',
-            value: stats.total_sellers,
-            icon: Store,
-            color: 'text-purple-500',
-            href: route('admin.sellers.index', { status: 'all' }),
-        },
-        {
-            label: 'Approved sellers',
-            value: stats.approved_sellers,
-            icon: Store,
-            color: 'text-emerald-500',
-            href: route('admin.sellers.index', { status: 'approved' }),
-        },
-        {
-            label: 'Pending sellers',
-            value: stats.pending_sellers,
-            icon: Clock,
-            color: 'text-amber-500',
-            href: route('admin.sellers.index', { status: 'pending' }),
-        },
-        { label: 'Suspended', value: stats.suspended_sellers, icon: AlertTriangle, color: 'text-rose-500' },
-        {
             label: 'Products',
             value: stats.total_products,
             icon: Package,
             color: 'text-indigo-500',
-            href: route('admin.products.index', { status: 'all' }),
+            href: route('manage.products.index'),
         },
         {
             label: 'Live products',
             value: stats.live_products,
             icon: Boxes,
             color: 'text-green-500',
-            href: route('admin.products.index', { status: 'approved' }),
-        },
-        {
-            label: 'Pending products',
-            value: stats.pending_products,
-            icon: Clock,
-            color: 'text-amber-500',
-            href: route('admin.products.index', { status: 'all' }),
+            href: route('manage.products.index', { status: 'approved' }),
         },
         { label: 'Out of stock', value: stats.out_of_stock, icon: PackageX, color: 'text-rose-500' },
         {
@@ -308,37 +275,6 @@ export default function AdminDashboard({
             <div className="mt-6 grid gap-6 lg:grid-cols-2">
                 <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
                     <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-gray-900">Pending Seller Approvals</h3>
-                        <Link
-                            href={route('admin.sellers.index', { status: 'pending' })}
-                            className="text-sm text-orange-500 hover:underline"
-                        >
-                            View all / Approve
-                        </Link>
-                    </div>
-                    {pendingSellers.length === 0 ? (
-                        <p className="mt-4 text-sm text-gray-500">No pending applications.</p>
-                    ) : (
-                        <div className="mt-4 divide-y">
-                            {pendingSellers.map((seller) => (
-                                <Link
-                                    key={seller.id}
-                                    href={route('admin.sellers.show', seller.id)}
-                                    className="flex justify-between py-3 text-sm hover:bg-gray-50"
-                                >
-                                    <div>
-                                        <p className="font-medium">{seller.business_name ?? seller.store_name}</p>
-                                        <p className="text-gray-500">{seller.user.email}</p>
-                                    </div>
-                                    <span className="font-medium text-orange-500">Approve →</span>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                    <div className="flex items-center justify-between">
                         <h3 className="font-semibold text-gray-900">Withdrawal payouts</h3>
                         <Link
                             href={route('admin.withdrawals.index', { status: 'pending' })}
@@ -374,34 +310,34 @@ export default function AdminDashboard({
                         Flow: Start processing → send MoMo → Mark paid (optional proof).
                     </p>
                 </div>
-            </div>
 
-            <div className="mt-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">Recent Orders</h3>
-                    <Link href={route('admin.orders.index')} className="text-sm text-orange-500 hover:underline">
-                        View all
-                    </Link>
-                </div>
-                {recentOrders.length === 0 ? (
-                    <p className="mt-4 text-sm text-gray-500">No orders yet.</p>
-                ) : (
-                    <div className="mt-4 divide-y">
-                        {recentOrders.map((order) => (
-                            <Link
-                                key={order.id}
-                                href={route('admin.orders.show', order.id)}
-                                className="flex justify-between py-3 text-sm hover:bg-gray-50"
-                            >
-                                <div>
-                                    <p className="font-medium">{order.order_number}</p>
-                                    <p className="text-gray-500">{order.buyer?.name}</p>
-                                </div>
-                                <p className="font-medium text-orange-500">{formatPrice(order.total)}</p>
-                            </Link>
-                        ))}
+                <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900">Recent Orders</h3>
+                        <Link href={route('admin.orders.index')} className="text-sm text-orange-500 hover:underline">
+                            View all
+                        </Link>
                     </div>
-                )}
+                    {recentOrders.length === 0 ? (
+                        <p className="mt-4 text-sm text-gray-500">No orders yet.</p>
+                    ) : (
+                        <div className="mt-4 divide-y">
+                            {recentOrders.map((order) => (
+                                <Link
+                                    key={order.id}
+                                    href={route('admin.orders.show', order.id)}
+                                    className="flex justify-between py-3 text-sm hover:bg-gray-50"
+                                >
+                                    <div>
+                                        <p className="font-medium">{order.order_number}</p>
+                                        <p className="text-gray-500">{order.buyer?.name}</p>
+                                    </div>
+                                    <p className="font-medium text-orange-500">{formatPrice(order.total)}</p>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </AdminLayout>
     );

@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Shop;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
+use App\Models\User;
+use App\Notifications\ContactMessageReceivedNotification;
 use App\Services\PlatformSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -59,10 +63,25 @@ class ContactController extends Controller
             'message' => ['required', 'string', 'min:10', 'max:5000'],
         ]);
 
-        ContactMessage::create([
+        $message = ContactMessage::create([
             ...$validated,
             'user_id' => $request->user()?->id,
         ]);
+
+        $staff = User::query()
+            ->whereIn('role', [UserRole::Admin, UserRole::Staff])
+            ->get();
+
+        if ($staff->isNotEmpty()) {
+            Notification::send($staff, new ContactMessageReceivedNotification($message));
+        }
+
+        $supportEmail = PlatformSettings::contactEmail();
+        $staffEmails = $staff->pluck('email')->filter()->map(fn ($e) => strtolower((string) $e));
+        if ($supportEmail && ! $staffEmails->contains(strtolower($supportEmail))) {
+            Notification::route('mail', $supportEmail)
+                ->notify(new ContactMessageReceivedNotification($message));
+        }
 
         return back()->with('success', 'Thank you! Your message has been sent. We will respond within 24–48 hours.');
     }

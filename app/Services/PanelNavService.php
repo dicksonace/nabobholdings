@@ -28,6 +28,7 @@ class PanelNavService
         return match ($user->role) {
             // Seller ops badges first; admin keys win on collisions (e.g. unread_messages = contact form).
             UserRole::Admin => array_merge(self::sellerCounts($user), self::adminCounts($user)),
+            UserRole::Staff => self::adminCounts($user),
             UserRole::Seller => self::sellerCounts($user),
             default => [],
         };
