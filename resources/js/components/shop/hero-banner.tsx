@@ -31,7 +31,7 @@ export default function HeroBanner({ slides }: HeroBannerProps) {
                         <div className="text-white">
                             <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur-sm sm:mb-4">
                                 <Sparkles className="h-3.5 w-3.5" />
-                                Your Trusted Marketplace
+                                Official Nabob Holdings store
                             </div>
                             <h1 className="text-2xl font-extrabold leading-tight tracking-tight transition-all sm:text-3xl md:text-5xl">{slide.title}</h1>
                             <p className="mt-3 max-w-lg text-sm text-white/85 sm:mt-4 sm:text-base md:text-lg">{slide.subtitle}</p>
@@ -54,10 +54,10 @@ export default function HeroBanner({ slides }: HeroBannerProps) {
                         <div className="hidden md:block">
                             <div className="grid grid-cols-2 gap-3">
                                 {[
-                                    { icon: ShieldCheck, label: 'Verified Sellers', sub: 'ID & business checked' },
-                                    { icon: Truck, label: 'Fast Delivery', sub: 'Sellers deliver nationwide' },
-                                    { icon: Sparkles, label: 'Best Prices', sub: 'Compare & save' },
-                                    { icon: ShieldCheck, label: 'Buyer Protection', sub: 'Dispute resolution' },
+                                    { icon: ShieldCheck, label: 'Quality checked', sub: 'Products you can trust' },
+                                    { icon: Truck, label: 'Fast delivery', sub: 'Delivered nationwide' },
+                                    { icon: Sparkles, label: 'Great deals', sub: 'Fair everyday prices' },
+                                    { icon: ShieldCheck, label: 'Buyer protection', sub: 'Support & easy refunds' },
                                 ].map((item) => (
                                     <div key={item.label} className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
                                         <item.icon className="h-6 w-6 text-white/90" />
@@ -72,10 +72,10 @@ export default function HeroBanner({ slides }: HeroBannerProps) {
                     {/* Mobile feature chips */}
                     <div className="mt-6 flex gap-2 overflow-x-auto pb-1 md:hidden">
                         {[
-                            { icon: ShieldCheck, label: 'Verified Sellers' },
-                            { icon: Truck, label: 'Fast Delivery' },
-                            { icon: Sparkles, label: 'Best Prices' },
-                            { icon: ShieldCheck, label: 'Buyer Protection' },
+                            { icon: ShieldCheck, label: 'Quality checked' },
+                            { icon: Truck, label: 'Fast delivery' },
+                            { icon: Sparkles, label: 'Great deals' },
+                            { icon: ShieldCheck, label: 'Buyer protection' },
                         ].map((item) => (
                             <div key={item.label} className="flex shrink-0 items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
                                 <item.icon className="h-3.5 w-3.5" />
