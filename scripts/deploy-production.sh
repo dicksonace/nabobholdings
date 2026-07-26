@@ -9,8 +9,13 @@ COMPOSER_BIN="${COMPOSER_BIN:-composer.phar}"
 echo "==> Deploying Nabob Holdings in $APP_DIR"
 cd "$APP_DIR"
 
-echo "==> Pull latest code"
-git pull origin main
+# Re-exec after pull so we always run the latest script body.
+if [[ "${DEPLOY_REEXECED:-}" != "1" ]]; then
+    echo "==> Pull latest code"
+    git pull origin main
+    export DEPLOY_REEXECED=1
+    exec bash "$0" "$@"
+fi
 
 echo "==> Install PHP dependencies"
 if [[ -f "$COMPOSER_BIN" ]]; then
