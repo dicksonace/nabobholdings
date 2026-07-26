@@ -18,7 +18,7 @@ class StoreCustomizationController extends Controller
         $customization = $customizations->forProfile($profile);
 
         if ($customization->isSetupComplete()) {
-            return redirect()->route('seller.dashboard');
+            return redirect()->route('manage.dashboard');
         }
 
         return Inertia::render('seller/store-setup', [
@@ -146,6 +146,6 @@ class StoreCustomizationController extends Controller
         $customizations->completeSetup($customization);
         $customizations->syncBrandingToProfile($profile, $customizations->publishedSettings($customization->fresh()));
 
-        return redirect()->route('seller.dashboard')->with('success', 'Your store is ready! Start adding products.');
+        return redirect()->route('manage.dashboard')->with('success', 'Your store is ready! Start adding products.');
     }
 }

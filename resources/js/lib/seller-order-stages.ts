@@ -170,7 +170,7 @@ export function getSellerOrderStage(slug: string): SellerOrderStage | undefined 
 
 export function sellerOrdersStageHref(slug: SellerOrderStageSlug): string {
     if (slug === 'all') {
-        return route('seller.orders.index');
+        return route('manage.orders.index');
     }
-    return route('seller.orders.stage', slug);
+    return route('manage.orders.stage', slug);
 }

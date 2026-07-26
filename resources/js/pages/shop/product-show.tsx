@@ -263,7 +263,7 @@ export default function ProductShow({ product, related, reviews, reviewable }: P
                                             Use a buyer account to shop. Manage your catalog from the Owner Panel.
                                         </p>
                                         <Link
-                                            href={auth.user?.role === 'admin' ? route('admin.dashboard') : route('seller.dashboard')}
+                                            href={auth.user?.role === 'admin' ? route('admin.dashboard') : route('manage.dashboard')}
                                             className="mt-2 inline-flex text-sm font-semibold text-orange-600 hover:underline"
                                         >
                                             Go to Owner Panel →

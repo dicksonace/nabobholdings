@@ -25,7 +25,7 @@ export default function SellerProductReviews({ product, reviews }: ProductReview
         <SellerLayout title="Product Comments" active="products">
             <Head title={`Comments — ${product.name}`} />
 
-            <Link href={route('seller.products.index')} className="text-sm text-orange-500 hover:underline">
+            <Link href={route('manage.products.index')} className="text-sm text-orange-500 hover:underline">
                 ← Back to Products
             </Link>
 

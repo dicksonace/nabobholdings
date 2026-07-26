@@ -113,7 +113,7 @@ class DirectPaymentSellerVisibilityTest extends TestCase
         $item = $this->unpaidDirectOrder($buyer, $seller, withClaim: false);
 
         $this->actingAs($seller)
-            ->get(route('seller.orders.stage', 'new'))
+            ->get(route('manage.orders.stage', 'new'))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('seller/orders/stage')
@@ -121,8 +121,8 @@ class DirectPaymentSellerVisibilityTest extends TestCase
             );
 
         $this->actingAs($seller)
-            ->get(route('seller.orders.show', $item))
-            ->assertRedirect(route('seller.orders.index'));
+            ->get(route('manage.orders.show', $item))
+            ->assertRedirect(route('manage.orders.index'));
     }
 
     public function test_claimed_direct_order_appears_on_seller_dashboard(): void
@@ -132,7 +132,7 @@ class DirectPaymentSellerVisibilityTest extends TestCase
         $item = $this->unpaidDirectOrder($buyer, $seller, withClaim: true);
 
         $this->actingAs($seller)
-            ->get(route('seller.orders.stage', 'new'))
+            ->get(route('manage.orders.stage', 'new'))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('seller/orders/stage')

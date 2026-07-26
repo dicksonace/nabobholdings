@@ -267,7 +267,7 @@ class WalletController extends Controller
                     'method' => $validated['method'],
                     'role' => 'seller',
                 ],
-                route('seller.wallet.callback'),
+                route('manage.wallet.callback'),
             );
 
             return Inertia::location($data['authorization_url']);
@@ -283,23 +283,23 @@ class WalletController extends Controller
         $reference = $request->query('reference');
 
         if (! $reference) {
-            return redirect()->route('seller.wallet')->with('error', 'Invalid payment reference.');
+            return redirect()->route('manage.wallet')->with('error', 'Invalid payment reference.');
         }
 
         try {
             $data = $this->paystack->verifyTransaction($reference);
 
             if ($data['status'] !== 'success') {
-                return redirect()->route('seller.wallet')->with('error', 'Payment was not successful.');
+                return redirect()->route('manage.wallet')->with('error', 'Payment was not successful.');
             }
 
             $metadata = $data['metadata'] ?? [];
             if (($metadata['type'] ?? '') !== 'wallet_topup') {
-                return redirect()->route('seller.wallet')->with('error', 'Invalid wallet top-up.');
+                return redirect()->route('manage.wallet')->with('error', 'Invalid wallet top-up.');
             }
 
             if ((int) ($metadata['user_id'] ?? 0) !== $request->user()->id) {
-                return redirect()->route('seller.wallet')->with('error', 'Payment does not belong to your account.');
+                return redirect()->route('manage.wallet')->with('error', 'Payment does not belong to your account.');
             }
 
             $amount = round(((int) ($data['amount'] ?? 0)) / 100, 2);
@@ -307,12 +307,12 @@ class WalletController extends Controller
 
             WalletService::creditFromVerifiedTopUp($request->user()->id, $amount, $reference, $method);
 
-            return redirect()->route('seller.dashboard')
+            return redirect()->route('manage.dashboard')
                 ->with('success', PlatformSettings::formatMoney($amount).' added to your wallet. You can cancel Pay-to-seller orders and refund buyers.');
         } catch (\Throwable $e) {
             Log::error('Seller wallet callback error', ['error' => $e->getMessage()]);
 
-            return redirect()->route('seller.wallet')->with('error', 'Could not verify payment. Contact support if charged.');
+            return redirect()->route('manage.wallet')->with('error', 'Could not verify payment. Contact support if charged.');
         }
     }
 }

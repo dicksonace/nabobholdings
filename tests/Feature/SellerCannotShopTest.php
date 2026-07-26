@@ -57,7 +57,7 @@ class SellerCannotShopTest extends TestCase
                 'product_id' => $product->id,
                 'quantity' => 1,
             ])
-            ->assertRedirect(route('seller.dashboard'))
+            ->assertRedirect(route('manage.dashboard'))
             ->assertSessionHas('error');
 
         $this->assertDatabaseMissing('cart_items', [
@@ -72,7 +72,7 @@ class SellerCannotShopTest extends TestCase
 
         $this->actingAs($seller)
             ->get(route('checkout.index'))
-            ->assertRedirect(route('seller.dashboard'))
+            ->assertRedirect(route('manage.dashboard'))
             ->assertSessionHas('error');
     }
 

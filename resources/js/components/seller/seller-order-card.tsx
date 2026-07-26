@@ -75,7 +75,7 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
             window.alert('Please enter a short reason (at least 5 characters).');
             return;
         }
-        router.post(route('seller.orders.reject-direct-payment', order.id), { reason: trimmed });
+        router.post(route('manage.orders.reject-direct-payment', order.id), { reason: trimmed });
     };
 
     return (
@@ -181,7 +181,7 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
                         size="sm"
                         className="min-w-0 flex-1 border-orange-200 text-orange-600 hover:bg-orange-50"
                     >
-                        <Link href={route('seller.orders.show', item.id)}>Manage order</Link>
+                        <Link href={route('manage.orders.show', item.id)}>Manage order</Link>
                     </Button>
                     <Button
                         asChild
@@ -190,7 +190,7 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
                         className="shrink-0 border-gray-200 text-gray-700 hover:bg-gray-50"
                         title="Print packing slip"
                     >
-                        <a href={route('seller.orders.print', item.id)} target="_blank" rel="noreferrer">
+                        <a href={route('manage.orders.print', item.id)} target="_blank" rel="noreferrer">
                             <Printer className="h-4 w-4" />
                             <span className="sr-only">Print</span>
                         </a>
@@ -202,7 +202,7 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
                         className="shrink-0 border-gray-200 text-gray-700 hover:bg-gray-50"
                         title="Download PDF"
                     >
-                        <a href={route('seller.orders.pdf', item.id)}>
+                        <a href={route('manage.orders.pdf', item.id)}>
                             <Download className="h-4 w-4" />
                             <span className="sr-only">PDF</span>
                         </a>
@@ -214,7 +214,7 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
                             size="sm"
                             className="shrink-0 border-red-200 text-red-600 hover:bg-red-50"
                         >
-                            <Link href={`${route('seller.orders.show', item.id)}?cancel=1`}>Cancel</Link>
+                            <Link href={`${route('manage.orders.show', item.id)}?cancel=1`}>Cancel</Link>
                         </Button>
                     )}
                     {needsPaymentReview && (
@@ -222,7 +222,7 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
                             <Button
                                 size="sm"
                                 className="shrink-0 bg-emerald-600 hover:bg-emerald-700"
-                                onClick={() => router.post(route('seller.orders.confirm-direct-payment', order.id))}
+                                onClick={() => router.post(route('manage.orders.confirm-direct-payment', order.id))}
                             >
                                 Confirm
                             </Button>

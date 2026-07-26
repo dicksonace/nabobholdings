@@ -35,7 +35,7 @@ class OrderController extends Controller
         if ($request->filled('status')) {
             $stage = $this->legacyStatusToStage($request->string('status')->toString());
 
-            return redirect()->route('seller.orders.stage', $stage);
+            return redirect()->route('manage.orders.stage', $stage);
         }
 
         return $this->hub($request);
@@ -79,7 +79,7 @@ class OrderController extends Controller
     public function stage(Request $request, string $stage): InertiaResponse|RedirectResponse
     {
         if (! array_key_exists($stage, self::STAGE_MAP)) {
-            return redirect()->route('seller.orders.index');
+            return redirect()->route('manage.orders.index');
         }
 
         $sellerId = $request->user()->id;
@@ -118,7 +118,7 @@ class OrderController extends Controller
 
         if (! $this->isVisibleOnSellerDashboard($orderItem)) {
             return redirect()
-                ->route('seller.orders.index')
+                ->route('manage.orders.index')
                 ->with('error', 'This Pay-to-seller order will appear after the buyer submits payment.');
         }
 
@@ -160,7 +160,7 @@ class OrderController extends Controller
         $nextStage = $this->statusToStage(OrderStatus::from($validated['status']));
 
         return redirect()
-            ->route('seller.orders.stage', $nextStage)
+            ->route('manage.orders.stage', $nextStage)
             ->with('success', 'Order moved to the next stage.');
     }
 
@@ -200,7 +200,7 @@ class OrderController extends Controller
             ? 'Order cancelled. The buyer was refunded to their Nabob Holdings wallet (debited from your available balance).'
             : 'Order cancelled.';
 
-        return redirect()->route('seller.orders.stage', 'cancelled')
+        return redirect()->route('manage.orders.stage', 'cancelled')
             ->with('success', $msg);
     }
 
@@ -211,7 +211,7 @@ class OrderController extends Controller
 
         if (! $this->isVisibleOnSellerDashboard($orderItem)) {
             return redirect()
-                ->route('seller.orders.index')
+                ->route('manage.orders.index')
                 ->with('error', 'This Pay-to-seller order will appear after the buyer submits payment.');
         }
 
@@ -226,7 +226,7 @@ class OrderController extends Controller
 
         if (! $this->isVisibleOnSellerDashboard($orderItem)) {
             return redirect()
-                ->route('seller.orders.index')
+                ->route('manage.orders.index')
                 ->with('error', 'This Pay-to-seller order will appear after the buyer submits payment.');
         }
 

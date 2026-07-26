@@ -145,7 +145,7 @@ class SellerRegisterController extends Controller
             $profile = $existingUser->sellerProfile;
             if ($existingUser->isSeller() && $profile) {
                 if ($profile->status === SellerStatus::Approved) {
-                    return redirect()->route('seller.dashboard');
+                    return redirect()->route('manage.dashboard');
                 }
                 if ($profile->status === SellerStatus::Pending) {
                     return redirect()->route('seller.login')->with(

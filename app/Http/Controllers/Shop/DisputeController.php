@@ -71,7 +71,7 @@ class DisputeController extends Controller
                 [
                     'dispute_id' => $dispute->id,
                     'order_id' => $order->id,
-                    'url' => route('seller.refunds.index'),
+                    'url' => route('manage.refunds.index'),
                 ],
             );
         }

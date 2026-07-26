@@ -115,7 +115,7 @@ export default function SellerOrderShow({
         return (
             <SellerLayout title="Order" active="orders">
                 <Head title="Order" />
-                <Link href={route('seller.orders.index')} className="mb-4 inline-block text-sm text-orange-500 hover:underline">
+                <Link href={route('manage.orders.index')} className="mb-4 inline-block text-sm text-orange-500 hover:underline">
                     ← Back to sales center
                 </Link>
                 <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
@@ -139,7 +139,7 @@ export default function SellerOrderShow({
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        form.post(route('seller.orders.update', orderItem.id), {
+        form.post(route('manage.orders.update', orderItem.id), {
             forceFormData: true,
             preserveScroll: true,
             onBefore: () => {
@@ -163,7 +163,7 @@ export default function SellerOrderShow({
                 driver_phone: form.data.driver_phone.trim(),
                 _method: 'patch',
             }));
-            form.post(route('seller.orders.update', orderItem.id), {
+            form.post(route('manage.orders.update', orderItem.id), {
                 forceFormData: true,
                 preserveScroll: true,
                 onFinish: () => {
@@ -176,7 +176,7 @@ export default function SellerOrderShow({
 
         setAdvancing(true);
         router.patch(
-            route('seller.orders.update', orderItem.id),
+            route('manage.orders.update', orderItem.id),
             {
                 status: next,
                 vehicle_number: form.data.vehicle_number.trim(),
@@ -198,7 +198,7 @@ export default function SellerOrderShow({
 
     const submitCancel: FormEventHandler = (e) => {
         e.preventDefault();
-        cancelForm.post(route('seller.orders.reject', orderItem.id), {
+        cancelForm.post(route('manage.orders.reject', orderItem.id), {
             preserveScroll: true,
             onSuccess: () => setShowCancel(false),
         });
@@ -210,7 +210,7 @@ export default function SellerOrderShow({
 
     const submitRejectPayment: FormEventHandler = (e) => {
         e.preventDefault();
-        rejectPaymentForm.post(route('seller.orders.reject-direct-payment', order.id), {
+        rejectPaymentForm.post(route('manage.orders.reject-direct-payment', order.id), {
             preserveScroll: true,
             onSuccess: () => {
                 setShowRejectPayment(false);
@@ -223,18 +223,18 @@ export default function SellerOrderShow({
         <SellerLayout title={`Order ${order.order_number}`} active="orders">
             <Head title={`Order ${order.order_number}`} />
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <Link href={route('seller.orders.stage', backStage)} className="inline-block text-sm text-orange-500 hover:underline">
+                <Link href={route('manage.orders.stage', backStage)} className="inline-block text-sm text-orange-500 hover:underline">
                     ← Back to queue
                 </Link>
                 <div className="flex flex-wrap gap-2">
                     <Button asChild variant="outline" size="sm" className="border-gray-200">
-                        <a href={route('seller.orders.print', orderItem.id)} target="_blank" rel="noreferrer">
+                        <a href={route('manage.orders.print', orderItem.id)} target="_blank" rel="noreferrer">
                             <Printer className="mr-1.5 h-4 w-4" />
                             Print packing slip
                         </a>
                     </Button>
                     <Button asChild size="sm" className="bg-gray-900 hover:bg-gray-800">
-                        <a href={route('seller.orders.pdf', orderItem.id)}>
+                        <a href={route('manage.orders.pdf', orderItem.id)}>
                             <Download className="mr-1.5 h-4 w-4" />
                             Download PDF
                         </a>
@@ -247,7 +247,7 @@ export default function SellerOrderShow({
                     <p className="font-semibold text-red-800">Refund request from buyer</p>
                     <p className="mt-1 text-sm text-red-700 capitalize">{dispute.reason.replace(/_/g, ' ')} · {dispute.status.replace(/_/g, ' ')}</p>
                     <p className="mt-2 text-sm text-red-600">{dispute.description}</p>
-                    <Link href={route('seller.refunds.index')} className="mt-2 inline-block text-sm font-medium text-red-700 hover:underline">
+                    <Link href={route('manage.refunds.index')} className="mt-2 inline-block text-sm font-medium text-red-700 hover:underline">
                         View all refund requests →
                     </Link>
                 </div>
@@ -700,7 +700,7 @@ export default function SellerOrderShow({
                                 </p>
                                 <Button
                                     className="w-full bg-emerald-600 hover:bg-emerald-700"
-                                    onClick={() => router.post(route('seller.orders.confirm-direct-payment', order.id))}
+                                    onClick={() => router.post(route('manage.orders.confirm-direct-payment', order.id))}
                                 >
                                     Confirm payment received
                                 </Button>

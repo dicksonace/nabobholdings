@@ -108,7 +108,7 @@ export default function OrdersHub({ counts, urgentOrders, recentCompleted, needs
                             Cancelled orders →
                         </Link>
                         <Link
-                            href={route('seller.refunds.index')}
+                            href={route('manage.refunds.index')}
                             className="mt-2 block text-center text-sm font-medium text-orange-600 hover:underline"
                         >
                             Refund requests →
@@ -122,7 +122,7 @@ export default function OrdersHub({ counts, urgentOrders, recentCompleted, needs
                                 {recentCompleted.map((item) => (
                                     <li key={item.id}>
                                         <Link
-                                            href={route('seller.orders.show', item.id)}
+                                            href={route('manage.orders.show', item.id)}
                                             className="flex items-center justify-between py-2.5 text-sm hover:opacity-80"
                                         >
                                             <span className="truncate font-medium text-emerald-900">{item.product_name}</span>

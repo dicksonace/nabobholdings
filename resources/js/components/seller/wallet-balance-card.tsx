@@ -58,7 +58,7 @@ export default function WalletBalanceCard({
 
     const submitPaystack: FormEventHandler = (e) => {
         e.preventDefault();
-        paystackForm.post(route('seller.wallet.add-funds'), {
+        paystackForm.post(route('manage.wallet.add-funds'), {
             onSuccess: () => closeTopUp(),
         });
     };
@@ -183,7 +183,7 @@ export default function WalletBalanceCard({
 
                                 {manualTopUpEnabled && (
                                     <Link
-                                        href={route('seller.wallet.manual-top-up')}
+                                        href={route('manage.wallet.manual-top-up')}
                                         onClick={closeTopUp}
                                         className="flex w-full items-start gap-3 rounded-xl border-2 border-gray-100 bg-white p-4 text-left transition hover:border-sky-200 hover:bg-sky-50"
                                     >

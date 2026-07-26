@@ -48,7 +48,7 @@ class WalletManualTopUpController extends Controller
         return Inertia::render($page, [
             'settings' => $settings,
             'requests' => $requests,
-            'walletRoute' => $user->isSeller() ? route('seller.wallet') : route('wallet.index'),
+            'walletRoute' => $user->isSeller() ? route('manage.wallet') : route('wallet.index'),
         ]);
     }
 
@@ -95,7 +95,7 @@ class WalletManualTopUpController extends Controller
         ]);
 
         $redirect = $user->isSeller()
-            ? redirect()->route('seller.wallet.manual-top-up')
+            ? redirect()->route('manage.wallet.manual-top-up')
             : redirect()->route('wallet.manual-top-up');
 
         return $redirect->with('success', 'Payment proof submitted. We will credit your wallet after admin verification.');
@@ -104,7 +104,7 @@ class WalletManualTopUpController extends Controller
     private function backToWallet(UserRole $role): RedirectResponse
     {
         if ($role === UserRole::Seller) {
-            return redirect()->route('seller.wallet');
+            return redirect()->route('manage.wallet');
         }
 
         return redirect()->route('wallet.index');

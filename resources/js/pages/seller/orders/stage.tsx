@@ -29,7 +29,7 @@ export default function OrdersStage({ orders, counts, stage }: OrdersStageProps)
             <Head title={meta.headline} />
 
             <Link
-                href={route('seller.orders.index')}
+                href={route('manage.orders.index')}
                 className="mb-4 inline-flex items-center text-sm text-gray-500 hover:text-orange-600"
             >
                 <ChevronLeft className="mr-1 h-4 w-4" />
@@ -77,7 +77,7 @@ export default function OrdersStage({ orders, counts, stage }: OrdersStageProps)
                     <p className="mt-4 text-lg font-semibold text-gray-900">{meta.emptyTitle}</p>
                     <p className="mx-auto mt-2 max-w-sm text-sm text-gray-500">{meta.emptyHint}</p>
                     <Link
-                        href={route('seller.orders.index')}
+                        href={route('manage.orders.index')}
                         className="mt-6 inline-flex items-center text-sm font-medium text-orange-600 hover:underline"
                     >
                         Back to sales center

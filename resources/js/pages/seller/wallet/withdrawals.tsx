@@ -24,7 +24,7 @@ export default function SellerWithdrawals({ wallet, withdrawals }: Props) {
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <Link
-                        href={route('seller.wallet')}
+                        href={route('manage.wallet')}
                         className="inline-flex items-center gap-1 text-sm text-orange-600 hover:underline"
                     >
                         <ArrowLeft className="h-4 w-4" />
@@ -58,7 +58,7 @@ export default function SellerWithdrawals({ wallet, withdrawals }: Props) {
                             {withdrawals.data.map((w) => (
                                 <li key={w.id}>
                                     <Link
-                                        href={route('seller.wallet.withdrawals.show', w.id)}
+                                        href={route('manage.wallet.withdrawals.show', w.id)}
                                         className="grid gap-2 px-4 py-4 transition hover:bg-orange-50/40 md:grid-cols-[9rem_1fr_7rem_8rem_2rem] md:items-center md:gap-3"
                                     >
                                         <div>

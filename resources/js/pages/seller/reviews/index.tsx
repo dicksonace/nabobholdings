@@ -29,7 +29,7 @@ export default function SellerReviewsIndex({ reviews, stats }: ReviewsIndexProps
     const submitReply: FormEventHandler = (e) => {
         e.preventDefault();
         if (!replyId) return;
-        replyForm.post(route('seller.reviews.reply', replyId), {
+        replyForm.post(route('manage.reviews.reply', replyId), {
             onSuccess: () => { setReplyId(null); replyForm.reset(); },
         });
     };

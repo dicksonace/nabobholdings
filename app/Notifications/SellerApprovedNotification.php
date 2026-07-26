@@ -27,7 +27,7 @@ class SellerApprovedNotification extends Notification implements ShouldQueue
             ->greeting('Congratulations '.$notifiable->name.'!')
             ->line('Your Nabob Holdings seller account has been approved.')
             ->line('You can now list products and start selling.')
-            ->action('Go to Dashboard', route('seller.dashboard'));
+            ->action('Go to Dashboard', route('manage.dashboard'));
     }
 
     public function toSms(object $notifiable): string

@@ -138,7 +138,7 @@ class ProductController extends Controller
             }
         });
 
-        return redirect()->route('seller.products.index')
+        return redirect()->route('manage.products.index')
             ->with('success', 'Product published successfully. It is now live in the shop.');
     }
 
@@ -230,7 +230,7 @@ class ProductController extends Controller
             ? 'Product updated successfully. It is live in the shop.'
             : 'Product updated. It is still hidden — publish it when you are ready.';
 
-        return redirect()->route('seller.products.index')
+        return redirect()->route('manage.products.index')
             ->with('success', $message);
     }
 
@@ -272,7 +272,7 @@ class ProductController extends Controller
             ]);
         }
 
-        return redirect()->route('seller.products.edit', $copy)
+        return redirect()->route('manage.products.edit', $copy)
             ->with('success', 'Product duplicated. Review and publish when ready.');
     }
 

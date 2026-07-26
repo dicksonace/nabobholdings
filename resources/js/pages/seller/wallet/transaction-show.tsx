@@ -51,7 +51,7 @@ export default function SellerTransactionShow({ wallet, transaction }: Props) {
             <Head title={`Transaction #${transaction.id}`} />
 
             <Link
-                href={route('seller.wallet.transactions')}
+                href={route('manage.wallet.transactions')}
                 className="inline-flex items-center gap-1 text-sm text-orange-600 hover:underline"
             >
                 <ArrowLeft className="h-4 w-4" />
@@ -139,7 +139,7 @@ export default function SellerTransactionShow({ wallet, transaction }: Props) {
                             </p>
                             {transaction.order_item.order && (
                                 <Link
-                                    href={route('seller.orders.show', transaction.order_item.id)}
+                                    href={route('manage.orders.show', transaction.order_item.id)}
                                     className="mt-3 inline-block text-sm font-medium text-orange-600 hover:underline"
                                 >
                                     View order →
@@ -160,7 +160,7 @@ export default function SellerTransactionShow({ wallet, transaction }: Props) {
                                 Status: {transaction.withdrawal.status}
                             </p>
                             <Link
-                                href={route('seller.wallet.withdrawals.show', transaction.withdrawal.id)}
+                                href={route('manage.wallet.withdrawals.show', transaction.withdrawal.id)}
                                 className="mt-3 inline-block text-sm font-medium text-orange-600 hover:underline"
                             >
                                 View withdrawal details →

@@ -47,7 +47,7 @@ class SellerProductVideoTest extends TestCase
         $video = UploadedFile::fake()->create('clip.mp4', 1024, 'video/mp4');
         $image = UploadedFile::fake()->image('item.jpg', 400, 400);
 
-        $response = $this->actingAs($seller)->post(route('seller.products.store'), [
+        $response = $this->actingAs($seller)->post(route('manage.products.store'), [
             'name' => 'Phone with video',
             'price' => 500,
             'quantity' => 2,
@@ -63,7 +63,7 @@ class SellerProductVideoTest extends TestCase
             'video_duration' => 28,
         ]);
 
-        $response->assertRedirect(route('seller.products.index'));
+        $response->assertRedirect(route('manage.products.index'));
 
         $product = Product::where('seller_id', $seller->id)->first();
         $this->assertNotNull($product);
@@ -81,7 +81,7 @@ class SellerProductVideoTest extends TestCase
         $seller = $this->approvedSeller();
         $image = UploadedFile::fake()->image('item.jpg', 400, 400);
 
-        $response = $this->actingAs($seller)->from(route('seller.products.create'))->post(route('seller.products.store'), [
+        $response = $this->actingAs($seller)->from(route('manage.products.create'))->post(route('manage.products.store'), [
             'name' => 'Missing fee product',
             'price' => 100,
             'quantity' => 1,
@@ -93,7 +93,7 @@ class SellerProductVideoTest extends TestCase
             'image_count' => 1,
         ]);
 
-        $response->assertRedirect(route('seller.products.create'));
+        $response->assertRedirect(route('manage.products.create'));
         $response->assertSessionHasErrors('delivery_fee');
         $this->assertDatabaseCount('products', 0);
     }

@@ -23,7 +23,7 @@ interface NotificationsPageProps {
 function notificationHref(item: NotificationItem): string | null {
     if (item.data?.url) return item.data.url;
     if (item.data?.conversation_id) return route('chat.show', item.data.conversation_id);
-    if (item.data?.order_id) return route('seller.orders.show', item.data.order_id);
+    if (item.data?.order_id) return route('manage.orders.show', item.data.order_id);
     return null;
 }
 

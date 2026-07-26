@@ -33,15 +33,15 @@ class EnsureApprovedSeller
         $profile = $user->sellerProfile;
 
         if (! $profile) {
-            return redirect()->route('seller.pending');
+            return redirect()->route('manage.pending');
         }
 
         if ($profile->status === SellerStatus::Suspended) {
-            return redirect()->route('seller.pending');
+            return redirect()->route('manage.pending');
         }
 
         if ($profile->status !== SellerStatus::Approved) {
-            return redirect()->route('seller.pending');
+            return redirect()->route('manage.pending');
         }
 
         return $next($request);

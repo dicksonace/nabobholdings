@@ -128,11 +128,11 @@ class SellerOrderPrintTest extends TestCase
         $this->assertStringContainsString('12 Market Road, Accra', $html);
         $this->assertStringContainsString('0248000111', $html);
 
-        $print = $this->actingAs($seller)->get(route('seller.orders.print', $item));
+        $print = $this->actingAs($seller)->get(route('manage.orders.print', $item));
         $print->assertOk();
         $this->assertStringContainsString('application/pdf', (string) $print->headers->get('content-type'));
 
-        $pdf = $this->actingAs($seller)->get(route('seller.orders.pdf', $item));
+        $pdf = $this->actingAs($seller)->get(route('manage.orders.pdf', $item));
         $pdf->assertOk();
         $this->assertStringContainsString('application/pdf', (string) $pdf->headers->get('content-type'));
         $this->assertGreaterThan(1000, strlen($pdf->getContent()));
@@ -146,7 +146,7 @@ class SellerOrderPrintTest extends TestCase
         $item = $this->makeOrderItem($buyer, $owner);
 
         $this->actingAs($intruder)
-            ->get(route('seller.orders.print', $item))
+            ->get(route('manage.orders.print', $item))
             ->assertForbidden();
     }
 }

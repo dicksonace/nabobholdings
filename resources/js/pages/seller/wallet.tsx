@@ -71,7 +71,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
 
     const saveMethod: FormEventHandler = (e) => {
         e.preventDefault();
-        methodForm.post(route('seller.wallet.payout-methods.store'), {
+        methodForm.post(route('manage.wallet.payout-methods.store'), {
             onSuccess: () => {
                 methodForm.reset();
                 setShowAddMethod(false);
@@ -89,7 +89,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
             setWithdrawStep('review');
             return;
         }
-        withdrawForm.post(route('seller.wallet.withdraw'), {
+        withdrawForm.post(route('manage.wallet.withdraw'), {
             onSuccess: () => {
                 withdrawForm.reset();
                 setWithdrawStep('method');
@@ -344,7 +344,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                                         variant="ghost"
                                         size="icon"
                                         className="text-red-500"
-                                        onClick={() => router.delete(route('seller.wallet.payout-methods.destroy', method.id))}
+                                        onClick={() => router.delete(route('manage.wallet.payout-methods.destroy', method.id))}
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -374,7 +374,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                         <p className="text-xs text-gray-500">Date, amount, destination, and status</p>
                     </div>
                     <Link
-                        href={route('seller.wallet.withdrawals')}
+                        href={route('manage.wallet.withdrawals')}
                         className="inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:underline"
                     >
                         View all
@@ -388,7 +388,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                         {withdrawals.data.map((w) => (
                             <li key={w.id}>
                                 <Link
-                                    href={route('seller.wallet.withdrawals.show', w.id)}
+                                    href={route('manage.wallet.withdrawals.show', w.id)}
                                     className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 transition hover:bg-orange-50/40"
                                 >
                                     <div className="min-w-0">
@@ -425,7 +425,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                         <p className="text-xs text-gray-500">Date, amount, and balance after each entry</p>
                     </div>
                     <Link
-                        href={route('seller.wallet.transactions')}
+                        href={route('manage.wallet.transactions')}
                         className="inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:underline"
                     >
                         View all
@@ -441,7 +441,7 @@ export default function SellerWallet({ wallet, transactions, withdrawals, payout
                             return (
                                 <li key={tx.id}>
                                     <Link
-                                        href={route('seller.wallet.transactions.show', tx.id)}
+                                        href={route('manage.wallet.transactions.show', tx.id)}
                                         className="flex flex-wrap items-start justify-between gap-3 px-5 py-4 transition hover:bg-orange-50/40"
                                     >
                                         <div className="min-w-0 flex-1">

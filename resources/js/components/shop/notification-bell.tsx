@@ -24,7 +24,7 @@ type NotificationItem = {
 function notificationHref(n: NotificationItem): string | null {
     if (n.data?.url) return n.data.url;
     if (n.data?.conversation_id) return route('chat.show', n.data.conversation_id);
-    if (n.data?.order_id) return route('seller.orders.show', n.data.order_id);
+    if (n.data?.order_id) return route('manage.orders.show', n.data.order_id);
     return null;
 }
 

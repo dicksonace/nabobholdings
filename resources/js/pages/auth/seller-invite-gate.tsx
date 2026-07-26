@@ -80,7 +80,7 @@ export default function SellerInviteGate({
         currentUser.role === 'admin'
             ? route('admin.dashboard')
             : currentUser.role === 'seller'
-              ? route('seller.dashboard')
+              ? route('manage.dashboard')
               : route('home');
 
     return (

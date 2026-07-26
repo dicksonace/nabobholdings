@@ -35,7 +35,7 @@ export function submitStoreDraft(
     if (removes.remove_promo_image) formData.append('remove_promo_image', '1');
     removes.remove_hero_images?.forEach((path) => formData.append('remove_hero_images[]', path));
 
-    router.post(route('seller.store-appearance.draft'), formData, {
+    router.post(route('manage.store-appearance.draft'), formData, {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: options?.onSuccess,
@@ -47,15 +47,15 @@ export function submitStoreDraft(
 }
 
 export function publishStore() {
-    router.post(route('seller.store-appearance.publish'), {}, { preserveScroll: true });
+    router.post(route('manage.store-appearance.publish'), {}, { preserveScroll: true });
 }
 
 export function resetStore() {
-    router.post(route('seller.store-appearance.reset'), {});
+    router.post(route('manage.store-appearance.reset'), {});
 }
 
 export function completeStoreSetup(options?: { onError?: () => void }) {
-    router.post(route('seller.store-appearance.complete-setup'), {}, {
+    router.post(route('manage.store-appearance.complete-setup'), {}, {
         onError: options?.onError,
     });
 }

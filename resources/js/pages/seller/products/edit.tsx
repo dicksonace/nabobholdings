@@ -97,7 +97,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
             return;
         }
         setFormHint(null);
-        post(route('seller.products.update', product.id), { forceFormData: true });
+        post(route('manage.products.update', product.id), { forceFormData: true });
     };
 
     return (

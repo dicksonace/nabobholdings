@@ -51,7 +51,7 @@ function SellerSidebar({
     return (
         <div className={cn('flex h-full flex-col', className)}>
             <div className="border-b border-gray-100 p-5">
-                <NabobBrand showText size="md" href={route('seller.dashboard')} />
+                <NabobBrand showText size="md" href={route('manage.dashboard')} />
                 <p className="mt-2 text-xs font-medium uppercase tracking-wider text-gray-400">Seller Hub</p>
             </div>
             <PanelSidebarNav
@@ -131,12 +131,12 @@ export default function SellerLayout({ children, title, active, showFab = false 
                                 >
                                     <Menu className="h-5 w-5" />
                                 </Button>
-                                <NabobBrand size="sm" href={route('seller.dashboard')} />
+                                <NabobBrand size="sm" href={route('manage.dashboard')} />
                             </div>
                             <h1 className="min-w-0 flex-1 truncate text-base font-semibold text-gray-900 sm:text-lg lg:text-xl">{title}</h1>
                             <div className="flex shrink-0 items-center gap-1">
                                 <NotificationBell />
-                                <Link href={route('seller.products.create')} className="hidden sm:inline-flex lg:hidden">
+                                <Link href={route('manage.products.create')} className="hidden sm:inline-flex lg:hidden">
                                     <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
                                         <Plus className="mr-1 h-4 w-4" />
                                         Add
@@ -190,7 +190,7 @@ export default function SellerLayout({ children, title, active, showFab = false 
 
             {showFab && (
                 <Link
-                    href={route('seller.products.create')}
+                    href={route('manage.products.create')}
                     className="fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg shadow-orange-500/30 transition hover:bg-orange-600 lg:hidden"
                 >
                     <Plus className="h-6 w-6" />

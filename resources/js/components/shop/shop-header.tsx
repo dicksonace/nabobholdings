@@ -55,10 +55,10 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
     // Single-store: sellers (legacy) and admin share owner-style links.
     const activeNavLinks = isAdmin || isSeller
         ? [
-              { label: 'Owner Panel', href: isAdmin ? route('admin.dashboard') : route('seller.dashboard'), highlight: true },
-              { label: 'Products', href: route('seller.products.index') },
-              { label: 'Orders', href: route('seller.orders.index') },
-              { label: 'Wallet', href: route('seller.wallet') },
+              { label: 'Owner Panel', href: isAdmin ? route('admin.dashboard') : route('manage.dashboard'), highlight: true },
+              { label: 'Products', href: route('manage.products.index') },
+              { label: 'Orders', href: route('manage.orders.index') },
+              { label: 'Wallet', href: route('manage.wallet') },
               { label: 'Browse shop', href: route('home') },
               { label: 'Contact', href: route('contact') },
               { label: 'FAQ', href: route('faq') },
@@ -77,7 +77,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
     const dashboardLink = () => {
         if (!auth.user) return route('login');
         if (isAdmin) return route('admin.dashboard');
-        if (isSeller) return route('seller.dashboard');
+        if (isSeller) return route('manage.dashboard');
         return route('orders.index');
     };
 
@@ -168,19 +168,19 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                                     {isSeller && (
                                         <>
                                             <DropdownMenuItem asChild>
-                                                <Link href={route('seller.products.index')} className="flex w-full cursor-pointer items-center">
+                                                <Link href={route('manage.products.index')} className="flex w-full cursor-pointer items-center">
                                                     <Package className="mr-2 h-4 w-4" />
                                                     My Products
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
-                                                <Link href={route('seller.orders.index')} className="flex w-full cursor-pointer items-center">
+                                                <Link href={route('manage.orders.index')} className="flex w-full cursor-pointer items-center">
                                                     <ShoppingCart className="mr-2 h-4 w-4" />
                                                     Seller Orders
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
-                                                <Link href={route('seller.wallet')} className="flex w-full cursor-pointer items-center">
+                                                <Link href={route('manage.wallet')} className="flex w-full cursor-pointer items-center">
                                                     <Wallet className="mr-2 h-4 w-4" />
                                                     Earnings
                                                 </Link>

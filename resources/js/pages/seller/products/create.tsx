@@ -194,7 +194,7 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
             return;
         }
         setStepHint(null);
-        post(route('seller.products.store'), {
+        post(route('manage.products.store'), {
             forceFormData: true,
             onError: (errs) => {
                 setStep(stepForErrors(errs as Record<string, string>));

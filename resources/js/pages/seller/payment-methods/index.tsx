@@ -58,13 +58,13 @@ export default function PaymentMethodsIndex({ profile, methods, types }: Payment
 
     const saveSettings: FormEventHandler = (e) => {
         e.preventDefault();
-        settingsForm.post(route('seller.payment-methods.settings'));
+        settingsForm.post(route('manage.payment-methods.settings'));
     };
 
     const addMethod: FormEventHandler = (e) => {
         e.preventDefault();
         if (locked) return;
-        methodForm.post(route('seller.payment-methods.store'), { onSuccess: () => methodForm.reset() });
+        methodForm.post(route('manage.payment-methods.store'), { onSuccess: () => methodForm.reset() });
     };
 
     return (
@@ -215,7 +215,7 @@ export default function PaymentMethodsIndex({ profile, methods, types }: Payment
                                 {!m.is_disabled && (
                                     <button
                                         type="button"
-                                        onClick={() => router.delete(route('seller.payment-methods.destroy', m.id))}
+                                        onClick={() => router.delete(route('manage.payment-methods.destroy', m.id))}
                                         className="shrink-0 text-red-500"
                                         aria-label="Remove payment method"
                                     >

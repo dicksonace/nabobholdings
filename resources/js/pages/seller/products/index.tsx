@@ -36,7 +36,7 @@ export default function ProductsIndex({ products, filters, categories = [] }: Pr
     const runBulk = (action: string) => {
         if (selected.length === 0) return;
         if (action === 'delete' && !confirm(`Move ${selected.length} product(s) to trash? You can restore them from Deleted.`)) return;
-        router.post(route('seller.products.bulk'), {
+        router.post(route('manage.products.bulk'), {
             action,
             product_ids: selected,
             category_id: action === 'category' ? bulkCategory : undefined,
@@ -44,7 +44,7 @@ export default function ProductsIndex({ products, filters, categories = [] }: Pr
     };
 
     const applyFilters = (overrides: Record<string, string>) => {
-        router.get(route('seller.products.index'), {
+        router.get(route('manage.products.index'), {
             status: filters.status ?? '',
             search: filters.search ?? '',
             sort: filters.sort,
@@ -83,7 +83,7 @@ export default function ProductsIndex({ products, filters, categories = [] }: Pr
                         className="pl-9"
                     />
                 </form>
-                <Link href={route('seller.products.create')} className="hidden lg:inline-flex">
+                <Link href={route('manage.products.create')} className="hidden lg:inline-flex">
                     <Button className="bg-orange-500 hover:bg-orange-600">
                         <Plus className="mr-2 h-4 w-4" />
                         Add product
@@ -136,7 +136,7 @@ export default function ProductsIndex({ products, filters, categories = [] }: Pr
             {products.data.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-16 text-center">
                     <p className="text-gray-500">No products found.</p>
-                    <Link href={route('seller.products.create')} className="mt-4 inline-block">
+                    <Link href={route('manage.products.create')} className="mt-4 inline-block">
                         <Button className="bg-orange-500 hover:bg-orange-600">Add your first product</Button>
                     </Link>
                 </div>
@@ -154,11 +154,11 @@ export default function ProductsIndex({ products, filters, categories = [] }: Pr
                             </label>
                             <SellerProductCard
                             product={product}
-                            onDuplicate={(id) => router.post(route('seller.products.duplicate', id))}
-                            onToggleVisibility={(id) => router.patch(route('seller.products.visibility', id))}
+                            onDuplicate={(id) => router.post(route('manage.products.duplicate', id))}
+                            onToggleVisibility={(id) => router.patch(route('manage.products.visibility', id))}
                             onDelete={(id) => {
                                 if (confirm('Move this product to trash? You can restore it from the Deleted tab.')) {
-                                    router.delete(route('seller.products.destroy', id));
+                                    router.delete(route('manage.products.destroy', id));
                                 }
                             }}
                             />
@@ -166,7 +166,7 @@ export default function ProductsIndex({ products, filters, categories = [] }: Pr
                                 <Button
                                     size="sm"
                                     className="absolute right-3 bottom-3 z-10 bg-green-600 hover:bg-green-700"
-                                    onClick={() => router.post(route('seller.products.restore', product.id))}
+                                    onClick={() => router.post(route('manage.products.restore', product.id))}
                                 >
                                     Restore
                                 </Button>

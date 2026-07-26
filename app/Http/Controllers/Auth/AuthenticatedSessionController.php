@@ -64,8 +64,7 @@ class AuthenticatedSessionController extends Controller
         } catch (ValidationException $e) {
             $portal = $request->input('portal', 'buyer');
             $loginRoute = match ($portal) {
-                'seller' => route('seller.login'),
-                'admin' => route('admin.login'),
+                'seller', 'admin' => route('admin.login'),
                 default => route('login'),
             };
 
@@ -81,14 +80,14 @@ class AuthenticatedSessionController extends Controller
         if ($user->isSeller()) {
             $profile = $user->sellerProfile;
             if (! $profile || $profile->status->value !== 'approved') {
-                return redirect()->intended(route('seller.pending', absolute: false));
+                return redirect()->intended(route('manage.pending', absolute: false));
             }
 
             if (! $profile->storeCustomization || ! $profile->storeCustomization->isSetupComplete()) {
-                return redirect()->intended(route('seller.store-setup', absolute: false));
+                return redirect()->intended(route('manage.store-setup', absolute: false));
             }
 
-            return redirect()->intended(route('seller.dashboard', absolute: false));
+            return redirect()->intended(route('manage.dashboard', absolute: false));
         }
 
         return match (true) {

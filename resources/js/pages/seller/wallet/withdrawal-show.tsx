@@ -30,7 +30,7 @@ export default function SellerWithdrawalShow({ wallet, withdrawal, ledger }: Pro
             <Head title={`Withdrawal #${withdrawal.id}`} />
 
             <Link
-                href={route('seller.wallet.withdrawals')}
+                href={route('manage.wallet.withdrawals')}
                 className="inline-flex items-center gap-1 text-sm text-orange-600 hover:underline"
             >
                 <ArrowLeft className="h-4 w-4" />
@@ -124,7 +124,7 @@ export default function SellerWithdrawalShow({ wallet, withdrawal, ledger }: Pro
                             {ledger.map((tx) => (
                                 <li key={tx.id}>
                                     <Link
-                                        href={route('seller.wallet.transactions.show', tx.id)}
+                                        href={route('manage.wallet.transactions.show', tx.id)}
                                         className="flex items-start justify-between gap-3 px-4 py-3 hover:bg-gray-50"
                                     >
                                         <div className="min-w-0">

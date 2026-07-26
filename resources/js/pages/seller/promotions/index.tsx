@@ -41,7 +41,7 @@ export default function PromotionsIndex({ coupons, types }: PromotionsProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        form.post(route('seller.promotions.store'), { onSuccess: () => form.reset() });
+        form.post(route('manage.promotions.store'), { onSuccess: () => form.reset() });
     };
 
     return (
@@ -119,7 +119,7 @@ export default function PromotionsIndex({ coupons, types }: PromotionsProps) {
                                     <span className={`rounded-full px-2 py-0.5 text-xs ${c.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'}`}>
                                         {c.is_active ? 'Active' : 'Inactive'}
                                     </span>
-                                    <Button variant="ghost" size="icon" className="text-red-500" onClick={() => router.delete(route('seller.promotions.destroy', c.id))}>
+                                    <Button variant="ghost" size="icon" className="text-red-500" onClick={() => router.delete(route('manage.promotions.destroy', c.id))}>
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>

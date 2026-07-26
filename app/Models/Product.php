@@ -186,7 +186,7 @@ class Product extends Model
     {
         $query = request()->routeIs(
             'admin.stores.products.*',
-            'seller.products.restore',
+            'manage.products.restore',
             'admin.stores.products.restore',
         ) ? static::withTrashed() : static::query();
 

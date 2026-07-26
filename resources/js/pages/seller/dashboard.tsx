@@ -116,11 +116,11 @@ export default function SellerDashboard({
             color: 'text-amber-600',
             bg: 'bg-amber-50',
             ring: 'border-amber-100',
-            href: route('seller.wallet'),
+            href: route('manage.wallet'),
         },
-        { label: 'Orders', value: stats.total_orders, sub: `${stats.pending_orders} new`, icon: ShoppingCart, color: 'text-orange-600', bg: 'bg-orange-50', ring: 'border-orange-100', href: route('seller.orders.index') },
-        { label: 'Live products', value: stats.live_products, sub: `${stats.out_of_stock} out of stock`, icon: Package, color: 'text-sky-600', bg: 'bg-sky-50', ring: 'border-sky-100', href: route('seller.products.index', { status: 'approved' }) },
-        { label: 'Store views', value: stats.product_views, sub: stats.average_rating ? `${stats.average_rating}★ avg rating` : 'No ratings yet', icon: Eye, color: 'text-violet-600', bg: 'bg-violet-50', ring: 'border-violet-100', href: route('seller.store-appearance.index') },
+        { label: 'Orders', value: stats.total_orders, sub: `${stats.pending_orders} new`, icon: ShoppingCart, color: 'text-orange-600', bg: 'bg-orange-50', ring: 'border-orange-100', href: route('manage.orders.index') },
+        { label: 'Live products', value: stats.live_products, sub: `${stats.out_of_stock} out of stock`, icon: Package, color: 'text-sky-600', bg: 'bg-sky-50', ring: 'border-sky-100', href: route('manage.products.index', { status: 'approved' }) },
+        { label: 'Store views', value: stats.product_views, sub: stats.average_rating ? `${stats.average_rating}★ avg rating` : 'No ratings yet', icon: Eye, color: 'text-violet-600', bg: 'bg-violet-50', ring: 'border-violet-100', href: route('manage.store-appearance.index') },
     ];
 
     return (
@@ -161,8 +161,8 @@ export default function SellerDashboard({
                     className="lg:col-span-2"
                     balance={stats.available_balance}
                     pendingBalance={stats.pending_balance}
-                    withdrawHref={`${route('seller.wallet')}#withdraw`}
-                    historyHref={`${route('seller.wallet')}#history`}
+                    withdrawHref={`${route('manage.wallet')}#withdraw`}
+                    historyHref={`${route('manage.wallet')}#history`}
                     onRefresh={refreshDashboard}
                     refreshing={refreshing}
                     countdownSec={secondsLeft}
@@ -226,7 +226,7 @@ export default function SellerDashboard({
                 {storeUrl && profile.slug && (
                     <div className="space-y-4">
                         <StoreShareCard slug={profile.slug} storeName={profile.business_name ?? profile.store_name ?? 'My Store'} storeUrl={storeUrl} />
-                        <Link href={route('seller.store-appearance.index')} className="flex items-center justify-between rounded-2xl border border-orange-100 bg-orange-50 p-5 transition hover:bg-orange-100">
+                        <Link href={route('manage.store-appearance.index')} className="flex items-center justify-between rounded-2xl border border-orange-100 bg-orange-50 p-5 transition hover:bg-orange-100">
                             <div>
                                 <p className="font-semibold text-orange-900">Customize store</p>
                                 <p className="text-sm text-orange-700">Theme, banner & layout</p>
@@ -241,14 +241,14 @@ export default function SellerDashboard({
                 <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
                     <div className="flex items-center justify-between">
                         <h3 className="font-semibold text-gray-900">Recent orders</h3>
-                        <Link href={route('seller.orders.index')} className="text-sm text-orange-500 hover:underline">View all</Link>
+                        <Link href={route('manage.orders.index')} className="text-sm text-orange-500 hover:underline">View all</Link>
                     </div>
                     {recentOrders.length === 0 ? (
                         <p className="mt-4 text-sm text-gray-500">No orders yet.</p>
                     ) : (
                         <div className="mt-4 divide-y">
                             {recentOrders.map((item) => (
-                                <Link key={item.id} href={route('seller.orders.show', item.id)} className="flex items-center justify-between rounded-lg px-2 py-3 -mx-2 text-sm hover:bg-gray-50">
+                                <Link key={item.id} href={route('manage.orders.show', item.id)} className="flex items-center justify-between rounded-lg px-2 py-3 -mx-2 text-sm hover:bg-gray-50">
                                     <div className="min-w-0">
                                         <p className="truncate font-medium">{item.product_name}</p>
                                         <p className="text-gray-500">Qty {item.quantity} · {formatOrderStatus(item.status)}</p>
@@ -285,7 +285,7 @@ export default function SellerDashboard({
                     <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                         <div className="flex items-center justify-between">
                             <h3 className="font-semibold text-gray-900">Withdrawals</h3>
-                            <Link href={`${route('seller.wallet')}#history`} className="text-sm text-orange-500 hover:underline">Finance</Link>
+                            <Link href={`${route('manage.wallet')}#history`} className="text-sm text-orange-500 hover:underline">Finance</Link>
                         </div>
                         {recentWithdrawals.length === 0 ? (
                             <p className="mt-3 text-sm text-gray-500">No withdrawals yet.</p>

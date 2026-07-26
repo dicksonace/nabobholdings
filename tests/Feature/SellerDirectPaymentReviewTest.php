@@ -113,7 +113,7 @@ class SellerDirectPaymentReviewTest extends TestCase
         $order = $this->pendingDirectOrder($buyer, $seller);
 
         $this->actingAs($seller)
-            ->post(route('seller.orders.confirm-direct-payment', $order))
+            ->post(route('manage.orders.confirm-direct-payment', $order))
             ->assertRedirect();
 
         $order->refresh();
@@ -131,7 +131,7 @@ class SellerDirectPaymentReviewTest extends TestCase
         $order = $this->pendingDirectOrder($buyer, $seller);
 
         $this->actingAs($seller)
-            ->post(route('seller.orders.reject-direct-payment', $order), [
+            ->post(route('manage.orders.reject-direct-payment', $order), [
                 'reason' => 'Money not received on MoMo',
             ])
             ->assertRedirect();
@@ -156,8 +156,8 @@ class SellerDirectPaymentReviewTest extends TestCase
         ]);
 
         $this->actingAs($seller)
-            ->from(route('seller.orders.index'))
-            ->post(route('seller.orders.reject-direct-payment', $order), [
+            ->from(route('manage.orders.index'))
+            ->post(route('manage.orders.reject-direct-payment', $order), [
                 'reason' => 'Money not received',
             ])
             ->assertSessionHasErrors('reason');

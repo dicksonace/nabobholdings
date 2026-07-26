@@ -24,7 +24,7 @@ export default function ProductAnalytics({ product, stats }: AnalyticsProps) {
     return (
         <SellerLayout title="Product analytics" active="products">
             <Head title={`Analytics — ${product.name}`} />
-            <Link href={route('seller.products.index')} className="inline-flex items-center gap-1 text-sm text-orange-500 hover:underline">
+            <Link href={route('manage.products.index')} className="inline-flex items-center gap-1 text-sm text-orange-500 hover:underline">
                 <ArrowLeft className="h-4 w-4" /> Back to products
             </Link>
 

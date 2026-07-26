@@ -118,14 +118,14 @@ class User extends Authenticatable
             $profile = $this->sellerProfile;
 
             if (! $profile || $profile->status->value !== 'approved') {
-                return route('seller.pending', absolute: false);
+                return route('manage.pending', absolute: false);
             }
 
             if (! $profile->storeCustomization || ! $profile->storeCustomization->isSetupComplete()) {
-                return route('seller.store-setup', absolute: false);
+                return route('manage.store-setup', absolute: false);
             }
 
-            return route('seller.dashboard', absolute: false);
+            return route('manage.dashboard', absolute: false);
         }
 
         return match (true) {

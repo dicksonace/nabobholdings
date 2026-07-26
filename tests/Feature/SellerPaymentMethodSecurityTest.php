@@ -74,7 +74,7 @@ class SellerPaymentMethodSecurityTest extends TestCase
         $this->assertFalse($profile->accept_direct_payments);
 
         $this->actingAs($seller)
-            ->post(route('seller.payment-methods.store'), [
+            ->post(route('manage.payment-methods.store'), [
                 'type' => 'mobile_money',
                 'account_name' => 'Another Account',
                 'account_number' => '0555123456',
@@ -120,7 +120,7 @@ class SellerPaymentMethodSecurityTest extends TestCase
             ]);
 
         $this->actingAs($seller)
-            ->delete(route('seller.payment-methods.destroy', $method->id))
+            ->delete(route('manage.payment-methods.destroy', $method->id))
             ->assertRedirect()
             ->assertSessionHas('error');
 
@@ -149,7 +149,7 @@ class SellerPaymentMethodSecurityTest extends TestCase
         $this->assertTrue($method->fresh()->isDisabled());
 
         $this->actingAs($seller)
-            ->post(route('seller.payment-methods.store'), [
+            ->post(route('manage.payment-methods.store'), [
                 'type' => 'mobile_money',
                 'account_name' => 'Clean Account',
                 'account_number' => '0200111222',
@@ -159,7 +159,7 @@ class SellerPaymentMethodSecurityTest extends TestCase
             ->assertSessionHas('success');
 
         $this->actingAs($seller)
-            ->post(route('seller.payment-methods.store'), [
+            ->post(route('manage.payment-methods.store'), [
                 'type' => 'mobile_money',
                 'account_name' => 'Same Bad Number',
                 'account_number' => '0244-123-456',

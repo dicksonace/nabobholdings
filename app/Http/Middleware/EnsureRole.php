@@ -18,8 +18,8 @@ class EnsureRole
                 return redirect()->route('admin.login');
             }
 
-            if ($request->is('seller') || $request->is('seller/*')) {
-                return redirect()->route('seller.login');
+            if ($request->is('manage') || $request->is('manage/*') || $request->is('seller') || $request->is('seller/*')) {
+                return redirect()->route('admin.login');
             }
 
             return redirect()->route('login');
@@ -28,8 +28,8 @@ class EnsureRole
         $allowed = array_map(fn ($r) => UserRole::from($r), $roles);
 
         if (! in_array($user->role, $allowed, true)) {
-            // Admin is also the store operator in single-seller mode — allow seller routes when listed.
-            if (($request->is('seller') || $request->is('seller/*')) && $user->isAdmin()) {
+            // Admin is also the store operator in single-seller mode — allow manage routes when listed.
+            if (($request->is('manage') || $request->is('manage/*')) && $user->isAdmin()) {
                 $allowsAdmin = collect($allowed)->contains(fn ($role) => $role === UserRole::Admin);
                 if ($allowsAdmin) {
                     return $next($request);
@@ -37,7 +37,7 @@ class EnsureRole
             }
 
             if (($request->is('admin') || $request->is('admin/*')) && $user->isSeller()) {
-                return redirect()->route('seller.dashboard');
+                return redirect()->route('manage.dashboard');
             }
 
             abort(403, 'Unauthorized.');

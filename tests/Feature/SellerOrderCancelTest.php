@@ -132,12 +132,12 @@ class SellerOrderCancelTest extends TestCase
         ]);
 
         $response = $this->actingAs($seller)
-            ->post(route('seller.orders.reject', $item), [
+            ->post(route('manage.orders.reject', $item), [
                 'cancellation_code' => 'out_of_stock',
             ]);
 
         $response->assertSessionHasNoErrors();
-        $response->assertRedirect(route('seller.orders.stage', 'cancelled'));
+        $response->assertRedirect(route('manage.orders.stage', 'cancelled'));
 
         $item->refresh();
         $this->assertSame(OrderStatus::Cancelled, $item->status);
@@ -192,8 +192,8 @@ class SellerOrderCancelTest extends TestCase
         ]);
 
         $this->actingAs($seller)
-            ->from(route('seller.orders.show', $item))
-            ->post(route('seller.orders.reject', $item), [
+            ->from(route('manage.orders.show', $item))
+            ->post(route('manage.orders.reject', $item), [
                 'cancellation_code' => 'out_of_stock',
             ])
             ->assertRedirect();
@@ -262,7 +262,7 @@ class SellerOrderCancelTest extends TestCase
         ]);
 
         $this->actingAs($seller)
-            ->post(route('seller.orders.reject', $item), [
+            ->post(route('manage.orders.reject', $item), [
                 'cancellation_code' => 'other',
                 'rejection_reason' => 'not pay',
             ])
@@ -355,11 +355,11 @@ class SellerOrderCancelTest extends TestCase
         ]);
 
         $this->actingAs($seller)
-            ->post(route('seller.orders.reject', $item), [
+            ->post(route('manage.orders.reject', $item), [
                 'cancellation_code' => 'out_of_stock',
             ])
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('seller.orders.stage', 'cancelled'));
+            ->assertRedirect(route('manage.orders.stage', 'cancelled'));
 
         $this->assertSame(OrderCancellation::REFUND_COMPLETED, $item->fresh()->refund_status);
         $this->assertEquals(80.0, (float) Wallet::where('user_id', $seller->id)->value('available_balance'));
@@ -421,11 +421,11 @@ class SellerOrderCancelTest extends TestCase
         ]);
 
         $this->actingAs($seller)
-            ->from(route('seller.orders.show', $item))
-            ->post(route('seller.orders.reject', $item), [
+            ->from(route('manage.orders.show', $item))
+            ->post(route('manage.orders.reject', $item), [
                 'cancellation_code' => 'out_of_stock',
             ])
-            ->assertRedirect(route('seller.orders.show', $item))
+            ->assertRedirect(route('manage.orders.show', $item))
             ->assertSessionHas('error');
 
         $this->assertSame(OrderStatus::Pending, $item->fresh()->status);

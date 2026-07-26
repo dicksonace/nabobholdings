@@ -83,8 +83,8 @@ class AppNotificationService
             'order_item_id' => $item?->id,
             'payment_channel' => $order->payment_channel?->value,
             'url' => $item?->id
-                ? route('seller.orders.show', $item->id)
-                : route('seller.orders.index'),
+                ? route('manage.orders.show', $item->id)
+                : route('manage.orders.index'),
         ]);
     }
 
@@ -98,7 +98,7 @@ class AppNotificationService
             [
                 'product_id' => $product->id,
                 'product_name' => $product->name,
-                'url' => route('seller.products.edit', $product->id),
+                'url' => route('manage.products.edit', $product->id),
             ],
         );
     }

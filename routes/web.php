@@ -129,7 +129,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/counts', [ChatNotificationController::class, 'counts'])->name('notifications.counts');
 });
 
-Route::prefix('seller')->name('seller.')->middleware(['auth', 'role:admin,seller'])->group(function () {
+Route::prefix('manage')->name('manage.')->middleware(['auth', 'role:admin,seller'])->group(function () {
     Route::get('/pending', [SellerDashboardController::class, 'pending'])->name('pending');
 
     Route::middleware(['seller.approved'])->group(function () {
@@ -253,3 +253,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+
+// Legacy /seller/* panel URLs → /manage/* (after auth so seller/login stays intact)
+Route::any('/seller/{path}', function (string $path) {
+    $target = '/manage/'.$path;
+    $qs = request()->getQueryString();
+
+    return redirect($qs ? "{$target}?{$qs}" : $target, 301);
+})->where('path', '.*')->name('seller.legacy-redirect');
+
+Route::redirect('/seller', '/manage/dashboard', 301);

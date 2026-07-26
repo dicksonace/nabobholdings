@@ -69,8 +69,8 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
                 ->action(
                     'View Order',
                     $this->orderItem
-                        ? route('seller.orders.show', $this->orderItem->id)
-                        : route('seller.orders.index'),
+                        ? route('manage.orders.show', $this->orderItem->id)
+                        : route('manage.orders.index'),
                 );
         }
 

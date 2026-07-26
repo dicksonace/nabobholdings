@@ -128,7 +128,7 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
             label: 'Store',
             icon: Store,
             defaultOpen: section === 'store',
-            items: [{ key: 'appearance', label: 'Customize Store', href: route('seller.store-appearance.index') }],
+            items: [{ key: 'appearance', label: 'Customize Store', href: route('manage.store-appearance.index') }],
         },
         {
             key: 'products',
@@ -136,11 +136,11 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
             icon: Package,
             defaultOpen: section === 'products',
             items: [
-                { key: 'products-all', label: 'All Products', href: route('seller.products.index'), mobile: true, defaultOnPath: true },
-                { key: 'products-add', label: 'Add Product', href: route('seller.products.create') },
-                { key: 'products-live', label: 'Active Products', href: route('seller.products.index', { status: 'approved' }) },
-                { key: 'products-draft', label: 'Hidden / Draft', href: route('seller.products.index', { status: 'draft' }) },
-                { key: 'products-sold-out', label: 'Out of Stock', href: route('seller.products.index', { status: 'sold_out' }) },
+                { key: 'products-all', label: 'All Products', href: route('manage.products.index'), mobile: true, defaultOnPath: true },
+                { key: 'products-add', label: 'Add Product', href: route('manage.products.create') },
+                { key: 'products-live', label: 'Active Products', href: route('manage.products.index', { status: 'approved' }) },
+                { key: 'products-draft', label: 'Hidden / Draft', href: route('manage.products.index', { status: 'draft' }) },
+                { key: 'products-sold-out', label: 'Out of Stock', href: route('manage.products.index', { status: 'sold_out' }) },
                 { key: 'categories', label: 'Categories', href: route('admin.categories.index') },
             ],
         },
@@ -150,7 +150,7 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
             icon: ShoppingCart,
             defaultOpen: section === 'orders',
             items: [
-                { key: 'orders-hub', label: 'Sales center', href: route('seller.orders.index'), mobile: true, defaultOnPath: true },
+                { key: 'orders-hub', label: 'Sales center', href: route('manage.orders.index'), mobile: true, defaultOnPath: true },
                 { key: 'orders-new', label: 'New orders', href: sellerOrdersStageHref('new'), badgeKey: 'pending_orders' },
                 { key: 'orders-processing', label: 'Processing', href: sellerOrdersStageHref('processing'), badgeKey: 'processing_orders' },
                 { key: 'orders-call', label: 'Call buyer', href: sellerOrdersStageHref('call'), badgeKey: 'call_orders' },
@@ -184,7 +184,7 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
             label: 'Marketing',
             icon: Tag,
             defaultOpen: section === 'marketing',
-            items: [{ key: 'promotions', label: 'Coupons & Promotions', href: route('seller.promotions.index') }],
+            items: [{ key: 'promotions', label: 'Coupons & Promotions', href: route('manage.promotions.index') }],
         },
         {
             key: 'customers',
@@ -193,7 +193,7 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
             defaultOpen: section === 'customers',
             items: [
                 { key: 'buyers', label: 'All Buyers', href: route('admin.buyers.index') },
-                { key: 'reviews', label: 'Product Reviews', href: route('seller.reviews.index') },
+                { key: 'reviews', label: 'Product Reviews', href: route('manage.reviews.index') },
             ],
         },
         {
@@ -202,10 +202,10 @@ export function adminNavGroups(active: AdminNavKey): PanelNavGroup[] {
             icon: Wallet,
             defaultOpen: section === 'finance',
             items: [
-                { key: 'wallet', label: 'Store Wallet', href: route('seller.wallet'), mobile: true },
-                { key: 'wallet-transactions', label: 'Transactions', href: route('seller.wallet.transactions') },
-                { key: 'wallet-withdrawals', label: 'My Withdrawals', href: route('seller.wallet.withdrawals') },
-                { key: 'payment-methods', label: 'Payment Methods', href: route('seller.payment-methods.index') },
+                { key: 'wallet', label: 'Store Wallet', href: route('manage.wallet'), mobile: true },
+                { key: 'wallet-transactions', label: 'Transactions', href: route('manage.wallet.transactions') },
+                { key: 'wallet-withdrawals', label: 'My Withdrawals', href: route('manage.wallet.withdrawals') },
+                { key: 'payment-methods', label: 'Payment Methods', href: route('manage.payment-methods.index') },
                 { key: 'withdrawals-buyers', label: 'Buyer Withdrawals', href: route('admin.withdrawals.index', { status: 'pending', role: 'buyer' }), badgeKey: 'pending_withdrawals' },
                 { key: 'manual-top-ups', label: 'Manual Top-ups', href: route('admin.manual-top-ups.index'), badgeKey: 'pending_manual_top_ups' },
                 { key: 'manual-funding-settings', label: 'Receive Accounts', href: route('admin.manual-funding.settings') },

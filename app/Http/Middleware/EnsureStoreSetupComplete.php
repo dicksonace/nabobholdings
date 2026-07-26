@@ -10,12 +10,12 @@ class EnsureStoreSetupComplete
 {
     /** @var list<string> */
     protected array $except = [
-        'seller.store-setup',
-        'seller.store-appearance.index',
-        'seller.store-appearance.draft',
-        'seller.store-appearance.publish',
-        'seller.store-appearance.reset',
-        'seller.store-appearance.complete-setup',
+        'manage.store-setup',
+        'manage.store-appearance.index',
+        'manage.store-appearance.draft',
+        'manage.store-appearance.publish',
+        'manage.store-appearance.reset',
+        'manage.store-appearance.complete-setup',
         'logout',
     ];
 
@@ -29,7 +29,7 @@ class EnsureStoreSetupComplete
         $customization = $profile?->storeCustomization;
 
         if (! $customization || ! $customization->isSetupComplete()) {
-            return redirect()->route('seller.store-setup');
+            return redirect()->route('manage.store-setup');
         }
 
         return $next($request);

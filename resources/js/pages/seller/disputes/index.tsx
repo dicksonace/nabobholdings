@@ -143,7 +143,7 @@ export default function SellerDisputesIndex({
             icon: MessageSquareWarning,
             tone: 'border-amber-100 bg-gradient-to-br from-amber-50 to-white',
             iconTone: 'bg-amber-100 text-amber-600',
-            href: route('seller.refunds.index', { status: counts.open > 0 ? 'open' : 'under_review' }),
+            href: route('manage.refunds.index', { status: counts.open > 0 ? 'open' : 'under_review' }),
         },
         {
             label: 'Refunded',
@@ -152,7 +152,7 @@ export default function SellerDisputesIndex({
             icon: CheckCircle2,
             tone: 'border-emerald-100 bg-gradient-to-br from-emerald-50 to-white',
             iconTone: 'bg-emerald-100 text-emerald-600',
-            href: route('seller.refunds.index', { status: 'resolved_buyer' }),
+            href: route('manage.refunds.index', { status: 'resolved_buyer' }),
         },
         {
             label: 'Declined',
@@ -161,7 +161,7 @@ export default function SellerDisputesIndex({
             icon: ShieldCheck,
             tone: 'border-violet-100 bg-gradient-to-br from-violet-50 to-white',
             iconTone: 'bg-violet-100 text-violet-600',
-            href: route('seller.refunds.index', { status: 'resolved_seller' }),
+            href: route('manage.refunds.index', { status: 'resolved_seller' }),
         },
         {
             label: 'All requests',
@@ -170,7 +170,7 @@ export default function SellerDisputesIndex({
             icon: Package,
             tone: 'border-sky-100 bg-gradient-to-br from-sky-50 to-white',
             iconTone: 'bg-sky-100 text-sky-600',
-            href: route('seller.refunds.index', { status: 'all' }),
+            href: route('manage.refunds.index', { status: 'all' }),
         },
     ];
 
@@ -226,7 +226,7 @@ export default function SellerDisputesIndex({
                     return (
                         <Link
                             key={tab.key}
-                            href={route('seller.refunds.index', { status: tab.key === 'all' ? undefined : tab.key })}
+                            href={route('manage.refunds.index', { status: tab.key === 'all' ? undefined : tab.key })}
                             className={cn(
                                 'inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition',
                                 active
@@ -259,7 +259,7 @@ export default function SellerDisputesIndex({
                             When a buyer asks for a refund on one of your orders, it shows up in this queue.
                         </p>
                         <Link
-                            href={route('seller.orders.index')}
+                            href={route('manage.orders.index')}
                             className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:text-orange-700"
                         >
                             Back to sales
@@ -345,7 +345,7 @@ export default function SellerDisputesIndex({
                                         )}
                                         {orderItemId ? (
                                             <Link
-                                                href={route('seller.orders.show', orderItemId)}
+                                                href={route('manage.orders.show', orderItemId)}
                                                 className="inline-flex items-center justify-center gap-1 rounded-full bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
                                             >
                                                 View order
