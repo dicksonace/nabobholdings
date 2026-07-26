@@ -87,7 +87,7 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
           : navLinks;
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 24);
+        const onScroll = () => setScrolled(window.scrollY > 40);
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
@@ -188,17 +188,20 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
             <div
                 className={cn(
                     'fixed inset-x-0 top-0 z-50 transition-[padding] duration-300 ease-out',
-                    floating ? 'px-3 pt-3 sm:px-4 sm:pt-3' : 'px-0 pt-0',
+                    floating ? 'px-3 pt-3 sm:px-5 sm:pt-4' : 'px-0 pt-0',
                 )}
             >
                 <header
                     className={cn(
-                        'relative mx-auto max-w-7xl overflow-hidden transition-all duration-300 ease-out',
+                        'relative overflow-hidden transition-all duration-300 ease-out',
                         floating
-                            ? 'rounded-2xl border border-white/15 bg-[#0f2744]/92 shadow-[0_12px_40px_rgba(15,39,68,0.45)] backdrop-blur-xl'
-                            : overHero
-                              ? 'rounded-none border-b border-white/10 bg-[#0f2744]/90 backdrop-blur-md'
-                              : 'rounded-none border-b border-[#0f2744]/10 bg-white/90 backdrop-blur-md',
+                            ? 'mx-auto w-full max-w-7xl rounded-2xl border border-white/15 bg-[#0f2744]/92 shadow-[0_12px_40px_rgba(15,39,68,0.45)] backdrop-blur-xl'
+                            : cn(
+                                  'w-full max-w-none rounded-none',
+                                  overHero
+                                      ? 'border-b border-white/10 bg-[#0f2744]/95 backdrop-blur-md'
+                                      : 'border-b border-[#0f2744]/10 bg-white/95 backdrop-blur-md',
+                              ),
                     )}
                 >
                     {!floating && (
@@ -210,7 +213,7 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                         />
                     )}
 
-                    <div className="relative px-3 sm:px-4">
+                    <div className={cn('relative px-3 sm:px-4', !floating && 'mx-auto max-w-7xl')}>
                         <div className="flex h-14 items-center gap-3 sm:h-16 sm:gap-5">
                             <NabobBrand size="sm" className="shrink-0" inverted={dark} />
 
