@@ -307,14 +307,22 @@ class CheckoutController extends Controller
         try {
             $data = $this->paystack->verifyTransaction($reference);
 
-            if ($data['status'] !== 'success') {
-                return redirect()->route('orders.index')->with('error', 'Payment was not successful.');
-            }
-
             $checkoutId = $data['metadata']['checkout_id'] ?? null;
             $checkout = $checkoutId
-                ? Checkout::findOrFail($checkoutId)
-                : Checkout::whereHas('orders', fn ($q) => $q->where('payment_reference', $reference))->firstOrFail();
+                ? Checkout::find($checkoutId)
+                : Checkout::whereHas('orders', fn ($q) => $q->where('payment_reference', $reference))->first();
+
+            if (! $checkout) {
+                return redirect()->route('orders.index')->with('error', 'Payment could not be matched to a checkout.');
+            }
+
+            if (($data['status'] ?? '') !== 'success') {
+                $this->orderService->markCheckoutPaymentFailed($checkout, $reference);
+
+                return redirect()
+                    ->route('checkout.payment', $checkout)
+                    ->with('error', 'Payment was not successful. You can try again.');
+            }
 
             $this->orderService->fulfillPaidCheckout($checkout, $reference);
 
@@ -322,7 +330,7 @@ class CheckoutController extends Controller
         } catch (\Throwable $e) {
             Log::error('Paystack callback error', ['error' => $e->getMessage()]);
 
-            return redirect()->route('orders.index')->with('error', 'Payment verification failed.');
+            return redirect()->route('orders.index')->with('error', 'Payment verification failed. If you were charged, contact support with your reference.');
         }
     }
 
@@ -346,14 +354,36 @@ class CheckoutController extends Controller
             return response()->json(['message' => 'No marketplace payment required for this checkout.'], 422);
         }
 
+        $channel = $request->input('channel');
+        $channels = match ($channel) {
+            'momo', 'mobile_money' => ['mobile_money'],
+            'card' => ['card'],
+            default => ['card', 'mobile_money'],
+        };
+
         $reference = 'CSH-'.uniqid();
+
+        $checkout->loadMissing('orders');
+
+        $checkout->orders
+            ->where('payment_channel', PaymentChannel::Marketplace)
+            ->each(fn (Order $order) => $order->update([
+                'payment_reference' => $reference,
+                'payment_status' => PaymentStatus::Pending,
+            ]));
+
+        if ($checkout->payment_status === PaymentStatus::Failed) {
+            $checkout->update(['payment_status' => PaymentStatus::Pending]);
+        }
 
         try {
             $data = $this->paystack->initializeTransaction(
                 $request->user()->email,
                 (float) $amount,
                 $reference,
-                ['checkout_id' => $checkout->id, 'checkout_number' => $checkout->checkout_number]
+                ['checkout_id' => $checkout->id, 'checkout_number' => $checkout->checkout_number],
+                null,
+                $channels,
             );
 
             return response()->json([
@@ -362,6 +392,7 @@ class CheckoutController extends Controller
                 'reference' => $data['reference'],
                 'email' => $request->user()->email,
                 'amount' => $amount,
+                'channels' => $channels,
             ]);
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 500);

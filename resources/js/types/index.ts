@@ -24,6 +24,7 @@ export interface NavItem {
 export interface Brand {
     name: string;
     logo: string | null;
+    tagline?: string;
 }
 
 export interface Currency {
@@ -40,6 +41,7 @@ export interface ContactInfo {
 export interface SharedData {
     name: string;
     brand: Brand;
+    appUrl?: string;
     currency: Currency;
     contact: ContactInfo;
     csrfToken?: string;

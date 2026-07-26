@@ -60,10 +60,15 @@ class HomeController extends Controller
             $query->where('free_shipping', true);
         }
 
+        if ($request->boolean('on_sale')) {
+            $query->whereNotNull('discount_price')->whereColumn('discount_price', '<', 'price');
+        }
+
         // Legacy quick-filter support
         match ($request->get('filter')) {
             'in_ghana' => $query->where('in_ghana', true),
             'free_ship' => $query->where('free_shipping', true),
+            'on_sale' => $query->whereNotNull('discount_price')->whereColumn('discount_price', '<', 'price'),
             default => null,
         };
 
@@ -97,10 +102,42 @@ class HomeController extends Controller
             ->orderBy('brand')
             ->get();
 
+        $hasActiveFilters = $search !== ''
+            || $request->filled('category')
+            || $request->filled('brand')
+            || $request->filled('price_min')
+            || $request->filled('price_max')
+            || $request->filled('rating')
+            || $request->boolean('in_ghana')
+            || $request->boolean('free_ship')
+            || $request->boolean('on_sale');
+
+        $categoryShelves = collect();
+        if (! $hasActiveFilters) {
+            $categoryShelves = $categories->take(4)->map(function (Category $category) {
+                $shelfProducts = Product::with(['images', 'seller.sellerProfile', 'category'])
+                    ->visibleInShop()
+                    ->where('category_id', $category->id)
+                    ->orderByDesc('purchase_count')
+                    ->orderByDesc('views')
+                    ->limit(8)
+                    ->get();
+
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'products_count' => $category->products_count,
+                    'products' => $shelfProducts,
+                ];
+            })->filter(fn (array $shelf) => count($shelf['products']) > 0)->values();
+        }
+
         return Inertia::render('shop/home', [
             'products' => $products,
             'categories' => $categories,
             'brands' => $brands,
+            'categoryShelves' => $categoryShelves,
             'priceRange' => [
                 'min' => (float) ($priceStats->min_price ?? 0),
                 'max' => (float) ($priceStats->max_price ?? 10000),
@@ -114,6 +151,7 @@ class HomeController extends Controller
                 'rating' => $request->get('rating', ''),
                 'in_ghana' => $request->boolean('in_ghana'),
                 'free_ship' => $request->boolean('free_ship'),
+                'on_sale' => $request->boolean('on_sale'),
                 'sort' => $sort,
                 'seed' => $rankingSeed ?? $request->get('seed', ''),
             ],

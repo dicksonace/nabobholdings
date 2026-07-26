@@ -515,6 +515,36 @@ class OrderService
         return $checkout->orders->first();
     }
 
+    public function markCheckoutPaymentFailed(Checkout $checkout, ?string $reference = null): Checkout
+    {
+        if (in_array($checkout->payment_status, [PaymentStatus::Paid, PaymentStatus::Refunded], true)) {
+            return $checkout;
+        }
+
+        return DB::transaction(function () use ($checkout, $reference) {
+            $checkout->load('orders');
+
+            foreach ($checkout->orders as $order) {
+                if ($order->payment_channel === PaymentChannel::Direct) {
+                    continue;
+                }
+
+                if ($order->payment_status === PaymentStatus::Paid) {
+                    continue;
+                }
+
+                $order->update([
+                    'payment_status' => PaymentStatus::Failed,
+                    'payment_reference' => $reference ?: $order->payment_reference,
+                ]);
+            }
+
+            $this->syncCheckoutPaymentStatus($checkout);
+
+            return $checkout->fresh(['orders']);
+        });
+    }
+
     public function fulfillPaidCheckout(Checkout $checkout, string $paystackReference): Checkout
     {
         if ($checkout->payment_status === PaymentStatus::Paid) {
@@ -835,9 +865,17 @@ class OrderService
 
         $allPaid = $paymentOrders->every(fn (Order $o) => $o->payment_status === PaymentStatus::Paid);
         $anyPaid = $paymentOrders->contains(fn (Order $o) => $o->payment_status === PaymentStatus::Paid);
+        $marketplaceOrders = $paymentOrders->where('payment_channel', PaymentChannel::Marketplace);
+        $allMarketplaceFailed = $marketplaceOrders->isNotEmpty()
+            && $marketplaceOrders->every(fn (Order $o) => $o->payment_status === PaymentStatus::Failed)
+            && ! $anyPaid;
 
         $checkout->update([
-            'payment_status' => $allPaid ? PaymentStatus::Paid : ($anyPaid ? PaymentStatus::Partial : PaymentStatus::Pending),
+            'payment_status' => $allPaid
+                ? PaymentStatus::Paid
+                : ($anyPaid
+                    ? PaymentStatus::Partial
+                    : ($allMarketplaceFailed ? PaymentStatus::Failed : PaymentStatus::Pending)),
             'status' => $allPaid ? OrderStatus::Processing : OrderStatus::Pending,
         ]);
     }

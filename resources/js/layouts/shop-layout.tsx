@@ -9,11 +9,13 @@ import { SharedData } from '@/types';
 interface ShopLayoutProps {
     children: ReactNode;
     hideHeaderSearch?: boolean;
+    /** Dark translucent header that blends into the home hero until scroll. */
+    overHero?: boolean;
     /** Hide header, footer, and buyer bottom nav (invoice / print-ready pages). */
     hideChrome?: boolean;
 }
 
-export default function ShopLayout({ children, hideHeaderSearch = false, hideChrome = false }: ShopLayoutProps) {
+export default function ShopLayout({ children, hideHeaderSearch = false, overHero = false, hideChrome = false }: ShopLayoutProps) {
     const page = usePage<SharedData>();
     const { auth, flash, brand, contact } = page.props;
     const brandName = brand?.name ?? 'Nabob Holdings';
@@ -45,7 +47,7 @@ export default function ShopLayout({ children, hideHeaderSearch = false, hideChr
         >
             {!hideChrome && (
                 <div className="print:hidden">
-                    <ShopHeader hideSearch={hideHeaderSearch} />
+                    <ShopHeader hideSearch={hideHeaderSearch} overHero={overHero} />
                 </div>
             )}
             {!hideChrome && flash?.success && (

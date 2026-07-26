@@ -21,17 +21,23 @@ class PaystackService
         return ! empty($this->secretKey) && ! empty(config('services.paystack.public_key'));
     }
 
-    public function initializeTransaction(string $email, float $amountGhs, string $reference, array $metadata = [], ?string $callbackUrl = null): array
+    public function initializeTransaction(string $email, float $amountGhs, string $reference, array $metadata = [], ?string $callbackUrl = null, ?array $channels = null): array
     {
+        $payload = [
+            'email' => $email,
+            'amount' => (int) round($amountGhs * 100),
+            'currency' => 'GHS',
+            'reference' => $reference,
+            'callback_url' => $callbackUrl ?? route('checkout.callback'),
+            'metadata' => $metadata,
+        ];
+
+        if ($channels) {
+            $payload['channels'] = $channels;
+        }
+
         $response = Http::withToken($this->secretKey)
-            ->post("{$this->baseUrl}/transaction/initialize", [
-                'email' => $email,
-                'amount' => (int) round($amountGhs * 100),
-                'currency' => 'GHS',
-                'reference' => $reference,
-                'callback_url' => $callbackUrl ?? route('checkout.callback'),
-                'metadata' => $metadata,
-            ]);
+            ->post("{$this->baseUrl}/transaction/initialize", $payload);
 
         if (! $response->successful()) {
             Log::error('Paystack initialize failed', ['body' => $response->json()]);

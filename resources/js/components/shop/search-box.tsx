@@ -49,6 +49,8 @@ interface SearchBoxProps {
     showBack?: boolean;
     /** Optional fixed destination; otherwise uses browser history, falling back to shop home. */
     backHref?: string;
+    /** Visual tone for header-over-hero (dark) vs default light surfaces. */
+    tone?: 'light' | 'dark';
 }
 
 export default function SearchBox({
@@ -64,6 +66,7 @@ export default function SearchBox({
     storeName,
     showBack = false,
     backHref,
+    tone = 'light',
 }: SearchBoxProps) {
     const [query, setQuery] = useState(initialQuery);
     const [open, setOpen] = useState(false);
@@ -195,7 +198,11 @@ export default function SearchBox({
                     <button
                         type="button"
                         onClick={handleBack}
-                        className={`inline-flex shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 shadow-sm transition-colors hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600 ${compact ? 'h-10 w-10' : 'h-11 w-11'}`}
+                        className={`inline-flex shrink-0 items-center justify-center rounded-xl border shadow-sm transition-colors ${compact ? 'h-10 w-10' : 'h-11 w-11'} ${
+                            tone === 'dark'
+                                ? 'border-white/20 bg-white/10 text-white hover:bg-white/15'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700'
+                        }`}
                         aria-label="Go back"
                         title="Back"
                     >
@@ -203,7 +210,11 @@ export default function SearchBox({
                     </button>
                 )}
                 <div
-                    className={`flex min-w-0 flex-1 overflow-hidden rounded-2xl border-2 border-orange-100 bg-gray-50 transition-colors focus-within:border-orange-300 focus-within:bg-white ${compact ? 'rounded-xl' : ''}`}
+                    className={`flex min-w-0 flex-1 overflow-hidden border-2 transition-colors focus-within:bg-white ${compact ? 'rounded-xl' : 'rounded-2xl'} ${
+                        tone === 'dark'
+                            ? 'border-white/20 bg-white/95 focus-within:border-[#fbbf24]'
+                            : 'border-[#0f2744]/10 bg-gray-50 focus-within:border-[#d97706]'
+                    }`}
                 >
                     <Input
                         type="search"
@@ -218,14 +229,18 @@ export default function SearchBox({
                         <>
                             <Link
                                 href={imageSearchHref}
-                                className={`flex shrink-0 items-center justify-center border-l border-orange-100 bg-white px-3 text-gray-500 transition-colors hover:bg-orange-50 hover:text-orange-500 ${compact ? '' : 'px-4'}`}
+                                className={`flex shrink-0 items-center justify-center border-l px-3 transition-colors ${compact ? '' : 'px-4'} ${
+                                    tone === 'dark'
+                                        ? 'border-[#0f2744]/10 bg-white text-[#0f2744]/60 hover:bg-amber-50 hover:text-[#d97706]'
+                                        : 'border-[#0f2744]/10 bg-white text-gray-500 hover:bg-amber-50 hover:text-[#d97706]'
+                                }`}
                                 title={isStoreSearch ? `Search ${storeName || 'store'} by photo` : 'Search by photo'}
                             >
                                 <Camera className="h-4 w-4" />
                             </Link>
                             <Button
                                 type="submit"
-                                className={`shrink-0 rounded-none bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 ${compact ? 'px-3' : 'rounded-r-2xl px-6'}`}
+                                className={`shrink-0 rounded-none bg-[#0f2744] hover:bg-[#152a45] ${compact ? 'px-3' : 'rounded-r-2xl px-6'}`}
                             >
                                 <Search className="h-4 w-4" />
                                 {!compact && <span className="ml-1 hidden sm:inline">Search</span>}

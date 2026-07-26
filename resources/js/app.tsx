@@ -13,6 +13,7 @@ import ChatSoundListener from './components/chat/chat-sound-listener';
 import FlashToastListener from './components/shop/flash-toast-listener';
 import { setCsrfToken } from './lib/csrf';
 import { setCurrencySymbol } from '@/types/marketplace';
+import { initAnalytics, trackPageView } from './lib/analytics';
 
 declare global {
     const route: typeof routeFn;
@@ -54,6 +55,9 @@ createInertiaApp({
             setCurrencySymbol(initialProps.currency.symbol);
         }
 
+        initAnalytics();
+        trackPageView(props.initialPage.url, typeof document !== 'undefined' ? document.title : undefined);
+
         root.render(
             <ChatProvider>
                 <ToastProvider>
@@ -63,7 +67,7 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#d97706',
     },
 });
 
@@ -82,6 +86,7 @@ router.on('success', (event) => {
     if (props.currency?.symbol) {
         setCurrencySymbol(props.currency.symbol);
     }
+    trackPageView(event.detail.page.url, typeof document !== 'undefined' ? document.title : undefined);
 });
 
 // This will set light / dark mode on load...

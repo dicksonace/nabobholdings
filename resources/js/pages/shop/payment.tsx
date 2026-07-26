@@ -64,7 +64,7 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
         };
     }, []);
 
-    const payWithPaystack = useCallback(async () => {
+    const payWithPaystack = useCallback(async (channel?: 'card' | 'momo') => {
         if (!paystackConfigured) {
             setError('Paystack is not configured.');
             return;
@@ -78,9 +78,12 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
             const res = await fetch(route('checkout.initialize', checkout.id), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
+                body: JSON.stringify(channel ? { channel } : {}),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message ?? 'Payment initialization failed');
+
+            savePaymentReference(checkout.id, data.reference);
 
             const handler = window.PaystackPop?.setup({
                 key: paystackPublicKey,
@@ -88,13 +91,19 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
                 amount: Math.round(data.amount * 100),
                 currency: 'GHS',
                 ref: data.reference,
-                callback: () => router.visit(route('checkout.callback', { reference: data.reference })),
-                onClose: () => setLoading(false),
+                channels: data.channels ?? ['card', 'mobile_money'],
+                callback: () => {
+                    clearPaymentReference(checkout.id);
+                    router.visit(route('checkout.callback', { reference: data.reference }));
+                },
+                onClose: () => {
+                    setLoading(false);
+                    setError('Payment window closed. You can try again whenever you are ready.');
+                },
             });
             handler?.openIframe();
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Payment failed');
-        } finally {
             setLoading(false);
         }
     }, [checkout.id, paystackConfigured, paystackPublicKey]);
@@ -120,9 +129,34 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
                             <p className="mt-1 text-2xl font-bold text-orange-500">{formatPrice(marketplaceTotal)}</p>
                             <p className="mt-1 text-sm text-gray-500">Pay securely via Paystack for marketplace sellers.</p>
                             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-                            <Button onClick={payWithPaystack} disabled={loading} className="mt-4 w-full bg-orange-500 hover:bg-orange-600">
-                                {loading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                                Pay via Nabob Holdings
+                            {checkout.payment_status === 'failed' && (
+                                <p className="mt-2 text-sm text-amber-800">Previous payment failed. Pick a method below to try again.</p>
+                            )}
+                            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                                <Button
+                                    onClick={() => payWithPaystack('momo')}
+                                    disabled={loading}
+                                    className="w-full bg-[#0f2744] hover:bg-[#152a45]"
+                                >
+                                    {loading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                                    Mobile Money
+                                </Button>
+                                <Button
+                                    onClick={() => payWithPaystack('card')}
+                                    disabled={loading}
+                                    className="w-full bg-[#d97706] hover:bg-[#b45309]"
+                                >
+                                    {loading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                                    Card
+                                </Button>
+                            </div>
+                            <Button
+                                variant="outline"
+                                onClick={() => payWithPaystack()}
+                                disabled={loading}
+                                className="mt-2 w-full"
+                            >
+                                Pay with any method
                             </Button>
                         </div>
                     )}

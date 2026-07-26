@@ -35,7 +35,7 @@ type NavLink = {
     highlight?: boolean;
 };
 
-export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolean }) {
+export default function ShopHeader({ hideSearch = false, overHero = false }: { hideSearch?: boolean; overHero?: boolean }) {
     const page = usePage<SharedData & { cartCount: number; wishlistCount: number; unreadMessages?: number }>();
     const { auth, cartCount, wishlistCount } = page.props;
     const chat = useChatOptional();
@@ -45,6 +45,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
     const initialSearch = params.get('q') ?? params.get('search') ?? '';
     const component = typeof page.component === 'string' ? page.component : '';
     const showSearchBack = ['shop/store', 'shop/product-show', 'shop/search', 'shop/image-search'].includes(component);
+    const dark = overHero && !scrolled;
 
     const navLinks: NavLink[] = [
         { label: 'Shop', href: route('home') },
@@ -112,8 +113,9 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
         return 'My Orders';
     };
 
-    const iconBtn =
-        'relative inline-flex h-10 w-10 items-center justify-center rounded-full text-[#0f2744] transition hover:bg-[#0f2744]/[0.06] active:scale-95';
+    const iconBtn = dark
+        ? 'relative inline-flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10 active:scale-95'
+        : 'relative inline-flex h-10 w-10 items-center justify-center rounded-full text-[#0f2744] transition hover:bg-[#0f2744]/[0.06] active:scale-95';
 
     const badge =
         'absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#d97706] px-1 text-[10px] font-bold text-white shadow-sm shadow-amber-600/30';
@@ -134,7 +136,10 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                     className={
                         mobile
                             ? 'block w-full rounded-xl px-3 py-3 text-left text-sm font-medium text-[#0f2744] hover:bg-amber-50'
-                            : 'text-sm font-medium text-[#0f2744]/80 transition hover:text-[#d97706]'
+                            : cn(
+                                  'text-sm font-medium transition',
+                                  dark ? 'text-white/80 hover:text-[#fbbf24]' : 'text-[#0f2744]/80 hover:text-[#d97706]',
+                              )
                     }
                 >
                     {link.label}
@@ -156,8 +161,12 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                         : cn(
                               'relative text-sm font-medium transition',
                               link.highlight
-                                  ? 'font-semibold text-amber-700 hover:text-amber-800'
-                                  : 'text-[#0f2744]/75 hover:text-[#d97706]',
+                                  ? dark
+                                      ? 'font-semibold text-[#fbbf24] hover:text-amber-200'
+                                      : 'font-semibold text-amber-700 hover:text-amber-800'
+                                  : dark
+                                    ? 'text-white/75 hover:text-[#fbbf24]'
+                                    : 'text-[#0f2744]/75 hover:text-[#d97706]',
                               'after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-[#d97706] after:transition-all hover:after:w-full',
                           )
                 }
@@ -170,17 +179,24 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
     return (
         <header
             className={cn(
-                'sticky top-0 z-50 transition-[background,box-shadow,border-color] duration-300',
+                'sticky top-0 z-50 transition-[background,box-shadow,border-color,color] duration-300',
                 scrolled
                     ? 'border-b border-[#0f2744]/10 bg-white/90 shadow-[0_8px_30px_rgba(15,39,68,0.08)] backdrop-blur-xl'
-                    : 'border-b border-transparent bg-white/80 backdrop-blur-md',
+                    : overHero
+                      ? 'border-b border-white/10 bg-[#0f2744]/90 backdrop-blur-md'
+                      : 'border-b border-transparent bg-white/80 backdrop-blur-md',
             )}
         >
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#d97706]/50 to-transparent" />
+            <div
+                className={cn(
+                    'pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent to-transparent',
+                    dark ? 'via-[#fbbf24]/60' : 'via-[#d97706]/50',
+                )}
+            />
 
             <div className="relative mx-auto max-w-7xl px-3 sm:px-4">
                 <div className="flex h-14 items-center gap-3 sm:h-16 sm:gap-5">
-                    <NabobBrand size="sm" className="shrink-0" />
+                    <NabobBrand size="sm" className="shrink-0" inverted={dark} />
 
                     {/* Desktop nav — same row as brand */}
                     <nav className="hidden items-center gap-5 lg:flex">
@@ -194,6 +210,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                                 className="w-full"
                                 showBack={showSearchBack}
                                 backHref={route('home')}
+                                tone={dark ? 'dark' : 'light'}
                             />
                         </div>
                     )}
@@ -206,13 +223,18 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                                 <DropdownMenuTrigger asChild>
                                     <button
                                         type="button"
-                                        className="hidden items-center gap-2 rounded-full border border-[#0f2744]/10 bg-white px-2.5 py-1.5 text-sm font-medium text-[#0f2744] shadow-sm transition hover:border-amber-300 hover:bg-amber-50/60 md:flex"
+                                        className={cn(
+                                            'hidden items-center gap-2 rounded-full px-2.5 py-1.5 text-sm font-medium shadow-sm transition md:flex',
+                                            dark
+                                                ? 'border border-white/20 bg-white/10 text-white hover:bg-white/15'
+                                                : 'border border-[#0f2744]/10 bg-white text-[#0f2744] hover:border-amber-300 hover:bg-amber-50/60',
+                                        )}
                                     >
-                                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0f2744] text-xs font-bold text-white">
+                                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#d97706] text-xs font-bold text-white">
                                             {(auth.user.name ?? 'U').charAt(0).toUpperCase()}
                                         </span>
                                         <span className="max-w-[6.5rem] truncate">{auth.user.name}</span>
-                                        <ChevronDown className="h-3.5 w-3.5 text-[#0f2744]/50" />
+                                        <ChevronDown className={cn('h-3.5 w-3.5', dark ? 'text-white/60' : 'text-[#0f2744]/50')} />
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56">
@@ -306,7 +328,12 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                             <div className="hidden items-center gap-2 md:flex">
                                 <Link
                                     href={route('login')}
-                                    className="inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-[#0f2744] transition hover:bg-[#0f2744]/[0.06]"
+                                    className={cn(
+                                        'inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition',
+                                        dark
+                                            ? 'text-white hover:bg-white/10'
+                                            : 'text-[#0f2744] hover:bg-[#0f2744]/[0.06]',
+                                    )}
                                 >
                                     <LogIn className="h-4 w-4" />
                                     Login
@@ -340,7 +367,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
 
                         <Link
                             href={auth.user ? route('cart.index') : route('login')}
-                            className={cn(iconBtn, 'bg-[#0f2744]/[0.04]')}
+                            className={cn(iconBtn, dark ? 'bg-white/10' : 'bg-[#0f2744]/[0.04]')}
                             title="Cart"
                         >
                             <ShoppingCart className="h-5 w-5" />
@@ -365,6 +392,7 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                             compact
                             showBack={showSearchBack}
                             backHref={route('home')}
+                            tone={dark ? 'dark' : 'light'}
                             onSubmitted={() => setMobileMenuOpen(false)}
                         />
                     </div>

@@ -1,9 +1,10 @@
+import SeoHead from '@/components/seo-head';
 import ShopLayout from '@/layouts/shop-layout';
 import { recordRecentView } from '@/lib/recent-views';
 import { addProductToCart, scrollToReviews } from '@/lib/shop-actions';
 import { formatPrice, Paginated, Product, ProductReview } from '@/types/marketplace';
 import { SharedData } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { MapPin, MessageSquare, Package, ShoppingBag, Store, Truck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -68,9 +69,22 @@ export default function ProductShow({ product, related, reviews, reviewable }: P
         addProductToCart(productId);
     };
 
+    const seoTitle = product.meta_title?.trim() || product.name;
+    const seoDescription =
+        product.meta_description?.trim()
+        || product.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200)
+        || `Buy ${product.name} from Nabob Holdings.`;
+
     return (
         <ShopLayout>
-            <Head title={product.name} />
+            <SeoHead
+                title={seoTitle}
+                description={seoDescription}
+                keywords={product.meta_keywords}
+                image={product.images?.[0]?.path}
+                url={`/products/${product.slug}`}
+                type="product"
+            />
             <div className="mx-auto w-full max-w-7xl px-3 py-4 sm:px-4 sm:py-8">
                 <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                     <ProductImageGallery

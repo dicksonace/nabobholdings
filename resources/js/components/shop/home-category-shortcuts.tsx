@@ -111,7 +111,7 @@ export default function HomeCategoryShortcuts({
         },
     ];
 
-    const categoryLinks = categories.slice(0, 4).map((cat, index) => ({
+    const categoryLinks = categories.slice(0, 8).map((cat, index) => ({
         key: `cat-${cat.id}`,
         label: cat.name,
         icon: categoryIcon(cat.slug, cat.name),
@@ -150,7 +150,7 @@ export default function HomeCategoryShortcuts({
                 {hasSaleProducts && (
                     <button
                         type="button"
-                        onClick={() => applyFilters({ sort: 'popular' }, filters)}
+                        onClick={() => applyFilters({ on_sale: true, sort: 'popular' }, filters)}
                         className="mt-4 flex w-full items-center justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-[#0f2744] via-[#1e3a5f] to-[#d97706] px-4 py-3 text-left shadow-sm sm:px-5 sm:py-4"
                     >
                         <div>

@@ -16,6 +16,7 @@ export interface ShopFilters {
     rating?: string;
     in_ghana?: boolean;
     free_ship?: boolean;
+    on_sale?: boolean;
     sort?: string;
     seed?: string;
 }
@@ -242,6 +243,7 @@ export default function ProductFilters({ filters, categories, brands, priceRange
                 {[
                     { key: 'in_ghana' as const, label: 'Local Delivery', desc: 'Seller delivers locally' },
                     { key: 'free_ship' as const, label: 'Free Delivery', desc: 'Seller delivers free' },
+                    { key: 'on_sale' as const, label: 'On Sale', desc: 'Discounted products only' },
                 ].map((item) => (
                     <label
                         key={item.key}
@@ -290,6 +292,7 @@ export function ActiveFilterChips({ filters, categories }: Pick<ProductFiltersPr
     }
     if (filters.in_ghana) chips.push({ label: 'Local Delivery', onRemove: () => applyFilters({ in_ghana: false }, filters) });
     if (filters.free_ship) chips.push({ label: 'Free Delivery', onRemove: () => applyFilters({ free_ship: false }, filters) });
+    if (filters.on_sale) chips.push({ label: 'On Sale', onRemove: () => applyFilters({ on_sale: false }, filters) });
 
     if (chips.length === 0) return null;
 

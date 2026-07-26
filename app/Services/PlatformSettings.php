@@ -71,6 +71,7 @@ class PlatformSettings
         return [
             'name' => static::brandName(),
             'logo' => static::brandLogoUrl(),
+            'tagline' => 'Your trusted online store — quality products, secure payments, and delivery across Ghana.',
         ];
     }
 

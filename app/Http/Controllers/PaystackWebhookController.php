@@ -76,6 +76,21 @@ class PaystackWebhookController extends Controller
             }
         }
 
+        if (in_array($event, ['charge.failed', 'charge.abandoned'], true) && $data) {
+            try {
+                $checkoutId = $data['metadata']['checkout_id'] ?? null;
+                $checkout = $checkoutId
+                    ? Checkout::find($checkoutId)
+                    : Checkout::whereHas('orders', fn ($q) => $q->where('payment_reference', $data['reference'] ?? ''))->first();
+
+                if ($checkout) {
+                    $this->orderService->markCheckoutPaymentFailed($checkout, $data['reference'] ?? null);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Paystack failed-charge webhook error', ['error' => $e->getMessage()]);
+            }
+        }
+
         if (in_array($event, ['transfer.success', 'transfer.failed', 'transfer.reversed'], true) && $data) {
             try {
                 $this->withdrawalPayouts->handleTransferWebhook($data);

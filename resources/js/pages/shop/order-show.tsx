@@ -156,7 +156,8 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
         order.status === 'cancelled'
         || (order.items?.length > 0 && order.items.every((item) => item.status === 'cancelled'));
     const isCod = order.payment_method === 'cash';
-    const paymentPending = order.payment_status === 'pending' && !isCancelled && !isCod;
+    const paymentPending = (order.payment_status === 'pending' || order.payment_status === 'failed') && !isCancelled && !isCod;
+    const paymentFailed = order.payment_status === 'failed' && !isCancelled && !isCod;
     const primaryStatus = mostAdvancedItemStatus(order.items) ?? order.status;
 
     const paymentBadge = (() => {
@@ -173,7 +174,7 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
             return { label: 'Refunded', className: 'bg-blue-100 text-blue-800' };
         }
         if (order.payment_status === 'failed') {
-            return { label: 'Not paid', className: 'bg-gray-100 text-gray-700' };
+            return { label: 'Payment failed', className: 'bg-red-100 text-red-800' };
         }
         return {
             label: 'Awaiting payment',
@@ -194,7 +195,20 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
                     &larr; {checkoutId ? `Back to purchase ${checkoutNumber ?? ''}`.trim() : 'Back to Orders'}
                 </Link>
 
-                {paymentPending && (
+                {paymentFailed && (
+                    <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                        <p className="font-medium text-red-800">Payment failed</p>
+                        <p className="mt-1 text-sm text-red-700">Your payment did not go through. You can retry without placing a new order.</p>
+                        <Link
+                            href={checkoutId ? route('checkout.payment', checkoutId) : route('checkout.payment', order.id)}
+                            className="mt-2 inline-flex rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                        >
+                            Retry payment
+                        </Link>
+                    </div>
+                )}
+
+                {paymentPending && !paymentFailed && (
                     <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
                         <p className="font-medium text-amber-800">Payment pending</p>
                         <Link

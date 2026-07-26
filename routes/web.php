@@ -20,6 +20,7 @@ use App\Http\Controllers\Chat\ConversationController as ChatConversationControll
 use App\Http\Controllers\Chat\MessageController as ChatMessageController;
 use App\Http\Controllers\Chat\NotificationController as ChatNotificationController;
 use App\Http\Controllers\PaystackWebhookController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Seller\CouponController as SellerCouponController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\DisputeController as SellerDisputeController;
@@ -61,6 +62,7 @@ Route::get('/store/{slug}', [StoreController::class, 'show'])->name('store.show'
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 Route::get('/faq', [FaqController::class, 'show'])->name('faq');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 Route::post('/webhooks/paystack', [PaystackWebhookController::class, 'handle']);
 

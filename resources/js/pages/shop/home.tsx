@@ -1,15 +1,16 @@
+import CategoryProductShelf, { CategoryShelf } from '@/components/shop/category-product-shelf';
 import HeroBanner from '@/components/shop/hero-banner';
 import HomeCategoryShortcuts from '@/components/shop/home-category-shortcuts';
 import InfiniteProductGrid from '@/components/shop/infinite-product-grid';
 import MatchesForRecentViews from '@/components/shop/matches-for-recent-views';
 import ProductFilters, { ActiveFilterChips, applyFilters, ShopFilters } from '@/components/shop/product-filters';
-import SearchBox from '@/components/shop/search-box';
+import SeoHead from '@/components/seo-head';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import ShopLayout from '@/layouts/shop-layout';
 import { addProductToCart } from '@/lib/shop-actions';
 import { Paginated, Product } from '@/types/marketplace';
 import { SharedData } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Grid3X3, LayoutList, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -24,6 +25,7 @@ interface HomeProps {
     products: Paginated<Product>;
     categories: Category[];
     brands: { brand: string; count: number }[];
+    categoryShelves?: CategoryShelf[];
     priceRange: { min: number; max: number };
     filters: ShopFilters;
     counts: { in_ghana: number; free_ship: number; total: number };
@@ -44,10 +46,21 @@ const sortOptions = [
 const quickFilters = [
     { key: 'in_ghana', label: 'Local Delivery', param: { in_ghana: true } },
     { key: 'free_ship', label: 'Free Delivery', param: { free_ship: true } },
+    { key: 'on_sale', label: 'On Sale', param: { on_sale: true } },
 ];
 
-export default function Home({ products, categories, brands, priceRange, filters, counts, heroSlides, hasSaleProducts = false }: HomeProps) {
-    const { auth } = usePage<SharedData>().props;
+export default function Home({
+    products,
+    categories,
+    brands,
+    categoryShelves = [],
+    priceRange,
+    filters,
+    counts,
+    heroSlides,
+    hasSaleProducts = false,
+}: HomeProps) {
+    const { auth, brand } = usePage<SharedData>().props;
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     const resetKey = useMemo(
@@ -64,10 +77,15 @@ export default function Home({ products, categories, brands, priceRange, filters
     };
 
     const filterProps = { filters, categories, brands, priceRange };
+    const showShelves = categoryShelves.length > 0;
 
     return (
-        <ShopLayout hideHeaderSearch>
-            <Head title="Shop" />
+        <ShopLayout overHero>
+            <SeoHead
+                title="Shop"
+                description={brand?.tagline ?? 'Shop quality products from Nabob Holdings — secure payments, order tracking, and delivery across Ghana.'}
+                url="/"
+            />
             <HeroBanner slides={heroSlides} />
 
             <HomeCategoryShortcuts
@@ -88,6 +106,14 @@ export default function Home({ products, categories, brands, priceRange, filters
             </div>
 
             <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6">
+                {showShelves && (
+                    <div className="mb-8">
+                        {categoryShelves.map((shelf) => (
+                            <CategoryProductShelf key={shelf.id} shelf={shelf} onAddToCart={handleAddToCart} />
+                        ))}
+                    </div>
+                )}
+
                 <div className="flex gap-6">
                     <div className="hidden w-64 shrink-0 lg:block">
                         <div className="sticky top-24">
@@ -96,15 +122,6 @@ export default function Home({ products, categories, brands, priceRange, filters
                     </div>
 
                     <div className="min-w-0 flex-1">
-                        <div className="mb-4 rounded-2xl border border-orange-100 bg-white p-3 shadow-sm sm:p-4">
-                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Search products</p>
-                            <SearchBox
-                                initialQuery={filters.search ?? ''}
-                                target="home"
-                                className="w-full"
-                            />
-                        </div>
-
                         <div className="mb-4 flex flex-col gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm sm:rounded-2xl sm:p-4">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                                 <div className="flex items-center gap-2">
@@ -172,7 +189,8 @@ export default function Home({ products, categories, brands, priceRange, filters
                                                 : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:shadow-sm'
                                         }`}
                                     >
-                                        {qf.label} ({counts[qf.key as keyof typeof counts]})
+                                        {qf.label}
+                                        {qf.key !== 'on_sale' && ` (${counts[qf.key as keyof typeof counts]})`}
                                     </button>
                                 );
                             })}

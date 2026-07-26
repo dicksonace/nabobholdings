@@ -7,7 +7,8 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title inertia>{{ config('app.name', 'Nabob Holdings') }}</title>
-
+        <meta name="description" content="Shop quality products from Nabob Holdings — secure payments, order tracking, and delivery across Ghana.">
+        <meta name="theme-color" content="#0f2744">
         <link rel="icon" href="/images/logo.png" type="image/png">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
