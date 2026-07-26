@@ -45,7 +45,9 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
     const initialSearch = params.get('q') ?? params.get('search') ?? '';
     const component = typeof page.component === 'string' ? page.component : '';
     const showSearchBack = ['shop/store', 'shop/product-show', 'shop/search', 'shop/image-search'].includes(component);
-    const dark = overHero && !scrolled;
+    const floating = scrolled;
+    // Full-bleed over hero at top; navy floating pill while scrolling.
+    const dark = (overHero && !scrolled) || floating;
 
     const navLinks: NavLink[] = [
         { label: 'Shop', href: route('home') },
@@ -85,7 +87,7 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
           : navLinks;
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 8);
+        const onScroll = () => setScrolled(window.scrollY > 24);
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
@@ -176,32 +178,45 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
         );
     };
 
+    // Reserve space so the fixed header does not cover page content.
+    const spacerClass = hideSearch ? 'h-14 sm:h-16' : 'h-[6.75rem] md:h-16';
+
     return (
-        <header
-            className={cn(
-                'sticky top-0 z-50 transition-[background,box-shadow,border-color,color] duration-300',
-                scrolled
-                    ? 'border-b border-[#0f2744]/10 bg-white/90 shadow-[0_8px_30px_rgba(15,39,68,0.08)] backdrop-blur-xl'
-                    : overHero
-                      ? 'border-b border-white/10 bg-[#0f2744]/90 backdrop-blur-md'
-                      : 'border-b border-transparent bg-white/80 backdrop-blur-md',
-            )}
-        >
+        <>
+            <div className={spacerClass} aria-hidden />
+
             <div
                 className={cn(
-                    'pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent to-transparent',
-                    dark ? 'via-[#fbbf24]/60' : 'via-[#d97706]/50',
+                    'fixed inset-x-0 top-0 z-50 transition-[padding] duration-300 ease-out',
+                    floating ? 'px-3 pt-3 sm:px-4 sm:pt-3' : 'px-0 pt-0',
                 )}
-            />
+            >
+                <header
+                    className={cn(
+                        'relative mx-auto max-w-7xl overflow-hidden transition-all duration-300 ease-out',
+                        floating
+                            ? 'rounded-2xl border border-white/15 bg-[#0f2744]/92 shadow-[0_12px_40px_rgba(15,39,68,0.45)] backdrop-blur-xl'
+                            : overHero
+                              ? 'rounded-none border-b border-white/10 bg-[#0f2744]/90 backdrop-blur-md'
+                              : 'rounded-none border-b border-[#0f2744]/10 bg-white/90 backdrop-blur-md',
+                    )}
+                >
+                    {!floating && (
+                        <div
+                            className={cn(
+                                'pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent to-transparent',
+                                dark ? 'via-[#fbbf24]/60' : 'via-[#d97706]/50',
+                            )}
+                        />
+                    )}
 
-            <div className="relative mx-auto max-w-7xl px-3 sm:px-4">
-                <div className="flex h-14 items-center gap-3 sm:h-16 sm:gap-5">
-                    <NabobBrand size="sm" className="shrink-0" inverted={dark} />
+                    <div className="relative px-3 sm:px-4">
+                        <div className="flex h-14 items-center gap-3 sm:h-16 sm:gap-5">
+                            <NabobBrand size="sm" className="shrink-0" inverted={dark} />
 
-                    {/* Desktop nav — same row as brand */}
-                    <nav className="hidden items-center gap-5 lg:flex">
-                        {activeNavLinks.map((link) => renderNavLink(link))}
-                    </nav>
+                            <nav className="hidden items-center gap-5 lg:flex">
+                                {activeNavLinks.map((link) => renderNavLink(link))}
+                            </nav>
 
                     {!hideSearch && (
                         <div className="mx-auto hidden min-w-0 max-w-xl flex-1 md:flex">
@@ -468,6 +483,8 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                     )}
                 </div>
             )}
-        </header>
+                </header>
+            </div>
+        </>
     );
 }
