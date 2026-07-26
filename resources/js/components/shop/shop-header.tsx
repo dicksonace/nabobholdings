@@ -11,12 +11,11 @@ import {
     MessageCircle,
     Package,
     ShoppingCart,
-    Store,
     User,
     Wallet,
     X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import NotificationBell from '@/components/shop/notification-bell';
 import SearchBox from '@/components/shop/search-box';
@@ -24,20 +23,30 @@ import NabobBrand from '@/components/nabob-brand';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useChatOptional } from '@/contexts/chat-context';
+import { cn } from '@/lib/utils';
 import { SharedData } from '@/types';
+
+type NavLink = {
+    label: string;
+    href: string;
+    auth?: boolean;
+    buyerOnly?: boolean;
+    chat?: boolean;
+    highlight?: boolean;
+};
 
 export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolean }) {
     const page = usePage<SharedData & { cartCount: number; wishlistCount: number; unreadMessages?: number }>();
     const { auth, cartCount, wishlistCount } = page.props;
     const chat = useChatOptional();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const params = new URLSearchParams(page.url.split('?')[1] ?? '');
     const initialSearch = params.get('q') ?? params.get('search') ?? '';
     const component = typeof page.component === 'string' ? page.component : '';
-    // Back beside search on store / product / search pages (not shop home).
     const showSearchBack = ['shop/store', 'shop/product-show', 'shop/search', 'shop/image-search'].includes(component);
 
-    const navLinks = [
+    const navLinks: NavLink[] = [
         { label: 'Shop', href: route('home') },
         { label: 'Wallet', href: route('wallet.index'), auth: true, buyerOnly: true },
         { label: 'Wishlist', href: route('wishlist.index'), auth: true, buyerOnly: true },
@@ -54,8 +63,8 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
     const isStaffUser = role === 'staff';
     const isOwnerOps = isAdmin || isSeller;
     const isBackOffice = isAdmin || isSeller || isStaffUser;
-    // Single-store: sellers (legacy) and admin share owner-style links; staff gets panel only.
-    const activeNavLinks = isOwnerOps
+
+    const activeNavLinks: NavLink[] = isOwnerOps
         ? [
               { label: 'Owner Panel', href: isAdmin ? route('admin.dashboard') : route('manage.dashboard'), highlight: true },
               { label: 'Products', href: route('manage.products.index') },
@@ -73,6 +82,13 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                 { label: 'FAQ', href: route('faq') },
             ]
           : navLinks;
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 8);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
 
     const openMessages = (e?: React.MouseEvent) => {
         e?.preventDefault();
@@ -96,21 +112,15 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
         return 'My Orders';
     };
 
-    const renderNavLink = (
-        link: { label: string; href: string; auth?: boolean; buyerOnly?: boolean; chat?: boolean; highlight?: boolean },
-        onNavigate?: () => void,
-        mobile = false,
-    ) => {
+    const iconBtn =
+        'relative inline-flex h-10 w-10 items-center justify-center rounded-full text-[#0f2744] transition hover:bg-[#0f2744]/[0.06] active:scale-95';
+
+    const badge =
+        'absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#d97706] px-1 text-[10px] font-bold text-white shadow-sm shadow-amber-600/30';
+
+    const renderNavLink = (link: NavLink, onNavigate?: () => void, mobile = false) => {
         if (link.auth && !auth.user) return null;
         if (link.buyerOnly && isBackOffice) return null;
-
-        const className = mobile
-            ? link.highlight
-                ? 'mb-2 flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-2.5 text-sm font-medium text-orange-700'
-                : 'block py-2.5 text-sm font-medium text-gray-600'
-            : link.highlight
-              ? 'text-sm font-semibold text-orange-600 hover:text-orange-700'
-              : 'text-sm font-medium text-gray-600 hover:text-orange-500';
 
         if (link.chat) {
             return (
@@ -121,7 +131,11 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                         openMessages();
                         onNavigate?.();
                     }}
-                    className={mobile ? 'block w-full py-2.5 text-left text-sm font-medium text-gray-600' : className}
+                    className={
+                        mobile
+                            ? 'block w-full rounded-xl px-3 py-3 text-left text-sm font-medium text-[#0f2744] hover:bg-amber-50'
+                            : 'text-sm font-medium text-[#0f2744]/80 transition hover:text-[#d97706]'
+                    }
                 >
                     {link.label}
                 </button>
@@ -129,46 +143,82 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
         }
 
         return (
-            <Link key={link.label} href={link.href} className={className} onClick={onNavigate}>
+            <Link
+                key={link.label}
+                href={link.href}
+                onClick={onNavigate}
+                className={
+                    mobile
+                        ? cn(
+                              'block rounded-xl px-3 py-3 text-sm font-medium',
+                              link.highlight ? 'bg-amber-50 font-semibold text-amber-800' : 'text-[#0f2744] hover:bg-amber-50',
+                          )
+                        : cn(
+                              'relative text-sm font-medium transition',
+                              link.highlight
+                                  ? 'font-semibold text-amber-700 hover:text-amber-800'
+                                  : 'text-[#0f2744]/75 hover:text-[#d97706]',
+                              'after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-[#d97706] after:transition-all hover:after:w-full',
+                          )
+                }
+            >
                 {link.label}
             </Link>
         );
     };
 
     return (
-        <header className="sticky top-0 z-50 border-b border-gray-100/80 bg-white/95 shadow-sm backdrop-blur-md">
-            <div className="mx-auto max-w-7xl px-3 py-2 sm:px-4 sm:py-3">
-                <div className="flex items-center gap-2 sm:gap-4">
+        <header
+            className={cn(
+                'sticky top-0 z-50 transition-[background,box-shadow,border-color] duration-300',
+                scrolled
+                    ? 'border-b border-[#0f2744]/10 bg-white/90 shadow-[0_8px_30px_rgba(15,39,68,0.08)] backdrop-blur-xl'
+                    : 'border-b border-transparent bg-white/80 backdrop-blur-md',
+            )}
+        >
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#d97706]/50 to-transparent" />
+
+            <div className="relative mx-auto max-w-7xl px-3 sm:px-4">
+                <div className="flex h-14 items-center gap-3 sm:h-16 sm:gap-5">
                     <NabobBrand size="sm" className="shrink-0" />
 
-                    <div className={`mx-auto hidden max-w-2xl flex-1 md:flex ${hideSearch ? 'md:hidden' : ''}`}>
-                        <SearchBox
-                            initialQuery={initialSearch}
-                            className="w-full"
-                            showBack={showSearchBack}
-                            backHref={route('home')}
-                        />
-                    </div>
+                    {/* Desktop nav — same row as brand */}
+                    <nav className="hidden items-center gap-5 lg:flex">
+                        {activeNavLinks.map((link) => renderNavLink(link))}
+                    </nav>
 
-                    {hideSearch && <div className="hidden flex-1 md:block" />}
+                    {!hideSearch && (
+                        <div className="mx-auto hidden min-w-0 max-w-xl flex-1 md:flex">
+                            <SearchBox
+                                initialQuery={initialSearch}
+                                className="w-full"
+                                showBack={showSearchBack}
+                                backHref={route('home')}
+                            />
+                        </div>
+                    )}
 
-                    <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
+                    {hideSearch && <div className="hidden flex-1 lg:block" />}
+
+                    <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
                         {auth.user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button
                                         type="button"
-                                        className="hidden items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 md:flex"
+                                        className="hidden items-center gap-2 rounded-full border border-[#0f2744]/10 bg-white px-2.5 py-1.5 text-sm font-medium text-[#0f2744] shadow-sm transition hover:border-amber-300 hover:bg-amber-50/60 md:flex"
                                     >
-                                        <User className="h-4 w-4" />
-                                        <span className="max-w-[6rem] truncate">{auth.user.name}</span>
-                                        <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+                                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0f2744] text-xs font-bold text-white">
+                                            {(auth.user.name ?? 'U').charAt(0).toUpperCase()}
+                                        </span>
+                                        <span className="max-w-[6.5rem] truncate">{auth.user.name}</span>
+                                        <ChevronDown className="h-3.5 w-3.5 text-[#0f2744]/50" />
                                     </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-52">
+                                <DropdownMenuContent align="end" className="w-56">
                                     {isBackOffice && (
                                         <DropdownMenuItem asChild>
-                                            <Link href={dashboardLink()} className="flex w-full cursor-pointer items-center font-medium text-orange-600">
+                                            <Link href={dashboardLink()} className="flex w-full cursor-pointer items-center font-medium text-amber-700">
                                                 <LayoutDashboard className="mr-2 h-4 w-4" />
                                                 {dashboardLabel()}
                                             </Link>
@@ -256,33 +306,25 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                             <div className="hidden items-center gap-2 md:flex">
                                 <Link
                                     href={route('login')}
-                                    className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                    className="inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-[#0f2744] transition hover:bg-[#0f2744]/[0.06]"
                                 >
                                     <LogIn className="h-4 w-4" />
                                     Login
                                 </Link>
                                 <Link
                                     href={route('register.buyer')}
-                                    className="flex items-center gap-1 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                                    className="inline-flex h-10 items-center rounded-full bg-[#d97706] px-5 text-sm font-semibold text-white shadow-md shadow-amber-600/25 transition hover:bg-[#b45309] hover:shadow-lg hover:shadow-amber-600/30 active:scale-[0.98]"
                                 >
-                                    <Store className="h-3.5 w-3.5" />
                                     Register
                                 </Link>
                             </div>
                         )}
 
                         {auth.user && !isBackOffice && (
-                            <button
-                                type="button"
-                                onClick={openMessages}
-                                className="relative hidden rounded-lg p-1.5 hover:bg-gray-50 sm:block sm:p-2"
-                                title="Messages"
-                            >
-                                <MessageCircle className="h-5 w-5 text-gray-700" />
+                            <button type="button" onClick={openMessages} className={cn(iconBtn, 'hidden sm:inline-flex')} title="Messages">
+                                <MessageCircle className="h-5 w-5" />
                                 {(page.props.unreadMessages ?? 0) > 0 && (
-                                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white sm:h-5 sm:w-5 sm:text-xs">
-                                        {(page.props.unreadMessages ?? 0) > 9 ? '9+' : page.props.unreadMessages}
-                                    </span>
+                                    <span className={badge}>{(page.props.unreadMessages ?? 0) > 9 ? '9+' : page.props.unreadMessages}</span>
                                 )}
                             </button>
                         )}
@@ -290,34 +332,24 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                         <NotificationBell />
 
                         {auth.user && !isBackOffice && (
-                            <Link
-                                href={route('wishlist.index')}
-                                className="relative hidden rounded-lg p-1.5 hover:bg-gray-50 sm:block sm:p-2"
-                            >
-                                <Heart className="h-5 w-5 text-gray-700" />
-                                {wishlistCount > 0 && (
-                                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white sm:h-5 sm:w-5 sm:text-xs">
-                                        {wishlistCount}
-                                    </span>
-                                )}
+                            <Link href={route('wishlist.index')} className={cn(iconBtn, 'hidden sm:inline-flex')} title="Wishlist">
+                                <Heart className="h-5 w-5" />
+                                {wishlistCount > 0 && <span className={badge}>{wishlistCount > 9 ? '9+' : wishlistCount}</span>}
                             </Link>
                         )}
 
                         <Link
                             href={auth.user ? route('cart.index') : route('login')}
-                            className="relative rounded-lg p-1.5 hover:bg-gray-50 sm:p-2"
+                            className={cn(iconBtn, 'bg-[#0f2744]/[0.04]')}
+                            title="Cart"
                         >
-                            <ShoppingCart className="h-5 w-5 text-gray-700" />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white sm:h-5 sm:w-5 sm:text-xs">
-                                    {cartCount}
-                                </span>
-                            )}
+                            <ShoppingCart className="h-5 w-5" />
+                            {cartCount > 0 && <span className={badge}>{cartCount > 9 ? '9+' : cartCount}</span>}
                         </Link>
 
                         <button
                             type="button"
-                            className="rounded-lg p-1.5 hover:bg-gray-50 md:hidden"
+                            className={cn(iconBtn, 'lg:hidden')}
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
                         >
@@ -326,9 +358,8 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                     </div>
                 </div>
 
-                {/* Mobile search — hidden on shop home (search lives above products) */}
                 {!hideSearch && (
-                    <div className="mt-2 md:hidden">
+                    <div className="pb-3 md:hidden">
                         <SearchBox
                             initialQuery={initialSearch}
                             compact
@@ -338,60 +369,65 @@ export default function ShopHeader({ hideSearch = false }: { hideSearch?: boolea
                         />
                     </div>
                 )}
-
-                <nav className="mt-2 hidden items-center gap-6 border-t border-gray-50 pt-2 md:mt-3 md:flex md:pt-3">
-                    {activeNavLinks.map((link) => renderNavLink(link))}
-                </nav>
             </div>
 
             {mobileMenuOpen && (
-                <div className="max-h-[calc(100dvh-8rem)] overflow-y-auto border-t border-gray-100 bg-white px-3 py-3 md:hidden">
+                <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-[#0f2744]/8 bg-white px-3 py-4 lg:hidden">
                     {auth.user && (
-                        <div className="mb-2 rounded-lg bg-gray-50 px-3 py-2.5">
-                            <p className="text-sm font-medium text-gray-900">{auth.user.name}</p>
-                            <p className="text-xs text-gray-500">
-                                {isSeller ? 'Seller account' : isAdmin ? 'Admin account' : 'Buyer account'}
-                            </p>
+                        <div className="mb-3 flex items-center gap-3 rounded-2xl bg-[#0f2744]/[0.04] px-3 py-3">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0f2744] text-sm font-bold text-white">
+                                {(auth.user.name ?? 'U').charAt(0).toUpperCase()}
+                            </span>
+                            <div>
+                                <p className="text-sm font-semibold text-[#0f2744]">{auth.user.name}</p>
+                                <p className="text-xs text-[#0f2744]/60">
+                                    {isSeller ? 'Seller account' : isAdmin || isStaffUser ? 'Staff account' : 'Buyer account'}
+                                </p>
+                            </div>
                         </div>
                     )}
-                    {activeNavLinks.map((link) => renderNavLink(link, () => setMobileMenuOpen(false), true))}
+
+                    <div className="space-y-0.5">{activeNavLinks.map((link) => renderNavLink(link, () => setMobileMenuOpen(false), true))}</div>
+
                     {!auth.user && (
-                        <div className="mt-2 grid grid-cols-2 gap-2">
+                        <div className="mt-4 grid grid-cols-2 gap-2">
                             <Link
                                 href={route('login')}
-                                className="block rounded-lg border border-gray-200 py-2.5 text-center text-sm font-medium text-gray-700"
+                                className="rounded-full border border-[#0f2744]/15 py-2.5 text-center text-sm font-semibold text-[#0f2744]"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 Login
                             </Link>
                             <Link
                                 href={route('register.buyer')}
-                                className="block rounded-lg bg-blue-500 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-600"
+                                className="rounded-full bg-[#d97706] py-2.5 text-center text-sm font-semibold text-white shadow-md shadow-amber-600/20"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 Register
                             </Link>
                         </div>
                     )}
+
                     {auth.user && (
                         <>
+                            <div className="my-3 h-px bg-[#0f2744]/8" />
                             <Link
                                 href={route('profile.edit')}
-                                className="block py-2.5 text-sm font-medium text-gray-600"
+                                className="block rounded-xl px-3 py-3 text-sm font-medium text-[#0f2744] hover:bg-amber-50"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 Profile
                             </Link>
                             <Link
                                 href={route('password.edit')}
-                                className="block py-2.5 text-sm font-medium text-gray-600"
+                                className="block rounded-xl px-3 py-3 text-sm font-medium text-[#0f2744] hover:bg-amber-50"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 Change password
                             </Link>
                             <Button
                                 variant="outline"
-                                className="mt-3 w-full"
+                                className="mt-3 w-full rounded-full border-[#0f2744]/15"
                                 onClick={() => {
                                     setMobileMenuOpen(false);
                                     router.post(route('logout'));
