@@ -9,6 +9,10 @@
     RewriteCond %{HTTPS} off
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+    # www → apex (APP_URL is https://nabobholdings.com)
+    RewriteCond %{HTTP_HOST} ^www\.nabobholdings\.com$ [NC]
+    RewriteRule ^ https://nabobholdings.com%{REQUEST_URI} [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

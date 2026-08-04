@@ -56,14 +56,14 @@ class ProductController extends Controller
                 'search' => $search ?: null,
                 'sort' => $sort,
             ],
-            'categories' => Category::activeOrdered()->get(['id', 'name']),
+            'categories' => $this->categoryOptions(),
         ]);
     }
 
     public function create(): Response
     {
         return Inertia::render('seller/products/create', [
-            'categories' => Category::activeOrdered()->get(),
+            'categories' => $this->categoryOptions(),
             'profile' => auth()->user()->sellerProfile,
         ]);
     }
@@ -148,7 +148,7 @@ class ProductController extends Controller
 
         return Inertia::render('seller/products/edit', [
             'product' => $product->load(['images', 'category']),
-            'categories' => Category::activeOrdered()->get(),
+            'categories' => $this->categoryOptions(),
             'profile' => $request->user()->sellerProfile,
         ]);
     }
@@ -509,6 +509,27 @@ class ProductController extends Controller
         }
 
         return null;
+    }
+
+    private function categoryOptions()
+    {
+        return Category::query()
+            ->activeOrdered()
+            ->with('parent:id,name')
+            ->get(['id', 'name', 'slug', 'icon', 'parent_id', 'spec_schema'])
+            ->map(function (Category $category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->parent
+                        ? "{$category->parent->name} › {$category->name}"
+                        : $category->name,
+                    'slug' => $category->slug,
+                    'icon' => $category->icon,
+                    'parent_id' => $category->parent_id,
+                    'spec_schema' => $category->spec_schema,
+                ];
+            })
+            ->values();
     }
 
     private function resolveSpecifications(?int $categoryId, array $specs): ?array

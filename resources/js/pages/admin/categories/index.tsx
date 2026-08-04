@@ -14,28 +14,38 @@ interface AdminCategory {
     name: string;
     slug: string;
     icon: string | null;
+    parent_id: number | null;
+    parent_name?: string | null;
     is_active: boolean;
     sort_order: number;
     products_count: number;
 }
 
-interface CategoriesIndexProps {
-    categories: AdminCategory[];
+interface ParentOption {
+    id: number;
+    name: string;
 }
 
-export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
+interface CategoriesIndexProps {
+    categories: AdminCategory[];
+    parents: ParentOption[];
+}
+
+export default function CategoriesIndex({ categories, parents }: CategoriesIndexProps) {
     const { flash } = usePage<SharedData>().props;
     const [editingId, setEditingId] = useState<number | null>(null);
 
     const createForm = useForm({
         name: '',
         icon: '',
+        parent_id: '',
         sort_order: '0',
     });
 
     const editForm = useForm({
         name: '',
         icon: '',
+        parent_id: '',
         is_active: true,
         sort_order: '0',
     });
@@ -45,6 +55,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
         editForm.setData({
             name: category.name,
             icon: category.icon ?? '',
+            parent_id: category.parent_id ? String(category.parent_id) : '',
             is_active: category.is_active,
             sort_order: String(category.sort_order),
         });
@@ -52,6 +63,10 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
 
     const submitCreate: FormEventHandler = (e) => {
         e.preventDefault();
+        createForm.transform((data) => ({
+            ...data,
+            parent_id: data.parent_id === '' ? null : Number(data.parent_id),
+        }));
         createForm.post(route('admin.categories.store'), {
             onSuccess: () => createForm.reset(),
         });
@@ -61,6 +76,10 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
         e.preventDefault();
         if (!editingId) return;
 
+        editForm.transform((data) => ({
+            ...data,
+            parent_id: data.parent_id === '' ? null : Number(data.parent_id),
+        }));
         editForm.put(route('admin.categories.update', editingId), {
             onSuccess: () => setEditingId(null),
         });
@@ -90,7 +109,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                 <div className="rounded-xl bg-white p-6 shadow-sm lg:col-span-1">
                     <h2 className="font-semibold text-gray-900">Add category</h2>
                     <p className="mt-1 text-sm text-gray-500">
-                        New categories appear in the seller product form immediately.
+                        Add a main group or a sub-category under one. You can edit these anytime — no developer needed.
                     </p>
                     <form className="mt-4 space-y-4" onSubmit={submitCreate}>
                         <div>
@@ -98,11 +117,25 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                             <Input
                                 value={createForm.data.name}
                                 onChange={(e) => createForm.setData('name', e.target.value)}
-                                placeholder="Vehicles"
+                                placeholder="Cars"
                                 required
                                 className="mt-1"
                             />
                             <InputError message={createForm.errors.name} />
+                        </div>
+                        <div>
+                            <Label>Parent group (optional)</Label>
+                            <select
+                                value={createForm.data.parent_id}
+                                onChange={(e) => createForm.setData('parent_id', e.target.value)}
+                                className="mt-1 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
+                            >
+                                <option value="">Top-level category</option>
+                                {parents.map((parent) => (
+                                    <option key={parent.id} value={parent.id}>{parent.name}</option>
+                                ))}
+                            </select>
+                            <InputError message={createForm.errors.parent_id} />
                         </div>
                         <div>
                             <Label>Icon (emoji)</Label>
@@ -122,7 +155,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                                 onChange={(e) => createForm.setData('sort_order', e.target.value)}
                                 className="mt-1"
                             />
-                            <p className="mt-1 text-xs text-gray-400">Lower numbers appear first in dropdowns.</p>
+                            <p className="mt-1 text-xs text-gray-400">Lower numbers appear first.</p>
                         </div>
                         <Button type="submit" disabled={createForm.processing} className="w-full bg-orange-500 hover:bg-orange-600">
                             {createForm.processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
@@ -134,13 +167,13 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                 <div className="overflow-hidden rounded-xl bg-white shadow-sm lg:col-span-2">
                     <div className="border-b px-6 py-4">
                         <h2 className="font-semibold text-gray-900">All categories</h2>
-                        <p className="text-sm text-gray-500">{categories.length} total</p>
+                        <p className="text-sm text-gray-500">{categories.length} total — edit or hide anytime</p>
                     </div>
 
                     {editingId !== null && (
                         <form onSubmit={submitEdit} className="border-b bg-orange-50 px-6 py-4">
                             <p className="mb-3 text-sm font-medium text-orange-900">Edit category</p>
-                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                 <div>
                                     <Label>Name</Label>
                                     <Input value={editForm.data.name} onChange={(e) => editForm.setData('name', e.target.value)} className="mt-1 bg-white" required />
@@ -150,13 +183,26 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                                     <Input value={editForm.data.icon} onChange={(e) => editForm.setData('icon', e.target.value)} className="mt-1 bg-white" />
                                 </div>
                                 <div>
+                                    <Label>Parent group</Label>
+                                    <select
+                                        value={editForm.data.parent_id}
+                                        onChange={(e) => editForm.setData('parent_id', e.target.value)}
+                                        className="mt-1 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
+                                    >
+                                        <option value="">Top-level category</option>
+                                        {parents.filter((p) => p.id !== editingId).map((parent) => (
+                                            <option key={parent.id} value={parent.id}>{parent.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
                                     <Label>Sort order</Label>
                                     <Input type="number" value={editForm.data.sort_order} onChange={(e) => editForm.setData('sort_order', e.target.value)} className="mt-1 bg-white" />
                                 </div>
                                 <div className="flex items-end">
                                     <label className="flex items-center gap-2 pb-2 text-sm">
                                         <input type="checkbox" checked={editForm.data.is_active} onChange={(e) => editForm.setData('is_active', e.target.checked)} />
-                                        Active (visible to sellers)
+                                        Active (visible in shop & product form)
                                     </label>
                                 </div>
                             </div>
@@ -172,7 +218,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                             <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
                                 <tr>
                                     <th className="px-6 py-3">Category</th>
-                                    <th className="px-6 py-3">Slug</th>
+                                    <th className="px-6 py-3">Parent</th>
                                     <th className="px-6 py-3">Products</th>
                                     <th className="px-6 py-3">Order</th>
                                     <th className="px-6 py-3">Status</th>
@@ -184,9 +230,13 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                                     <tr key={category.id} className={!category.is_active ? 'bg-gray-50 text-gray-500' : undefined}>
                                         <td className="px-6 py-4 font-medium text-gray-900">
                                             <span className="mr-2">{category.icon ?? '📦'}</span>
-                                            {category.name}
+                                            {category.parent_id ? (
+                                                <span className="text-gray-700">{category.name}</span>
+                                            ) : (
+                                                <span className="font-semibold">{category.name}</span>
+                                            )}
                                         </td>
-                                        <td className="px-6 py-4 text-gray-500">{category.slug}</td>
+                                        <td className="px-6 py-4 text-gray-500">{category.parent_name ?? '—'}</td>
                                         <td className="px-6 py-4">{category.products_count}</td>
                                         <td className="px-6 py-4">{category.sort_order}</td>
                                         <td className="px-6 py-4">

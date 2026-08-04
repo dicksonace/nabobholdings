@@ -33,7 +33,9 @@ class HomeController extends Controller
         }
 
         if ($category = $request->get('category')) {
-            $query->where('category_id', $category);
+            $categoryId = (int) $category;
+            $childIds = Category::where('parent_id', $categoryId)->pluck('id')->all();
+            $query->whereIn('category_id', array_values(array_unique([$categoryId, ...$childIds])));
         }
 
         if ($brand = $request->get('brand')) {
@@ -86,13 +88,37 @@ class HomeController extends Controller
             ->selectRaw('MIN(COALESCE(discount_price, price)) as min_price, MAX(COALESCE(discount_price, price)) as max_price')
             ->first();
 
-        $categories = Category::where('is_active', true)
+        $allCategories = Category::where('is_active', true)
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order')->orderBy('name')])
             ->withCount(['products' => fn ($q) => $q->visibleInShop()])
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get()
-            ->filter(fn ($c) => $c->products_count > 0)
+            ->get();
+
+        $childProductCounts = Product::visibleInShop()
+            ->selectRaw('category_id, COUNT(*) as aggregate')
+            ->groupBy('category_id')
+            ->pluck('aggregate', 'category_id');
+
+        $categories = $allCategories
+            ->map(function (Category $category) use ($childProductCounts) {
+                $direct = (int) ($childProductCounts[$category->id] ?? $category->products_count ?? 0);
+                $nested = $category->children->sum(fn (Category $child) => (int) ($childProductCounts[$child->id] ?? 0));
+                $category->setAttribute('products_count', $direct + $nested);
+
+                return $category;
+            })
+            ->filter(fn (Category $c) => $c->products_count > 0 || $c->children->isNotEmpty())
             ->values();
+
+        // Prefer top-level groups for shop filters/shortcuts; include leaf categories that have stock.
+        $filterCategories = $categories
+            ->filter(fn (Category $c) => $c->parent_id === null)
+            ->values();
+
+        if ($filterCategories->isEmpty()) {
+            $filterCategories = $categories;
+        }
 
         $brands = Product::visibleInShop()
             ->whereNotNull('brand')
@@ -114,10 +140,12 @@ class HomeController extends Controller
 
         $categoryShelves = collect();
         if (! $hasActiveFilters) {
-            $categoryShelves = $categories->take(4)->map(function (Category $category) {
+            $categoryShelves = $filterCategories->take(4)->map(function (Category $category) {
+                $ids = [$category->id, ...$category->children->pluck('id')->all()];
+
                 $shelfProducts = Product::with(['images', 'seller.sellerProfile', 'category'])
                     ->visibleInShop()
-                    ->where('category_id', $category->id)
+                    ->whereIn('category_id', $ids)
                     ->orderByDesc('purchase_count')
                     ->orderByDesc('views')
                     ->limit(8)
@@ -135,7 +163,13 @@ class HomeController extends Controller
 
         return Inertia::render('shop/home', [
             'products' => $products,
-            'categories' => $categories,
+            'categories' => $filterCategories->map(fn (Category $c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'slug' => $c->slug,
+                'products_count' => $c->products_count,
+                'icon' => $c->icon,
+            ])->values(),
             'brands' => $brands,
             'categoryShelves' => $categoryShelves,
             'priceRange' => [

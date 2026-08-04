@@ -48,6 +48,14 @@ if [[ -d "$APP_DIR/public/build" ]]; then
     cp -r "$APP_DIR/public/build" "$PUBLIC_HTML/build"
 fi
 
+echo "==> Sync public_html .htaccess (HTTPS + www → apex)"
+if [[ -f "$APP_DIR/public/.htaccess" ]]; then
+    cp "$APP_DIR/public/.htaccess" "$PUBLIC_HTML/.htaccess"
+fi
+
+echo "==> Sync catalog categories (Sahan tree)"
+$PHP_BIN artisan catalog:sync-categories --deactivate-old
+
 echo "==> Cache for production"
 $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
