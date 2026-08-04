@@ -223,7 +223,7 @@ export default function SellerOrderShow({
         <SellerLayout title={`Order ${order.order_number}`} active="orders">
             <Head title={`Order ${order.order_number}`} />
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <Link href={route('manage.orders.stage', backStage)} className="inline-block text-sm text-orange-500 hover:underline">
+                <Link href={route('manage.orders.stage', { stage: backStage }, false)} className="inline-block text-sm text-orange-500 hover:underline">
                     ← Back to queue
                 </Link>
                 <div className="flex flex-wrap gap-2">

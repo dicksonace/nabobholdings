@@ -169,8 +169,10 @@ export function getSellerOrderStage(slug: string): SellerOrderStage | undefined 
 }
 
 export function sellerOrdersStageHref(slug: SellerOrderStageSlug): string {
+    // Always relative so production never inherits a localhost Ziggy base URL.
     if (slug === 'all') {
-        return route('manage.orders.index');
+        return route('manage.orders.index', undefined, false);
     }
-    return route('manage.orders.stage', slug);
+
+    return route('manage.orders.stage', { stage: slug }, false);
 }

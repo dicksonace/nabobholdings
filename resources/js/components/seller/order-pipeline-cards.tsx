@@ -1,5 +1,6 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
+import { MouseEvent } from 'react';
 
 import { cn } from '@/lib/utils';
 import { sellerOrderStages, sellerOrdersStageHref } from '@/lib/seller-order-stages';
@@ -8,6 +9,10 @@ interface OrderPipelineCardsProps {
     counts: Record<string, number>;
     activeSlug?: string;
     compact?: boolean;
+}
+
+function scrollToStageOrders() {
+    document.getElementById('stage-orders')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export default function OrderPipelineCards({ counts, activeSlug, compact }: OrderPipelineCardsProps) {
@@ -19,10 +24,28 @@ export default function OrderPipelineCards({ counts, activeSlug, compact }: Orde
                 const Icon = stage.icon;
                 const href = sellerOrdersStageHref(stage.slug);
 
+                const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+                    // Already on this stage — take them to the orders list instead of a no-op visit.
+                    if (active) {
+                        e.preventDefault();
+                        scrollToStageOrders();
+                        return;
+                    }
+
+                    e.preventDefault();
+                    router.visit(href, {
+                        onSuccess: () => {
+                            // After the stage page loads, jump to the queue.
+                            window.setTimeout(scrollToStageOrders, 50);
+                        },
+                    });
+                };
+
                 return (
                     <Link
                         key={stage.slug}
                         href={href}
+                        onClick={handleClick}
                         className={cn(
                             'group relative block overflow-hidden rounded-[1.35rem] border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md',
                             stage.cardBg,
@@ -43,7 +66,7 @@ export default function OrderPipelineCards({ counts, activeSlug, compact }: Orde
                                 )}
                             </div>
                             {count > 0 && (
-                                <span className="flex h-2.5 w-2.5 shrink-0">
+                                <span className="pointer-events-none relative flex h-2.5 w-2.5 shrink-0">
                                     <span className="absolute inline-flex h-2.5 w-2.5 animate-ping rounded-full bg-orange-400 opacity-60" />
                                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-orange-500" />
                                 </span>
@@ -51,7 +74,7 @@ export default function OrderPipelineCards({ counts, activeSlug, compact }: Orde
                         </div>
 
                         <div className={cn('mt-4 flex items-center justify-end gap-1 text-sm font-semibold', stage.accent)}>
-                            <span>{stage.cta}</span>
+                            <span>{active ? 'See orders' : stage.cta}</span>
                             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                         </div>
                     </Link>

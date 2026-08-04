@@ -64,51 +64,59 @@ export default function OrdersStage({ orders, counts, stage }: OrdersStageProps)
                 </div>
             </div>
 
-            <div className="mb-6">
+            <div id="stage-orders" className="scroll-mt-24">
+                {orders.data.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-16 text-center">
+                        <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl ${meta.iconBg}`}>
+                            <Icon className={`h-7 w-7 ${meta.accent}`} />
+                        </div>
+                        <p className="mt-4 text-lg font-semibold text-gray-900">{meta.emptyTitle}</p>
+                        <p className="mx-auto mt-2 max-w-sm text-sm text-gray-500">{meta.emptyHint}</p>
+                        <Link
+                            href={route('manage.orders.index', undefined, false)}
+                            className="mt-6 inline-flex items-center text-sm font-medium text-orange-600 hover:underline"
+                        >
+                            Back to sales center
+                            <ChevronRight className="ml-1 h-4 w-4" />
+                        </Link>
+                    </div>
+                ) : (
+                    <>
+                        <div className="mb-3 flex items-center justify-between gap-2">
+                            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">Orders to review</h2>
+                            <p className="text-sm text-gray-500">
+                                {orders.total} order{orders.total === 1 ? '' : 's'}
+                            </p>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                            {orders.data.map((item) => (
+                                <SellerOrderCard key={item.id} item={item} stageSlug={stage} />
+                            ))}
+                        </div>
+
+                        {orders.last_page > 1 && (
+                            <div className="mt-8 flex flex-wrap justify-center gap-2">
+                                {orders.links.map((link, i) => (
+                                    <Link
+                                        key={i}
+                                        href={link.url ?? '#'}
+                                        preserveScroll
+                                        className={`rounded-lg px-3 py-1.5 text-sm ${
+                                            link.active ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+
+            <div className="mt-8 mb-2">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Jump to stage</p>
                 <OrderPipelineCards counts={counts} activeSlug={stage} compact />
             </div>
-
-            {orders.data.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-16 text-center">
-                    <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl ${meta.iconBg}`}>
-                        <Icon className={`h-7 w-7 ${meta.accent}`} />
-                    </div>
-                    <p className="mt-4 text-lg font-semibold text-gray-900">{meta.emptyTitle}</p>
-                    <p className="mx-auto mt-2 max-w-sm text-sm text-gray-500">{meta.emptyHint}</p>
-                    <Link
-                        href={route('manage.orders.index')}
-                        className="mt-6 inline-flex items-center text-sm font-medium text-orange-600 hover:underline"
-                    >
-                        Back to sales center
-                        <ChevronRight className="ml-1 h-4 w-4" />
-                    </Link>
-                </div>
-            ) : (
-                <>
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                        {orders.data.map((item) => (
-                            <SellerOrderCard key={item.id} item={item} stageSlug={stage} />
-                        ))}
-                    </div>
-
-                    {orders.last_page > 1 && (
-                        <div className="mt-8 flex flex-wrap justify-center gap-2">
-                            {orders.links.map((link, i) => (
-                                <Link
-                                    key={i}
-                                    href={link.url ?? '#'}
-                                    preserveScroll
-                                    className={`rounded-lg px-3 py-1.5 text-sm ${
-                                        link.active ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                    }`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </>
-            )}
         </SellerLayout>
     );
 }
