@@ -18,9 +18,9 @@ class PlatformSettings
 
     public const CURRENCY_SYMBOL_KEY = 'currency_symbol';
 
-    public const DEFAULT_CURRENCY_CODE = 'USD';
+    public const DEFAULT_CURRENCY_CODE = 'LKR';
 
-    public const DEFAULT_CURRENCY_SYMBOL = '$';
+    public const DEFAULT_CURRENCY_SYMBOL = 'Rs';
 
     public const CONTACT_ADDRESS_KEY = 'contact_address';
 

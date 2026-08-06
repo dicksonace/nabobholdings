@@ -23,10 +23,12 @@ class PaystackService
 
     public function initializeTransaction(string $email, float $amountGhs, string $reference, array $metadata = [], ?string $callbackUrl = null, ?array $channels = null): array
     {
+        $currency = PlatformSettings::currencyCode();
+
         $payload = [
             'email' => $email,
             'amount' => (int) round($amountGhs * 100),
-            'currency' => 'GHS',
+            'currency' => $currency,
             'reference' => $reference,
             'callback_url' => $callbackUrl ?? route('checkout.callback'),
             'metadata' => $metadata,
@@ -93,13 +95,15 @@ class PaystackService
 
     public function createMobileMoneyRecipient(string $name, string $phone, string $network): array
     {
+        $currency = PlatformSettings::currencyCode();
+
         $response = Http::withToken($this->secretKey)
             ->post("{$this->baseUrl}/transferrecipient", [
                 'type' => 'mobile_money',
                 'name' => $name,
                 'account_number' => $this->normalizeGhanaPhone($phone),
                 'bank_code' => $this->mobileMoneyBankCode($network),
-                'currency' => 'GHS',
+                'currency' => $currency,
             ]);
 
         if (! $response->successful()) {
@@ -112,6 +116,8 @@ class PaystackService
 
     public function initiateTransfer(string $recipientCode, float $amountGhs, string $reference, string $reason): array
     {
+        $currency = PlatformSettings::currencyCode();
+
         $response = Http::withToken($this->secretKey)
             ->post("{$this->baseUrl}/transfer", [
                 'source' => 'balance',
@@ -119,7 +125,7 @@ class PaystackService
                 'recipient' => $recipientCode,
                 'reference' => $reference,
                 'reason' => $reason,
-                'currency' => 'GHS',
+                'currency' => $currency,
             ]);
 
         if (! $response->successful()) {

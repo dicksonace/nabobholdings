@@ -1,4 +1,4 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { CreditCard, LoaderCircle } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 
@@ -15,6 +15,7 @@ import {
 } from '@/lib/checkout-draft';
 import { isBankPaymentMethod, bankPaymentTitle } from '@/lib/payment-method-display';
 import { formatPrice, Order, productImageUrl } from '@/types/marketplace';
+import { SharedData } from '@/types';
 
 interface CheckoutData {
     id: number;
@@ -53,6 +54,7 @@ declare global {
 export default function Payment({ checkout, marketplaceTotal, directOrders, paystackPublicKey, paystackConfigured }: PaymentProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const { currency } = usePage<SharedData>().props;
 
     useEffect(() => {
         const script = document.createElement('script');
@@ -89,7 +91,7 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
                 key: paystackPublicKey,
                 email: data.email,
                 amount: Math.round(data.amount * 100),
-                currency: 'GHS',
+                currency: currency?.code ?? 'LKR',
                 ref: data.reference,
                 channels: data.channels ?? ['card', 'mobile_money'],
                 callback: () => {

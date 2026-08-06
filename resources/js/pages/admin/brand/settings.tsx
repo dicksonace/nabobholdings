@@ -26,6 +26,7 @@ interface Props {
 }
 
 const CURRENCY_PRESETS = [
+    { code: 'LKR', symbol: 'Rs', label: 'Sri Lankan Rupee' },
     { code: 'USD', symbol: '$', label: 'US Dollar' },
     { code: 'EUR', symbol: '€', label: 'Euro' },
     { code: 'GBP', symbol: '£', label: 'British Pound' },
@@ -175,8 +176,8 @@ export default function BrandSettings({ brand, currency, contact }: Props) {
                     <Label>Currency</Label>
                     <p className="mt-1 text-xs text-gray-500">
                         Sets the currency symbol and code shown across the whole app — product prices, carts, invoices,
-                        wallets and emails. This changes how amounts are <em>displayed</em>; it does not convert existing
-                        prices or change the currency Paystack charges in.
+                        wallets, emails and Paystack checkout requests. This changes how amounts are <em>displayed</em>;
+                        it does not convert existing saved prices.
                     </p>
 
                     <div className="mt-4 grid gap-4 sm:grid-cols-3">
