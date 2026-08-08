@@ -64,6 +64,7 @@ class HandleInertiaRequests extends Middleware
             'csrfToken' => csrf_token(),
             'name' => $brand['name'],
             'brand' => $brand,
+            'theme' => PlatformSettings::siteTheme(),
             'appUrl' => rtrim(config('app.url'), '/'),
             'currency' => PlatformSettings::currency(),
             'contact' => PlatformSettings::contact(),

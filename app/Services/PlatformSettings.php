@@ -71,8 +71,46 @@ class PlatformSettings
         return [
             'name' => static::brandName(),
             'logo' => static::brandLogoUrl(),
-            'tagline' => 'Your trusted online store — quality products, secure payments, and delivery across Ghana.',
+            'tagline' => 'Your trusted online store — quality products, secure payments, and delivery across Sri Lanka.',
         ];
+    }
+
+    /**
+     * Published owner-store theme colors for the main shop chrome.
+     *
+     * @return array{primary_color: string, secondary_color: string, background_color: string, text_color: string}
+     */
+    public static function siteTheme(): array
+    {
+        $fallback = [
+            'primary_color' => '#0f2744',
+            'secondary_color' => '#d97706',
+            'background_color' => '#ffffff',
+            'text_color' => '#111827',
+        ];
+
+        try {
+            $admin = \App\Models\User::query()
+                ->where('email', 'admin@nabobholdings.com')
+                ->orWhere('role', \App\Enums\UserRole::Admin)
+                ->first();
+
+            $customization = $admin?->sellerProfile?->storeCustomization;
+            if (! $customization) {
+                return $fallback;
+            }
+
+            $theme = app(StoreCustomizationService::class)->publishedSettings($customization)['theme'] ?? [];
+
+            return [
+                'primary_color' => (string) ($theme['primary_color'] ?? $fallback['primary_color']),
+                'secondary_color' => (string) ($theme['secondary_color'] ?? $fallback['secondary_color']),
+                'background_color' => (string) ($theme['background_color'] ?? $fallback['background_color']),
+                'text_color' => (string) ($theme['text_color'] ?? $fallback['text_color']),
+            ];
+        } catch (\Throwable) {
+            return $fallback;
+        }
     }
 
     /**

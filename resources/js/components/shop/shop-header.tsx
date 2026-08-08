@@ -37,7 +37,9 @@ type NavLink = {
 
 export default function ShopHeader({ hideSearch = false, overHero = false }: { hideSearch?: boolean; overHero?: boolean }) {
     const page = usePage<SharedData & { cartCount: number; wishlistCount: number; unreadMessages?: number }>();
-    const { auth, cartCount, wishlistCount } = page.props;
+    const { auth, cartCount, wishlistCount, theme } = page.props;
+    const primary = theme?.primary_color || '#0f2744';
+    const secondary = theme?.secondary_color || '#d97706';
     const chat = useChatOptional();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -195,21 +197,26 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                     className={cn(
                         'relative overflow-hidden transition-all duration-300 ease-out',
                         floating
-                            ? 'mx-auto w-full max-w-7xl rounded-2xl border border-white/15 bg-[#0f2744]/92 shadow-[0_12px_40px_rgba(15,39,68,0.45)] backdrop-blur-xl'
+                            ? 'mx-auto w-full max-w-7xl rounded-2xl border border-white/15 shadow-[0_12px_40px_rgba(15,39,68,0.45)] backdrop-blur-xl'
                             : cn(
                                   'w-full max-w-none rounded-none',
                                   overHero
-                                      ? 'border-b border-white/10 bg-[#0f2744]/95 backdrop-blur-md'
-                                      : 'border-b border-[#0f2744]/10 bg-white/95 backdrop-blur-md',
+                                      ? 'border-b border-white/10 backdrop-blur-md'
+                                      : 'border-b border-black/10 bg-white/95 backdrop-blur-md',
                               ),
                     )}
+                    style={
+                        floating || overHero
+                            ? { backgroundColor: `${primary}eb` }
+                            : undefined
+                    }
                 >
                     {!floating && (
                         <div
-                            className={cn(
-                                'pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent to-transparent',
-                                dark ? 'via-[#fbbf24]/60' : 'via-[#d97706]/50',
-                            )}
+                            className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent to-transparent"
+                            style={{
+                                backgroundImage: `linear-gradient(to right, transparent, ${secondary}80, transparent)`,
+                            }}
                         />
                     )}
 
@@ -358,7 +365,8 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                                 </Link>
                                 <Link
                                     href={route('register.buyer')}
-                                    className="inline-flex h-10 items-center rounded-full bg-[#d97706] px-5 text-sm font-semibold text-white shadow-md shadow-amber-600/25 transition hover:bg-[#b45309] hover:shadow-lg hover:shadow-amber-600/30 active:scale-[0.98]"
+                                    className="inline-flex h-10 items-center rounded-full px-5 text-sm font-semibold text-white shadow-md transition hover:brightness-95 hover:shadow-lg active:scale-[0.98]"
+                                    style={{ backgroundColor: secondary }}
                                 >
                                     Register
                                 </Link>
@@ -446,7 +454,8 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                             </Link>
                             <Link
                                 href={route('register.buyer')}
-                                className="rounded-full bg-[#d97706] py-2.5 text-center text-sm font-semibold text-white shadow-md shadow-amber-600/20"
+                                className="rounded-full py-2.5 text-center text-sm font-semibold text-white shadow-md"
+                                style={{ backgroundColor: secondary }}
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 Register

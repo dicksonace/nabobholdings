@@ -91,12 +91,50 @@ export default function StoreAppearance({
         );
     };
 
+    const saveAndPublish = () => {
+        setSaving(true);
+        publishStore(
+            settings,
+            { store_logo: logoFile, cover_image: coverFile, hero_images: heroFiles, promo_image: promoFile },
+            {
+                remove_store_logo: removeLogo,
+                remove_cover_image: removeCover,
+                remove_promo_image: removePromo,
+                remove_hero_images: removedHeroImages,
+            },
+            {
+                onSuccess: () => {
+                    setSaving(false);
+                    setLogoFile(null);
+                    setCoverFile(null);
+                    setHeroFiles([]);
+                    setPromoFile(null);
+                    setRemovedHeroImages([]);
+                    setRemoveLogo(false);
+                    setRemoveCover(false);
+                    setRemovePromo(false);
+                },
+                onError: () => setSaving(false),
+            },
+        );
+    };
+
     const applyPreset = (key: string) => {
         const preset = presets[key];
         if (!preset) return;
         setSettings((prev) => ({
             ...prev,
             theme: { ...prev.theme, preset: key, primary_color: preset.primary_color, secondary_color: preset.secondary_color, background_color: preset.background_color, text_color: preset.text_color },
+        }));
+    };
+
+    const setThemeColor = (
+        field: 'primary_color' | 'secondary_color' | 'background_color' | 'text_color',
+        value: string,
+    ) => {
+        setSettings((prev) => ({
+            ...prev,
+            theme: { ...prev.theme, preset: 'custom', [field]: value },
         }));
     };
 
@@ -133,7 +171,9 @@ export default function StoreAppearance({
 
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm text-gray-500">
-                    {setupComplete ? 'Changes save as draft until you publish.' : 'Complete setup to unlock your dashboard.'}
+                    {setupComplete
+                        ? 'Pick colors, then click Publish to apply them across the live website.'
+                        : 'Complete setup to unlock your dashboard.'}
                 </p>
                 <div className="flex flex-wrap gap-2">
                     <Button variant="outline" size="sm" onClick={() => resetStore()}>Reset defaults</Button>
@@ -141,8 +181,9 @@ export default function StoreAppearance({
                         {saving && <LoaderCircle className="mr-1 h-3.5 w-3.5 animate-spin" />}
                         Save draft
                     </Button>
-                    <Button size="sm" className="bg-orange-500 hover:bg-orange-600" onClick={() => publishStore()}>
-                        Publish
+                    <Button size="sm" className="bg-orange-500 hover:bg-orange-600" disabled={saving} onClick={saveAndPublish}>
+                        {saving && <LoaderCircle className="mr-1 h-3.5 w-3.5 animate-spin" />}
+                        Publish live
                     </Button>
                     <a href={storeUrl} target="_blank" rel="noreferrer" className="text-sm text-orange-500 hover:underline">View live store</a>
                 </div>
@@ -181,7 +222,7 @@ export default function StoreAppearance({
                                     {(['primary_color', 'secondary_color', 'background_color', 'text_color'] as const).map((field) => (
                                         <div key={field}>
                                             <Label className="capitalize">{field.replace('_', ' ')}</Label>
-                                            <Input type="color" value={settings.theme[field]} onChange={(e) => setSettings({ ...settings, theme: { ...settings.theme, [field]: e.target.value } })} className="mt-1 h-9" />
+                                            <Input type="color" value={settings.theme[field]} onChange={(e) => setThemeColor(field, e.target.value)} className="mt-1 h-9" />
                                         </div>
                                     ))}
                                 </div>

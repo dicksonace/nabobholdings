@@ -27,6 +27,13 @@ export interface Brand {
     tagline?: string;
 }
 
+export interface SiteTheme {
+    primary_color: string;
+    secondary_color: string;
+    background_color: string;
+    text_color: string;
+}
+
 export interface Currency {
     code: string;
     symbol: string;
@@ -41,6 +48,7 @@ export interface ContactInfo {
 export interface SharedData {
     name: string;
     brand: Brand;
+    theme?: SiteTheme;
     appUrl?: string;
     currency: Currency;
     contact: ContactInfo;

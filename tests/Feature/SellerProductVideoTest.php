@@ -47,8 +47,16 @@ class SellerProductVideoTest extends TestCase
         $video = UploadedFile::fake()->create('clip.mp4', 1024, 'video/mp4');
         $image = UploadedFile::fake()->image('item.jpg', 400, 400);
 
+        $category = \App\Models\Category::create([
+            'name' => 'Test Category',
+            'slug' => 'test-category-'.uniqid(),
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
         $response = $this->actingAs($seller)->post(route('manage.products.store'), [
             'name' => 'Phone with video',
+            'category_id' => $category->id,
             'price' => 500,
             'quantity' => 2,
             'shipping_type' => 'paid',
@@ -81,8 +89,16 @@ class SellerProductVideoTest extends TestCase
         $seller = $this->approvedSeller();
         $image = UploadedFile::fake()->image('item.jpg', 400, 400);
 
+        $category = \App\Models\Category::create([
+            'name' => 'Fee Category',
+            'slug' => 'fee-category-'.uniqid(),
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
         $response = $this->actingAs($seller)->from(route('manage.products.create'))->post(route('manage.products.store'), [
             'name' => 'Missing fee product',
+            'category_id' => $category->id,
             'price' => 100,
             'quantity' => 1,
             'shipping_type' => 'paid',

@@ -180,8 +180,8 @@ class ProductController extends Controller
         $currentCount = $product->images()->count();
         $newCount = $request->file('images') ? count($request->file('images')) : 0;
 
-        if ($currentCount + $newCount > 5) {
-            return back()->withErrors(['images' => 'Maximum 5 images allowed per product.']);
+        if ($currentCount + $newCount > 6) {
+            return back()->withErrors(['images' => 'Maximum 6 images allowed per product.']);
         }
 
         if ($request->file('images')) {
@@ -377,7 +377,21 @@ class ProductController extends Controller
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:500'],
             'meta_keywords' => ['nullable', 'string', 'max:255'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'category_id' => [
+                'required',
+                'integer',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    $ok = Category::query()
+                        ->whereKey($value)
+                        ->where('is_active', true)
+                        ->whereDoesntHave('children')
+                        ->exists();
+
+                    if (! $ok) {
+                        $fail('Choose a product category (not a top-level group).');
+                    }
+                },
+            ],
             'sku' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'condition' => ['nullable', 'in:new,used,refurbished'],
@@ -515,8 +529,13 @@ class ProductController extends Controller
     {
         return Category::query()
             ->activeOrdered()
+            ->whereDoesntHave('children')
             ->with('parent:id,name')
             ->get(['id', 'name', 'slug', 'icon', 'parent_id', 'spec_schema'])
+            ->sortBy(fn (Category $category) => strtolower(
+                ($category->parent?->name ? $category->parent->name.' ' : '').$category->name
+            ))
+            ->values()
             ->map(function (Category $category) {
                 return [
                     'id' => $category->id,

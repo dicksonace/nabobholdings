@@ -54,6 +54,28 @@ class StoreCustomizationController extends Controller
 
     public function updateDraft(Request $request, StoreCustomizationService $customizations): RedirectResponse
     {
+        $this->persistIncomingDraft($request, $customizations);
+
+        return back()->with('success', 'Draft saved. Click Publish to apply colors on the live website.');
+    }
+
+    public function publish(Request $request, StoreCustomizationService $customizations): RedirectResponse
+    {
+        $profile = $request->user()->sellerProfile;
+
+        if ($request->filled('settings')) {
+            $this->persistIncomingDraft($request, $customizations);
+        }
+
+        $customization = $customizations->forProfile($profile->fresh());
+        $customizations->publish($customization);
+        $customizations->syncBrandingToProfile($profile, $customizations->publishedSettings($customization->fresh()));
+
+        return back()->with('success', 'Store theme published. Colors now apply across the website.');
+    }
+
+    private function persistIncomingDraft(Request $request, StoreCustomizationService $customizations): void
+    {
         $profile = $request->user()->sellerProfile;
         $customization = $customizations->forProfile($profile);
 
@@ -113,19 +135,6 @@ class StoreCustomizationController extends Controller
 
         $customization = $customizations->updateDraft($customization, $incoming);
         $customizations->syncBrandingToProfile($profile, $customizations->draftSettings($customization));
-
-        return back()->with('success', 'Draft saved.');
-    }
-
-    public function publish(Request $request, StoreCustomizationService $customizations): RedirectResponse
-    {
-        $profile = $request->user()->sellerProfile;
-        $customization = $customizations->forProfile($profile);
-
-        $customizations->publish($customization);
-        $customizations->syncBrandingToProfile($profile, $customizations->publishedSettings($customization->fresh()));
-
-        return back()->with('success', 'Store published successfully.');
     }
 
     public function reset(Request $request, StoreCustomizationService $customizations): RedirectResponse

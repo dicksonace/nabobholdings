@@ -16,12 +16,11 @@ interface StoreDraftRemoves {
     remove_hero_images?: string[];
 }
 
-export function submitStoreDraft(
+function buildStoreFormData(
     settings: StoreCustomizationSettings,
     files: StoreDraftFiles = {},
     removes: StoreDraftRemoves = {},
-    options?: { onSuccess?: () => void; onError?: () => void },
-) {
+): FormData {
     const formData = new FormData();
     formData.append('settings', JSON.stringify(settings));
 
@@ -35,19 +34,39 @@ export function submitStoreDraft(
     if (removes.remove_promo_image) formData.append('remove_promo_image', '1');
     removes.remove_hero_images?.forEach((path) => formData.append('remove_hero_images[]', path));
 
-    router.post(route('manage.store-appearance.draft'), formData, {
+    return formData;
+}
+
+export function submitStoreDraft(
+    settings: StoreCustomizationSettings,
+    files: StoreDraftFiles = {},
+    removes: StoreDraftRemoves = {},
+    options?: { onSuccess?: () => void; onError?: () => void },
+) {
+    router.post(route('manage.store-appearance.draft'), buildStoreFormData(settings, files, removes), {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: options?.onSuccess,
         onError: options?.onError,
-        onFinish: () => {
-            // keep saving state managed by callers via onSuccess/onError
-        },
     });
 }
 
-export function publishStore() {
-    router.post(route('manage.store-appearance.publish'), {}, { preserveScroll: true });
+export function publishStore(
+    settings?: StoreCustomizationSettings,
+    files: StoreDraftFiles = {},
+    removes: StoreDraftRemoves = {},
+    options?: { onSuccess?: () => void; onError?: () => void },
+) {
+    const payload = settings
+        ? buildStoreFormData(settings, files, removes)
+        : {};
+
+    router.post(route('manage.store-appearance.publish'), payload, {
+        forceFormData: Boolean(settings),
+        preserveScroll: true,
+        onSuccess: options?.onSuccess,
+        onError: options?.onError,
+    });
 }
 
 export function resetStore() {

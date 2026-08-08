@@ -60,13 +60,24 @@ class StoreCustomizationService
 
     public function updateDraft(StoreCustomization $customization, array $incoming): StoreCustomization
     {
+        $previous = $this->draftSettings($customization);
+        $previousPreset = (string) ($previous['theme']['preset'] ?? '');
+        $incomingPreset = (string) ($incoming['theme']['preset'] ?? '');
+
         $merged = $this->mergeWithDefaults(array_replace_recursive(
             $customization->draft_settings ?? [],
             $incoming,
         ));
 
-        if (! empty($incoming['theme']['preset'])) {
-            $merged = $this->applyPreset($merged, $incoming['theme']['preset']);
+        // Only re-apply a preset when the owner actually picked a new one.
+        // Otherwise custom color edits get wiped on every draft save.
+        if (
+            $incomingPreset !== ''
+            && $incomingPreset !== 'custom'
+            && $incomingPreset !== $previousPreset
+            && isset(self::presets()[$incomingPreset])
+        ) {
+            $merged = $this->applyPreset($merged, $incomingPreset);
         }
 
         $customization->update(['draft_settings' => $merged]);

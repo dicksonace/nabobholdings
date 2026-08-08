@@ -55,12 +55,12 @@ export default function NabobBrand({
         <span
             className={cn(
                 'font-bold whitespace-nowrap tracking-tight',
-                inverted ? 'text-white' : 'text-[#0f2744]',
+                inverted ? 'text-white' : 'text-[var(--brand-primary,#0f2744)]',
                 showText ? textSize.lg : textSize[size],
             )}
         >
             {first}
-            {rest && <span className={inverted ? 'text-[#fbbf24]' : 'text-[#d97706]'}>&nbsp;{rest}</span>}
+            {rest && <span className={inverted ? 'text-[#fbbf24]' : 'text-[var(--brand-secondary,#d97706)]'}>&nbsp;{rest}</span>}
         </span>
     );
 

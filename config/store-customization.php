@@ -3,6 +3,13 @@
 return [
 
     'presets' => [
+        'nabob' => [
+            'label' => 'Nabob Navy',
+            'primary_color' => '#0f2744',
+            'secondary_color' => '#d97706',
+            'background_color' => '#ffffff',
+            'text_color' => '#111827',
+        ],
         'ocean' => [
             'label' => 'Ocean Blue',
             'primary_color' => '#1e3a8a',
@@ -49,10 +56,10 @@ return [
 
     'defaults' => [
         'theme' => [
-            'preset' => 'ocean',
-            'primary_color' => '#1e3a8a',
-            'secondary_color' => '#f97316',
-            'background_color' => '#f8fafc',
+            'preset' => 'nabob',
+            'primary_color' => '#0f2744',
+            'secondary_color' => '#d97706',
+            'background_color' => '#ffffff',
             'text_color' => '#111827',
             'button_style' => 'rounded',
             'font_family' => 'system',

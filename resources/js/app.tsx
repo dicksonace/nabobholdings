@@ -14,6 +14,7 @@ import FlashToastListener from './components/shop/flash-toast-listener';
 import { setCsrfToken } from './lib/csrf';
 import { setCurrencySymbol } from '@/types/marketplace';
 import { initAnalytics, trackPageView } from './lib/analytics';
+import type { SiteTheme } from './types';
 
 declare global {
     const route: typeof routeFn;
@@ -21,6 +22,14 @@ declare global {
 
 let appName = import.meta.env.VITE_APP_NAME || 'Nabob Holdings';
 
+function applySiteTheme(theme?: SiteTheme) {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    root.style.setProperty('--brand-primary', theme?.primary_color || '#0f2744');
+    root.style.setProperty('--brand-secondary', theme?.secondary_color || '#d97706');
+    root.style.setProperty('--brand-background', theme?.background_color || '#ffffff');
+    root.style.setProperty('--brand-text', theme?.text_color || '#111827');
+}
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
@@ -43,6 +52,7 @@ createInertiaApp({
             csrfToken?: string;
             brand?: { name?: string };
             currency?: { symbol?: string };
+            theme?: SiteTheme;
         };
         const initialToken = initialProps.csrfToken;
         if (initialToken) {
@@ -54,6 +64,7 @@ createInertiaApp({
         if (initialProps.currency?.symbol) {
             setCurrencySymbol(initialProps.currency.symbol);
         }
+        applySiteTheme(initialProps.theme);
 
         initAnalytics();
         trackPageView(props.initialPage.url, typeof document !== 'undefined' ? document.title : undefined);
@@ -67,7 +78,7 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#d97706',
+        color: 'var(--brand-secondary, #d97706)',
     },
 });
 
@@ -76,6 +87,7 @@ router.on('success', (event) => {
         csrfToken?: string;
         brand?: { name?: string };
         currency?: { symbol?: string };
+        theme?: SiteTheme;
     };
     if (props.csrfToken) {
         setCsrfToken(props.csrfToken);
@@ -86,6 +98,7 @@ router.on('success', (event) => {
     if (props.currency?.symbol) {
         setCurrencySymbol(props.currency.symbol);
     }
+    applySiteTheme(props.theme);
     trackPageView(event.detail.page.url, typeof document !== 'undefined' ? document.title : undefined);
 });
 

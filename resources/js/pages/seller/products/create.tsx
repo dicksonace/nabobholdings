@@ -49,6 +49,7 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
     const [step, setStep] = useState(0);
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+    const [imagesConfirmed, setImagesConfirmed] = useState(false);
     const [videoFile, setVideoFile] = useState<File | null>(null);
     const [videoDuration, setVideoDuration] = useState<number | null>(null);
     const [previewMode, setPreviewMode] = useState<'grid' | 'detail'>('grid');
@@ -143,8 +144,13 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
     }), [data, imagePreviews]);
 
     const stepBlocker = (): string | null => {
-        if (step === 0 && data.name.trim().length === 0) {
-            return 'Enter a product name to continue.';
+        if (step === 0) {
+            if (data.name.trim().length === 0) {
+                return 'Enter a product name to continue.';
+            }
+            if (!data.category_id) {
+                return 'Choose a category to continue.';
+            }
         }
         if (step === 1) {
             if (data.price === '' || Number.isNaN(Number(data.price)) || Number(data.price) < 0) {
@@ -162,6 +168,9 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
         if (step === 4) {
             if (imageFiles.length === 0) {
                 return 'Add at least one product photo before publishing.';
+            }
+            if (!imagesConfirmed) {
+                return 'Tap “Confirm Images” after uploading, then publish.';
             }
         }
         return null;
@@ -194,6 +203,13 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
             return;
         }
         setStepHint(null);
+        setData((current) => ({
+            ...current,
+            images: imageFiles,
+            image_count: imageFiles.length,
+            video: videoFile,
+            video_duration: videoDuration,
+        }));
         post(route('manage.products.store'), {
             forceFormData: true,
             onError: (errs) => {
@@ -271,20 +287,23 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
                                 </div>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div>
-                                        <Label>Category</Label>
+                                        <Label>Category *</Label>
                                         <select
                                             value={data.category_id}
                                             onChange={(e) => {
                                                 setData('category_id', e.target.value);
                                                 setData('specifications', {});
+                                                setStepHint(null);
                                             }}
                                             className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+                                            required
                                         >
                                             <option value="">Select category</option>
                                             {categories.map((c) => (
                                                 <option key={c.id} value={c.id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
                                             ))}
                                         </select>
+                                        <InputError message={errors.category_id} />
                                     </div>
                                     <div>
                                         <Label>Brand</Label>
@@ -437,9 +456,11 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
                                     onChange={(files) => {
                                         setImageFiles(files);
                                         setData('images', files);
+                                        setImagesConfirmed(false);
                                         setStepHint(null);
                                     }}
                                     onConfirmedChange={(confirmed) => {
+                                        setImagesConfirmed(confirmed);
                                         if (confirmed) setStepHint(null);
                                     }}
                                     error={errors.images}
