@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import { ChevronDown, ChevronUp, Star, X } from 'lucide-react';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,12 +62,13 @@ function FilterSection({ title, defaultOpen = true, children }: { title: string;
 function pricePresets() {
     const c = getCurrencySymbol();
 
+    // LKR-scale buckets (catalog prices typically run from thousands to hundreds of thousands).
     return [
-        { label: `Under ${c}100`, min: '', max: '100' },
-        { label: `${c}100 – ${c}500`, min: '100', max: '500' },
-        { label: `${c}500 – ${c}2,000`, min: '500', max: '2000' },
-        { label: `${c}2,000 – ${c}5,000`, min: '2000', max: '5000' },
-        { label: `Over ${c}5,000`, min: '5000', max: '' },
+        { label: `Under ${c}5,000`, min: '', max: '5000' },
+        { label: `${c}5,000 – ${c}25,000`, min: '5000', max: '25000' },
+        { label: `${c}25,000 – ${c}75,000`, min: '25000', max: '75000' },
+        { label: `${c}75,000 – ${c}200,000`, min: '75000', max: '200000' },
+        { label: `Over ${c}200,000`, min: '200000', max: '' },
     ];
 }
 
@@ -96,6 +97,11 @@ export default function ProductFilters({ filters, categories, brands, priceRange
     const [localMin, setLocalMin] = useState(filters.price_min ?? '');
     const [localMax, setLocalMax] = useState(filters.price_max ?? '');
 
+    useEffect(() => {
+        setLocalMin(filters.price_min ?? '');
+        setLocalMax(filters.price_max ?? '');
+    }, [filters.price_min, filters.price_max]);
+
     const applyPrice = () => {
         applyFilters({ price_min: localMin, price_max: localMax }, filters);
     };
@@ -104,6 +110,9 @@ export default function ProductFilters({ filters, categories, brands, priceRange
         if (typeof value === 'boolean') return filters[key] === value;
         return String(filters[key] ?? '') === String(value);
     };
+
+    const isPricePresetActive = (min: string, max: string) =>
+        String(filters.price_min ?? '') === min && String(filters.price_max ?? '') === max;
 
     return (
         <aside className={cn('rounded-2xl border border-gray-100 bg-white p-5 shadow-sm', className)}>
@@ -188,7 +197,12 @@ export default function ProductFilters({ filters, categories, brands, priceRange
                             key={preset.label}
                             type="button"
                             onClick={() => applyFilters({ price_min: preset.min, price_max: preset.max }, filters)}
-                            className="block w-full rounded-lg px-2 py-1 text-left text-sm text-gray-600 hover:bg-gray-50 hover:text-orange-600"
+                            className={cn(
+                                'block w-full rounded-lg px-2 py-1 text-left text-sm transition-colors',
+                                isPricePresetActive(preset.min, preset.max)
+                                    ? 'bg-orange-50 font-medium text-orange-600'
+                                    : 'text-gray-600 hover:bg-gray-50 hover:text-orange-600',
+                            )}
                         >
                             {preset.label}
                         </button>
@@ -197,7 +211,7 @@ export default function ProductFilters({ filters, categories, brands, priceRange
             </FilterSection>
 
             <FilterSection title="Customer Reviews">
-                {[4, 3, 2].map((stars) => (
+                {[5, 4, 3].map((stars) => (
                     <button
                         key={stars}
                         type="button"
@@ -221,21 +235,23 @@ export default function ProductFilters({ filters, categories, brands, priceRange
             </FilterSection>
 
             {brands.length > 0 && (
-                <FilterSection title="Brand" defaultOpen={false}>
-                    {brands.map((b) => (
-                        <button
-                            key={b.brand}
-                            type="button"
-                            onClick={() => applyFilters({ brand: b.brand }, filters)}
-                            className={cn(
-                                'flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-sm transition-colors',
-                                isActive('brand', b.brand) ? 'bg-orange-50 font-medium text-orange-600' : 'text-gray-600 hover:bg-gray-50',
-                            )}
-                        >
-                            <span>{b.brand}</span>
-                            <span className="text-xs text-gray-400">({b.count})</span>
-                        </button>
-                    ))}
+                <FilterSection title="Brand" defaultOpen={true}>
+                    <div className="max-h-72 space-y-1 overflow-y-auto pr-1">
+                        {brands.map((b) => (
+                            <button
+                                key={b.brand}
+                                type="button"
+                                onClick={() => applyFilters({ brand: b.brand }, filters)}
+                                className={cn(
+                                    'flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-sm transition-colors',
+                                    isActive('brand', b.brand) ? 'bg-orange-50 font-medium text-orange-600' : 'text-gray-600 hover:bg-gray-50',
+                                )}
+                            >
+                                <span className="pr-2">{b.brand}</span>
+                                <span className="shrink-0 text-xs text-gray-400">({b.count})</span>
+                            </button>
+                        ))}
+                    </div>
                 </FilterSection>
             )}
 

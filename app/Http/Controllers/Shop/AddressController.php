@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Models\BuyerAddress;
-use App\Support\GhanaLocations;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -130,7 +128,7 @@ class AddressController extends Controller
             'secondary_phone' => ['nullable', 'string', 'max:20'],
             'address_line' => ['required', 'string', 'max:255'],
             'additional_details' => ['nullable', 'string', 'max:255'],
-            'region' => ['required', 'string', 'max:100', Rule::in(GhanaLocations::regions())],
+            'region' => ['required', 'string', 'max:100'],
             'city' => ['required', 'string', 'max:100'],
             'digital_address' => ['nullable', 'string', 'max:100'],
             'is_default' => ['sometimes', 'boolean'],
@@ -152,7 +150,7 @@ class AddressController extends Controller
             'secondary_phone' => null,
             'address_line' => $user->residential_address,
             'additional_details' => null,
-            'region' => GhanaLocations::isValidRegion((string) $user->region) ? $user->region : '',
+            'region' => $user->region,
             'city' => $user->city,
             'digital_address' => $user->digital_address,
             'is_default' => true,

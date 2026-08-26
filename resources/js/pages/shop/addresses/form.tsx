@@ -1,15 +1,24 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { LoaderCircle, MapPin } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useMemo, useState } from 'react';
 
 import InputError from '@/components/input-error';
-import GhanaLocationFields from '@/components/shop/ghana-location-fields';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import ShopLayout from '@/layouts/shop-layout';
 import { BuyerAddress } from '@/types/buyer-address';
-import { citiesForRegion, GHANA_REGIONS } from '@/lib/ghana-locations';
+
+const DIAL_CODES = [
+    { code: '+94', label: '🇱🇰 +94' },
+    { code: '+91', label: '🇮🇳 +91' },
+    { code: '+971', label: '🇦🇪 +971' },
+    { code: '+44', label: '🇬🇧 +44' },
+    { code: '+1', label: '🇺🇸 +1' },
+    { code: '+61', label: '🇦🇺 +61' },
+    { code: '+65', label: '🇸🇬 +65' },
+    { code: '+233', label: '🇬🇭 +233' },
+] as const;
 
 type AddressDefaults = {
     first_name?: string | null;
@@ -30,32 +39,132 @@ interface FormProps {
     returnTo?: string | null;
 }
 
+function splitPhone(raw: string | null | undefined): { dial: string; local: string } {
+    const value = (raw ?? '').trim();
+    if (!value) {
+        return { dial: '+94', local: '' };
+    }
+
+    const matched = DIAL_CODES.find((item) => value.startsWith(item.code));
+    if (matched) {
+        return { dial: matched.code, local: value.slice(matched.code.length).replace(/^[\s\-]+/, '') };
+    }
+
+    if (value.startsWith('+')) {
+        const parts = value.match(/^(\+\d{1,3})\s*(.*)$/);
+        if (parts) {
+            return { dial: parts[1], local: parts[2] };
+        }
+    }
+
+    return { dial: '+94', local: value };
+}
+
+function PhoneField({
+    id,
+    label,
+    dial,
+    local,
+    onDialChange,
+    onLocalChange,
+    placeholder,
+    required,
+    error,
+    hint,
+}: {
+    id: string;
+    label: string;
+    dial: string;
+    local: string;
+    onDialChange: (dial: string) => void;
+    onLocalChange: (local: string) => void;
+    placeholder: string;
+    required?: boolean;
+    error?: string;
+    hint?: string;
+}) {
+    const dialOptions = useMemo(() => {
+        if (DIAL_CODES.some((item) => item.code === dial)) {
+            return DIAL_CODES;
+        }
+
+        return [{ code: dial, label: dial }, ...DIAL_CODES];
+    }, [dial]);
+
+    return (
+        <div>
+            <Label htmlFor={id}>{label}</Label>
+            <div className="mt-1 flex overflow-hidden rounded-md border border-input bg-white">
+                <select
+                    aria-label={`${label} country code`}
+                    value={dial}
+                    onChange={(e) => onDialChange(e.target.value)}
+                    className="border-r bg-gray-50 px-2 text-sm text-gray-700 outline-none"
+                >
+                    {dialOptions.map((item) => (
+                        <option key={item.code} value={item.code}>
+                            {item.label}
+                        </option>
+                    ))}
+                </select>
+                <Input
+                    id={id}
+                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    placeholder={placeholder}
+                    value={local}
+                    onChange={(e) => onLocalChange(e.target.value)}
+                    required={required}
+                    inputMode="tel"
+                />
+            </div>
+            {hint && <p className="mt-1 text-xs text-gray-500">{hint}</p>}
+            <InputError message={error} />
+        </div>
+    );
+}
+
 export default function AddressForm({ address, defaults, returnTo }: FormProps) {
     const seed = address ?? defaults ?? {};
-    const regionSeed = GHANA_REGIONS.includes(seed.region ?? '') ? (seed.region as string) : '';
-    const citySeed =
-        regionSeed && citiesForRegion(regionSeed).includes(seed.city ?? '')
-            ? (seed.city as string)
-            : seed.city && regionSeed
-              ? (seed.city as string)
-              : '';
+    const primaryPhone = splitPhone(seed.phone);
+    const secondaryPhone = splitPhone(seed.secondary_phone);
 
-    const { data, setData, post, put, processing, errors } = useForm({
+    const [phoneDial, setPhoneDial] = useState(primaryPhone.dial);
+    const [phoneLocal, setPhoneLocal] = useState(primaryPhone.local);
+    const [secondaryDial, setSecondaryDial] = useState(secondaryPhone.dial);
+    const [secondaryLocal, setSecondaryLocal] = useState(secondaryPhone.local);
+
+    const { data, setData, post, put, processing, errors, transform } = useForm({
         first_name: seed.first_name ?? '',
         last_name: seed.last_name ?? '',
         phone: seed.phone ?? '',
         secondary_phone: seed.secondary_phone ?? '',
         address_line: seed.address_line ?? '',
         additional_details: seed.additional_details ?? '',
-        region: regionSeed,
-        city: citySeed,
+        region: seed.region ?? '',
+        city: seed.city ?? '',
         digital_address: seed.digital_address ?? '',
         is_default: address?.is_default ?? defaults?.is_default ?? true,
         return: returnTo ?? '',
     });
 
+    const composePhone = (dial: string, local: string) => {
+        const cleaned = local.trim();
+        if (!cleaned) {
+            return '';
+        }
+
+        return `${dial} ${cleaned.replace(/^0+/, '')}`.trim();
+    };
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
+        transform((current) => ({
+            ...current,
+            phone: composePhone(phoneDial, phoneLocal),
+            secondary_phone: composePhone(secondaryDial, secondaryLocal) || null,
+        }));
+
         if (address) {
             put(route('addresses.update', address.id));
         } else {
@@ -108,36 +217,28 @@ export default function AddressForm({ address, defaults, returnTo }: FormProps) 
                                 <InputError message={errors.last_name} />
                             </div>
                         </div>
-                        <div>
-                            <Label htmlFor="phone">Mobile number</Label>
-                            <div className="mt-1 flex overflow-hidden rounded-md border border-input bg-white">
-                                <span className="flex items-center border-r bg-gray-50 px-3 text-sm text-gray-600">🇬🇭 +233</span>
-                                <Input
-                                    id="phone"
-                                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                                    placeholder="24 000 0000"
-                                    value={data.phone}
-                                    onChange={(e) => setData('phone', e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <p className="mt-1 text-xs text-gray-500">Use a number you can reach for delivery.</p>
-                            <InputError message={errors.phone} />
-                        </div>
-                        <div>
-                            <Label htmlFor="secondary_phone">Secondary mobile (optional)</Label>
-                            <div className="mt-1 flex overflow-hidden rounded-md border border-input bg-white">
-                                <span className="flex items-center border-r bg-gray-50 px-3 text-sm text-gray-600">🇬🇭 +233</span>
-                                <Input
-                                    id="secondary_phone"
-                                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                                    placeholder="Optional"
-                                    value={data.secondary_phone}
-                                    onChange={(e) => setData('secondary_phone', e.target.value)}
-                                />
-                            </div>
-                            <InputError message={errors.secondary_phone} />
-                        </div>
+                        <PhoneField
+                            id="phone"
+                            label="Mobile number"
+                            dial={phoneDial}
+                            local={phoneLocal}
+                            onDialChange={setPhoneDial}
+                            onLocalChange={setPhoneLocal}
+                            placeholder="70 123 4567"
+                            required
+                            error={errors.phone}
+                            hint="Use a number you can reach for delivery."
+                        />
+                        <PhoneField
+                            id="secondary_phone"
+                            label="Secondary mobile (optional)"
+                            dial={secondaryDial}
+                            local={secondaryLocal}
+                            onDialChange={setSecondaryDial}
+                            onLocalChange={setSecondaryLocal}
+                            placeholder="Optional"
+                            error={errors.secondary_phone}
+                        />
                     </div>
 
                     <div className="space-y-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
@@ -165,20 +266,38 @@ export default function AddressForm({ address, defaults, returnTo }: FormProps) 
                             />
                             <InputError message={errors.additional_details} />
                         </div>
-                        <GhanaLocationFields
-                            region={data.region}
-                            city={data.city}
-                            onRegionChange={(region) => setData('region', region)}
-                            onCityChange={(city) => setData('city', city)}
-                            regionError={errors.region}
-                            cityError={errors.city}
-                        />
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <Label htmlFor="region">Province / District</Label>
+                                <Input
+                                    id="region"
+                                    className="mt-1"
+                                    placeholder="e.g. Western Province"
+                                    value={data.region}
+                                    onChange={(e) => setData('region', e.target.value)}
+                                    required
+                                />
+                                <InputError message={errors.region} />
+                            </div>
+                            <div>
+                                <Label htmlFor="city">City / Town</Label>
+                                <Input
+                                    id="city"
+                                    className="mt-1"
+                                    placeholder="e.g. Colombo"
+                                    value={data.city}
+                                    onChange={(e) => setData('city', e.target.value)}
+                                    required
+                                />
+                                <InputError message={errors.city} />
+                            </div>
+                        </div>
                         <div>
-                            <Label htmlFor="digital_address">Digital address (optional)</Label>
+                            <Label htmlFor="digital_address">Postal code (optional)</Label>
                             <Input
                                 id="digital_address"
                                 className="mt-1"
-                                placeholder="Ghana Post GPS"
+                                placeholder="e.g. 00300"
                                 value={data.digital_address}
                                 onChange={(e) => setData('digital_address', e.target.value)}
                             />

@@ -39,7 +39,7 @@ class HomeController extends Controller
         }
 
         if ($brand = $request->get('brand')) {
-            $query->where('brand', $brand);
+            $query->whereRaw('LOWER(brand) = ?', [mb_strtolower((string) $brand)]);
         }
 
         if ($request->filled('price_min')) {

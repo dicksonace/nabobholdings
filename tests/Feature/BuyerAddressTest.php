@@ -68,18 +68,18 @@ class BuyerAddressTest extends TestCase
             ->post(route('addresses.store'), [
                 'first_name' => 'Robert',
                 'last_name' => 'Asare',
-                'phone' => '0248520718',
-                'secondary_phone' => '0248520718',
-                'address_line' => 'Near Sefwi Bekwai station',
-                'region' => 'Western North',
-                'city' => 'Sefwi Bekwai',
+                'phone' => '0701234567',
+                'secondary_phone' => '0701234567',
+                'address_line' => 'Near Galle Face',
+                'region' => 'Western Province',
+                'city' => 'Colombo',
                 'is_default' => true,
             ])
             ->assertRedirect(route('addresses.index'));
 
         $this->assertDatabaseHas('buyer_addresses', [
             'user_id' => $buyer->id,
-            'city' => 'Sefwi Bekwai',
+            'city' => 'Colombo',
             'is_default' => 1,
         ]);
 
@@ -98,10 +98,10 @@ class BuyerAddressTest extends TestCase
             'user_id' => $buyer->id,
             'first_name' => 'Robert',
             'last_name' => 'Asare',
-            'phone' => '0248520718',
+            'phone' => '0701234567',
             'address_line' => 'Home',
-            'region' => 'Western',
-            'city' => 'Takoradi',
+            'region' => 'Southern Province',
+            'city' => 'Galle',
             'is_default' => true,
         ]);
 
@@ -127,11 +127,11 @@ class BuyerAddressTest extends TestCase
             'user_id' => $buyer->id,
             'first_name' => 'Robert',
             'last_name' => 'Asare',
-            'phone' => '0248520718',
+            'phone' => '0701234567',
             'address_line' => 'Near station',
             'additional_details' => 'Gate blue',
-            'region' => 'Western North',
-            'city' => 'Sefwi Bekwai',
+            'region' => 'Western Province',
+            'city' => 'Colombo',
             'is_default' => true,
         ]);
 
@@ -146,9 +146,9 @@ class BuyerAddressTest extends TestCase
         $this->assertDatabaseHas('orders', [
             'buyer_id' => $buyer->id,
             'receiver_name' => 'Robert Asare',
-            'receiver_phone' => '0248520718',
-            'region' => 'Western North',
-            'city' => 'Sefwi Bekwai',
+            'receiver_phone' => '0701234567',
+            'region' => 'Western Province',
+            'city' => 'Colombo',
         ]);
     }
 }
