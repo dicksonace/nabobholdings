@@ -284,7 +284,7 @@ class OrderService
                     'reference' => $order->payment_reference,
                 ]);
 
-                if ($paymentMethod !== 'cash' && $channel !== PaymentChannel::Direct) {
+                if (! Order::isOfflineMarketplacePayment($paymentMethod) && $channel !== PaymentChannel::Direct) {
                     $order->seller->notify(new PaymentConfirmedNotification($order->load('items'), $order->items->first(), pendingOrder: true));
                     if ($order->seller) {
                         AppNotificationService::notifySellerNewOrder(
@@ -307,7 +307,7 @@ class OrderService
             CartItem::where('user_id', $buyer->id)->delete();
 
             $checkout = $checkout->load('orders.items.seller');
-            if ($paymentMethod !== 'cash') {
+            if (! Order::isOfflineMarketplacePayment($paymentMethod)) {
                 $buyer->notify(new OrderPlacedNotification($checkout->orders->first(), checkout: $checkout));
             }
 
@@ -962,28 +962,34 @@ class OrderService
         ]);
     }
 
-    public function confirmCashOnDelivery(Checkout $checkout): Checkout
+    public function confirmCashOnDelivery(Checkout $checkout, string $paymentMethod = 'cash'): Checkout
     {
+        $cashOnDelivery = $paymentMethod === 'cash';
+
         foreach ($checkout->orders as $order) {
             $order->update([
                 'status' => OrderStatus::Pending,
-                'payment_method' => 'cash',
+                'payment_method' => $paymentMethod,
                 'payment_status' => PaymentStatus::Pending,
             ]);
         }
 
         $checkout->update(['status' => OrderStatus::Pending]);
-        $checkout->buyer->notify(new OrderPlacedNotification($checkout->orders->first(), cashOnDelivery: true, checkout: $checkout));
+        $checkout->buyer->notify(new OrderPlacedNotification(
+            $checkout->orders->first(),
+            cashOnDelivery: $cashOnDelivery,
+            checkout: $checkout,
+        ));
 
         foreach ($checkout->orders as $order) {
             foreach ($order->items as $item) {
-                $item->seller->notify(new PaymentConfirmedNotification($order, $item, cashOnDelivery: true));
+                $item->seller->notify(new PaymentConfirmedNotification($order, $item, cashOnDelivery: $cashOnDelivery));
                 if ($item->seller) {
                     AppNotificationService::notifySellerNewOrder(
                         $item->seller,
                         $order,
                         $item,
-                        cashOnDelivery: true,
+                        cashOnDelivery: $cashOnDelivery,
                     );
                 }
             }
@@ -1317,9 +1323,9 @@ class OrderService
     private function assertValidStatusTransition(OrderItem $item, OrderStatus $next): void
     {
         $item->loadMissing('order');
-        $isCod = $item->order?->payment_method === 'cash';
+        $usesCodSellerFlow = Order::isOfflineMarketplacePayment($item->order?->payment_method);
 
-        $flow = $isCod
+        $flow = $usesCodSellerFlow
             ? [
                 OrderStatus::Pending->value => [OrderStatus::Processing],
                 OrderStatus::Processing->value => [OrderStatus::CallConfirmed],

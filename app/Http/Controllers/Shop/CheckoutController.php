@@ -140,8 +140,8 @@ class CheckoutController extends Controller
 
         $shipping = $address->toShippingArray();
         $sellerCoupons = $request->input('seller_coupons', []);
-        $paymentMethod = 'cash';
         $checkoutOption = $request->string('payment_method')->toString();
+        $paymentMethod = $checkoutOption === 'bank_transfer' ? 'bank_transfer' : 'cash';
         $bankSlipPath = null;
 
         if ($checkoutOption === 'bank_transfer') {
@@ -165,7 +165,7 @@ class CheckoutController extends Controller
 
         DirectCheckoutDraft::clear($request);
 
-        $this->orderService->confirmCashOnDelivery($checkout);
+        $this->orderService->confirmCashOnDelivery($checkout, $paymentMethod);
 
         return redirect()->route('checkouts.show', $checkout)
             ->with('success', $checkoutOption === 'bank_transfer'

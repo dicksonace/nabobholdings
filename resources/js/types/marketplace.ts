@@ -347,7 +347,24 @@ export function buyerFulfillmentLabel(
         return 'Cash on delivery';
     }
 
+    if (paymentMethod === 'bank_transfer' && status === 'pending') {
+        return 'Bank transfer';
+    }
+
     return formatOrderStatus(status);
+}
+
+export function isOfflineCheckoutPayment(paymentMethod?: string | null): boolean {
+    return paymentMethod === 'cash' || paymentMethod === 'bank_transfer';
+}
+
+export function formatPaymentMethodLabel(paymentMethod?: string | null): string | null {
+    if (!paymentMethod) return null;
+    if (paymentMethod === 'cash') return 'Cash on delivery';
+    if (paymentMethod === 'bank_transfer') return 'Bank transfer';
+    if (paymentMethod === 'direct') return 'Direct payment';
+    if (paymentMethod === 'wallet') return 'Wallet';
+    return paymentMethod.replace(/_/g, ' ');
 }
 
 export function productEffectivePrice(product: { price: number; discount_price?: number | null }): number {

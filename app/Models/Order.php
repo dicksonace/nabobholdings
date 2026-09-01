@@ -60,6 +60,11 @@ class Order extends Model
         return 'CS'.date('Ymd').strtoupper(substr(uniqid(), -6));
     }
 
+    public static function isOfflineMarketplacePayment(?string $method): bool
+    {
+        return in_array($method, ['cash', 'bank_transfer'], true);
+    }
+
     public function buyer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'buyer_id');

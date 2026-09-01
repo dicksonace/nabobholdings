@@ -149,6 +149,12 @@ class SellerOrderPrintService
             return 'Cash on delivery';
         }
 
+        if ($order->payment_method === 'bank_transfer') {
+            return $order->payment_status->value === 'paid'
+                ? 'Bank transfer (verified)'
+                : 'Bank transfer (slip pending)';
+        }
+
         if ($order->payment_channel?->value === 'direct') {
             return $order->payment_status->value === 'paid'
                 ? 'Paid to seller (direct)'

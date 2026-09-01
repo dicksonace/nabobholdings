@@ -7,7 +7,7 @@ import OrderProgress from '@/components/shop/order-progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ShopLayout from '@/layouts/shop-layout';
-import { buyerFulfillmentLabel, formatOrderStatus, formatPrice, mostAdvancedItemStatus, orderStatusBadgeClass, Order, OrderItem, productImageUrl } from '@/types/marketplace';
+import { buyerFulfillmentLabel, formatOrderStatus, formatPaymentMethodLabel, formatPrice, isOfflineCheckoutPayment, mostAdvancedItemStatus, orderStatusBadgeClass, Order, OrderItem, productImageUrl } from '@/types/marketplace';
 
 interface CheckoutShowProps {
     checkout: {
@@ -265,6 +265,8 @@ export default function CheckoutShow({ checkout, reviews }: CheckoutShowProps) {
                             order.seller?.seller_profile?.business_name ?? order.seller?.name ?? 'Seller';
                         const primaryStatus = mostAdvancedItemStatus(order.items) ?? order.status;
                         const isCod = order.payment_method === 'cash';
+                        const isBankTransfer = order.payment_method === 'bank_transfer';
+                        const isOffline = isOfflineCheckoutPayment(order.payment_method);
                         const isOrderCancelled = order.status === 'cancelled';
 
                         return (
@@ -298,13 +300,17 @@ export default function CheckoutShow({ checkout, reviews }: CheckoutShowProps) {
                                                     className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${
                                                         isCod
                                                             ? 'bg-teal-600 text-white'
-                                                            : order.payment_status === 'paid'
-                                                              ? 'bg-emerald-600 text-white'
-                                                              : 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-200'
+                                                            : isBankTransfer
+                                                              ? order.payment_status === 'paid'
+                                                                  ? 'bg-emerald-600 text-white'
+                                                                  : 'bg-sky-600 text-white'
+                                                              : order.payment_status === 'paid'
+                                                                ? 'bg-emerald-600 text-white'
+                                                                : 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-200'
                                                     }`}
                                                 >
-                                                    {isCod
-                                                        ? 'Cash on delivery'
+                                                    {isOffline
+                                                        ? (formatPaymentMethodLabel(order.payment_method) ?? order.payment_method)
                                                         : order.payment_status === 'paid'
                                                           ? 'Paid'
                                                           : 'Awaiting payment'}
@@ -319,7 +325,7 @@ export default function CheckoutShow({ checkout, reviews }: CheckoutShowProps) {
                                     </div>
                                 </div>
 
-                                {(order.payment_status === 'paid' || order.payment_method === 'cash') && (
+                                {(order.payment_status === 'paid' || isOffline) && (
                                     <div className="mt-4 border-t pt-4">
                                         <OrderProgress status={primaryStatus} paymentMethod={order.payment_method} />
                                     </div>

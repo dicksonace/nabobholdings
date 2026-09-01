@@ -7,7 +7,7 @@ import OrderProgress from '@/components/shop/order-progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ShopLayout from '@/layouts/shop-layout';
-import { buyerFulfillmentLabel, formatPrice, formatOrderStatus, mostAdvancedItemStatus, orderStatusBadgeClass, Order, OrderItem, productImageUrl } from '@/types/marketplace';
+import { buyerFulfillmentLabel, formatPaymentMethodLabel, formatPrice, formatOrderStatus, isOfflineCheckoutPayment, mostAdvancedItemStatus, orderStatusBadgeClass, Order, OrderItem, productImageUrl } from '@/types/marketplace';
 
 interface OrderShowProps {
     order: Order & {
@@ -156,8 +156,10 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
         order.status === 'cancelled'
         || (order.items?.length > 0 && order.items.every((item) => item.status === 'cancelled'));
     const isCod = order.payment_method === 'cash';
-    const paymentPending = (order.payment_status === 'pending' || order.payment_status === 'failed') && !isCancelled && !isCod;
-    const paymentFailed = order.payment_status === 'failed' && !isCancelled && !isCod;
+    const isBankTransfer = order.payment_method === 'bank_transfer';
+    const isOffline = isOfflineCheckoutPayment(order.payment_method);
+    const paymentPending = (order.payment_status === 'pending' || order.payment_status === 'failed') && !isCancelled && !isOffline;
+    const paymentFailed = order.payment_status === 'failed' && !isCancelled && !isOffline;
     const primaryStatus = mostAdvancedItemStatus(order.items) ?? order.status;
 
     const paymentBadge = (() => {
@@ -166,6 +168,12 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
         }
         if (isCod) {
             return { label: 'Cash on delivery', className: 'bg-teal-600 text-white' };
+        }
+        if (isBankTransfer) {
+            return {
+                label: order.payment_status === 'paid' ? 'Bank transfer verified' : 'Bank transfer',
+                className: order.payment_status === 'paid' ? 'bg-emerald-600 text-white' : 'bg-sky-600 text-white',
+            };
         }
         if (order.payment_status === 'paid') {
             return { label: 'Paid', className: 'bg-emerald-600 text-white' };
@@ -240,7 +248,7 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
                         </div>
                     </div>
 
-                    {(order.payment_status === 'paid' || order.payment_method === 'cash') && (
+                    {(order.payment_status === 'paid' || isOffline) && (
                         <div className="mt-6 border-t pt-6">
                             <h3 className="mb-4 text-sm font-semibold text-gray-900">Order progress</h3>
                             <OrderProgress status={primaryStatus} paymentMethod={order.payment_method} />
@@ -257,7 +265,7 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
                         <div>
                             <h3 className="text-sm font-semibold text-gray-900">Payment</h3>
                             <p className="mt-1 text-sm text-gray-600 capitalize">
-                                {isCod ? 'Cash on delivery' : order.payment_method}
+                                {formatPaymentMethodLabel(order.payment_method) ?? order.payment_method}
                             </p>
                         </div>
                     </div>
@@ -289,8 +297,8 @@ export default function OrderShow({ order, reviews, checkoutNumber, checkoutId }
                                             ?? order.seller.name
                                             ?? 'Seller'}
                                     </p>
-                                    {isCod && (
-                                        <p className="mt-0.5 text-xs text-teal-700">Cash on delivery order</p>
+                                    {isOffline && (
+                                        <p className="mt-0.5 text-xs text-teal-700">{formatPaymentMethodLabel(order.payment_method)} order</p>
                                     )}
                                 </div>
                                 {order.seller.seller_profile?.slug && (

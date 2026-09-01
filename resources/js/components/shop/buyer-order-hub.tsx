@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { isOfflineCheckoutPayment } from '@/types/marketplace';
+
 interface OrderHubCounts {
     all: number;
     unpaid: number;
@@ -259,7 +261,7 @@ export function orderStatusMessage(order: {
     if (order.status === 'cancelled' || allItemsCancelled) {
         return 'Order cancelled';
     }
-    if (order.payment_status === 'pending' && order.payment_method !== 'cash') {
+    if (order.payment_status === 'pending' && !isOfflineCheckoutPayment(order.payment_method)) {
         return 'Waiting for payment';
     }
     if (order.status === 'shipped') {
@@ -282,9 +284,13 @@ export function orderStatusMessage(order: {
         return 'Seller confirmed your order by call';
     }
     if (order.status === 'processing' || order.status === 'pending') {
-        return order.payment_method === 'cash'
-            ? 'Cash on delivery · Seller is preparing your order'
-            : 'Seller is preparing your order';
+        if (order.payment_method === 'cash') {
+            return 'Cash on delivery · Seller is preparing your order';
+        }
+        if (order.payment_method === 'bank_transfer') {
+            return 'Bank transfer · Seller is preparing your order';
+        }
+        return 'Seller is preparing your order';
     }
     if (order.status === 'refunded' || order.payment_status === 'refunded') {
         return 'Refund processed';

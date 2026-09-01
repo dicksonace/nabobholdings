@@ -392,7 +392,12 @@ class OrderController extends Controller
         $checkout->update([
             'bank_slip_verified_at' => now(),
             'bank_slip_verified_by' => $request->user()->id,
+            'payment_status' => PaymentStatus::Paid,
         ]);
+
+        foreach ($checkout->orders as $order) {
+            $order->update(['payment_status' => PaymentStatus::Paid]);
+        }
 
         return back()->with('success', 'Bank slip marked as verified.');
     }

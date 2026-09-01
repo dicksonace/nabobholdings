@@ -149,6 +149,50 @@ class BuyerAddressTest extends TestCase
             'receiver_phone' => '0701234567',
             'region' => 'Western Province',
             'city' => 'Colombo',
+            'payment_method' => 'cash',
+        ]);
+    }
+
+    public function test_checkout_bank_transfer_stores_bank_transfer_payment_method(): void
+    {
+        $buyer = $this->buyer();
+        [, $product] = $this->approvedSellerWithProduct();
+
+        CartItem::create([
+            'user_id' => $buyer->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+        ]);
+
+        $address = BuyerAddress::create([
+            'user_id' => $buyer->id,
+            'first_name' => 'Robert',
+            'last_name' => 'Asare',
+            'phone' => '0701234567',
+            'address_line' => 'Near station',
+            'region' => 'Western Province',
+            'city' => 'Colombo',
+            'is_default' => true,
+        ]);
+
+        $slip = \Illuminate\Http\UploadedFile::fake()->image('slip.jpg');
+
+        $this->actingAs($buyer)
+            ->post(route('checkout.store'), [
+                'address_id' => $address->id,
+                'payment_method' => 'bank_transfer',
+                'bank_slip' => $slip,
+                'seller_payments' => [],
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('orders', [
+            'buyer_id' => $buyer->id,
+            'payment_method' => 'bank_transfer',
+        ]);
+
+        $this->assertDatabaseHas('checkouts', [
+            'buyer_id' => $buyer->id,
         ]);
     }
 }

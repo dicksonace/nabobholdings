@@ -155,6 +155,7 @@
 <body>
 @php
     $isCod = $order->payment_method === 'cash';
+    $isBankTransfer = $order->payment_method === 'bank_transfer';
     $shipToLines = array_values(array_filter([
         $order->digital_address,
         collect([$order->city, $order->region])->filter()->implode(', '),
@@ -218,7 +219,7 @@
         <td class="wrap">
             <strong>{{ $paymentLabel }}</strong>
             &nbsp;
-            <span class="pill">{{ $isCod ? 'COD' : strtoupper($order->payment_status->value) }}</span>
+            <span class="pill">{{ $isCod ? 'COD' : ($isBankTransfer ? 'BANK' : strtoupper($order->payment_status->value)) }}</span>
         </td>
         <td class="right muted">
             Lines: {{ $items->count() }} · Qty: {{ $items->sum('quantity') }}

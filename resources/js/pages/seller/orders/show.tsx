@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import SellerLayout from '@/layouts/seller-layout';
-import { formatPrice, formatOrderStatus, OrderItem, productImageUrl } from '@/types/marketplace';
+import { formatPrice, formatOrderStatus, isOfflineCheckoutPayment, OrderItem, productImageUrl } from '@/types/marketplace';
 
 interface DisputeInfo {
     id: number;
@@ -129,9 +129,11 @@ export default function SellerOrderShow({
     const image = orderItem.product?.images?.[0];
     const dispute = orderItem.dispute;
     const isCod = order.payment_method === 'cash';
-    const sellerFlow = isCod ? codSellerFlow : paidSellerFlow;
-    const next = nextSellerStatus(itemStatus, isCod);
-    const isTerminal = isCod
+    const isBankTransfer = order.payment_method === 'bank_transfer';
+    const usesCodFlow = isOfflineCheckoutPayment(order.payment_method);
+    const sellerFlow = usesCodFlow ? codSellerFlow : paidSellerFlow;
+    const next = nextSellerStatus(itemStatus, usesCodFlow);
+    const isTerminal = usesCodFlow
         ? ['cancelled', 'delivered', 'refunded'].includes(itemStatus)
         : ['cancelled', 'delivered', 'refunded', 'awaiting_confirmation'].includes(itemStatus);
     const needsDeliveryDetails = next === 'shipped';
@@ -276,13 +278,22 @@ export default function SellerOrderShow({
 
                         {itemStatus === 'pending' && (
                             <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">
-                                {isCod ? (
-                                    <>
-                                        <p className="font-semibold">New Order (Cash on Delivery)</p>
-                                        <p className="mt-1 text-amber-800">
-                                            Buyer will pay cash when you deliver. Start processing, call them to confirm, then pack and send.
-                                        </p>
-                                    </>
+                                {usesCodFlow ? (
+                                    isBankTransfer ? (
+                                        <>
+                                            <p className="font-semibold">New order (Bank transfer)</p>
+                                            <p className="mt-1 text-amber-800">
+                                                The buyer uploaded a bank deposit slip. Nabob Holdings will verify payment, then you can process, call, pack, and deliver.
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="font-semibold">New Order (Cash on Delivery)</p>
+                                            <p className="mt-1 text-amber-800">
+                                                Buyer will pay cash when you deliver. Start processing, call them to confirm, then pack and send.
+                                            </p>
+                                        </>
+                                    )
                                 ) : (
                                     <>
                                         <p className="font-semibold">New order — payment received</p>
@@ -292,7 +303,7 @@ export default function SellerOrderShow({
                             </div>
                         )}
 
-                        {isCod && itemStatus === 'processing' && (
+                        {usesCodFlow && itemStatus === 'processing' && (
                             <div className="mt-4 rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm text-teal-900">
                                 <p className="font-semibold">Call the buyer next</p>
                                 <p className="mt-1 text-teal-800">
@@ -309,17 +320,19 @@ export default function SellerOrderShow({
                             </div>
                         )}
 
-                        {isCod && itemStatus === 'call_confirmed' && (
+                        {usesCodFlow && itemStatus === 'call_confirmed' && (
                             <div className="mt-4 rounded-xl border border-fuchsia-100 bg-fuchsia-50 p-4 text-sm text-fuchsia-900">
                                 <p className="font-semibold">Call done — pack the order</p>
                                 <p className="mt-1 text-fuchsia-800">You confirmed with the buyer. Mark packing when the item is ready.</p>
                             </div>
                         )}
 
-                        {isCod && itemStatus === 'shipped' && (
+                        {usesCodFlow && itemStatus === 'shipped' && (
                             <div className="mt-4 rounded-xl border border-orange-100 bg-orange-50 p-4 text-sm text-orange-900">
                                 <p className="font-semibold">Package on the way</p>
-                                <p className="mt-1 text-orange-800">Collect cash on delivery, then tap Complete.</p>
+                                <p className="mt-1 text-orange-800">
+                                    {isCod ? 'Collect cash on delivery, then tap Complete.' : 'Complete the order once the buyer receives the item.'}
+                                </p>
                             </div>
                         )}
 

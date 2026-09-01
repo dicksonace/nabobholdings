@@ -4,7 +4,7 @@ import { Download, MapPin, Printer, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getSellerOrderStage } from '@/lib/seller-order-stages';
-import { formatOrderStatus, formatPrice, OrderItem, productImageUrl } from '@/types/marketplace';
+import { formatOrderStatus, formatPaymentMethodLabel, formatPrice, isOfflineCheckoutPayment, OrderItem, productImageUrl } from '@/types/marketplace';
 
 export type SellerOrderListItem = OrderItem & {
     order: {
@@ -46,7 +46,8 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
     const image = item.product?.images?.[0];
     const order = item.order;
     const stage = stageSlug ? getSellerOrderStage(stageSlug) : undefined;
-    const isCod = order.payment_method === 'cash';
+    const isBankTransfer = order.payment_method === 'bank_transfer';
+    const offlinePaymentLabel = formatPaymentMethodLabel(order.payment_method);
     const hasPaymentClaim = Boolean(order.direct_payment_reference || order.direct_payment_proof_path);
     const needsPaymentReview =
         order.payment_channel === 'direct' && order.payment_status === 'pending' && hasPaymentClaim;
@@ -55,7 +56,7 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
     const isDirect = order.payment_channel === 'direct';
     const isPaid = order.payment_status === 'paid';
 
-    const paymentLabel = isCod
+    const paymentLabel = isOfflineCheckoutPayment(order.payment_method)
         ? null
         : isDirect
             ? isPaid
@@ -92,9 +93,14 @@ export default function SellerOrderCard({ item, stageSlug }: SellerOrderCardProp
                     <div className="flex items-start justify-between gap-2">
                         <p className="line-clamp-2 font-semibold text-gray-900">{item.product_name}</p>
                         <div className="flex shrink-0 flex-col items-end gap-1">
-                            {isCod && (
-                                <span className="rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-teal-800">
-                                    Cash on delivery
+                            {isOfflineCheckoutPayment(order.payment_method) && offlinePaymentLabel && (
+                                <span
+                                    className={cn(
+                                        'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
+                                        isBankTransfer ? 'bg-sky-100 text-sky-800' : 'bg-teal-100 text-teal-800',
+                                    )}
+                                >
+                                    {offlinePaymentLabel}
                                 </span>
                             )}
                             <span

@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { codOrderFulfillmentSteps, formatOrderStatus, orderFulfillmentSteps } from '@/types/marketplace';
+import { codOrderFulfillmentSteps, formatOrderStatus, isOfflineCheckoutPayment, orderFulfillmentSteps } from '@/types/marketplace';
 
 interface OrderProgressProps {
     status: string;
@@ -36,9 +36,9 @@ const codStepIndex = (status: string): number => {
 };
 
 export default function OrderProgress({ status, paymentMethod, className }: OrderProgressProps) {
-    const isCod = paymentMethod === 'cash';
-    const steps = isCod ? codOrderFulfillmentSteps : orderFulfillmentSteps;
-    const current = isCod ? codStepIndex(status) : paidStepIndex(status);
+    const isOffline = isOfflineCheckoutPayment(paymentMethod);
+    const steps = isOffline ? codOrderFulfillmentSteps : orderFulfillmentSteps;
+    const current = isOffline ? codStepIndex(status) : paidStepIndex(status);
     const terminal = ['cancelled', 'refunded'].includes(status);
 
     if (terminal) {
@@ -87,7 +87,11 @@ export default function OrderProgress({ status, paymentMethod, className }: Orde
                 />
             </div>
             <p className="text-center text-sm font-medium text-gray-800">
-                {isCod && status === 'pending' ? 'Cash on delivery' : formatOrderStatus(status)}
+                {paymentMethod === 'cash' && status === 'pending'
+                    ? 'Cash on delivery'
+                    : paymentMethod === 'bank_transfer' && status === 'pending'
+                        ? 'Bank transfer'
+                        : formatOrderStatus(status)}
             </p>
         </div>
     );

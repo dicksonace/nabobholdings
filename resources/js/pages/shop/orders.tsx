@@ -4,7 +4,7 @@ import { ChevronRight, Package, Store, Truck } from 'lucide-react';
 import BuyerOrderHub, { OrderHubCounts, OrderStatusTabs, orderStatusMessage } from '@/components/shop/buyer-order-hub';
 import { Button } from '@/components/ui/button';
 import ShopLayout from '@/layouts/shop-layout';
-import { formatPrice, orderStatusBadgeClass, Paginated, productImageUrl } from '@/types/marketplace';
+import { formatPrice, isOfflineCheckoutPayment, orderStatusBadgeClass, Paginated, productImageUrl } from '@/types/marketplace';
 import { SharedData } from '@/types';
 
 interface PurchasePackage {
@@ -52,7 +52,7 @@ interface OrdersProps {
 
 function packageHeadline(pkg: PurchasePackage): string {
     if (pkg.status === 'cancelled') return 'Order closed';
-    if (pkg.payment_status === 'pending' && pkg.payment_method !== 'cash') return 'Awaiting payment';
+    if (pkg.payment_status === 'pending' && !isOfflineCheckoutPayment(pkg.payment_method)) return 'Awaiting payment';
     if (pkg.status === 'delivered') return 'Order completed';
     if (pkg.status === 'awaiting_confirmation') return 'Confirm delivery';
     if (pkg.status === 'shipped') return 'Out for delivery';
@@ -61,6 +61,7 @@ function packageHeadline(pkg: PurchasePackage): string {
     if (pkg.status === 'call_confirmed') return 'Seller called';
     if (pkg.status === 'processing') return 'Processing';
     if (pkg.payment_method === 'cash') return 'Cash on delivery';
+    if (pkg.payment_method === 'bank_transfer') return 'Bank transfer';
     return 'Processing';
 }
 
@@ -217,7 +218,7 @@ export default function Orders({ purchases, counts, tab }: OrdersProps) {
                                         <div className="flex flex-col items-stretch gap-2 border-t border-gray-50 px-3 py-3">
                                             <div className="flex flex-wrap justify-end gap-2">
                                             {pkg.payment_status === 'pending'
-                                                && pkg.payment_method !== 'cash'
+                                                && !isOfflineCheckoutPayment(pkg.payment_method)
                                                 && pkg.status !== 'cancelled'
                                                 && purchase.status !== 'cancelled' && (
                                                 <Button
