@@ -92,16 +92,14 @@ export default function Checkout({
         }
 
         const restoredPayment: CheckoutPaymentOption =
-            draft?.payment_method === 'bank_transfer' && bankAccounts.length > 0
-                ? 'bank_transfer'
-                : 'cod';
+            draft?.payment_method === 'bank_transfer' ? 'bank_transfer' : 'cod';
 
         return {
             address_id: restoredAddressId,
             payment_option: restoredPayment,
             seller_coupons: sellerCoupons,
         };
-    }, [addresses, bankAccounts.length, cartKey, selectedAddressId, sellerGroups]);
+    }, [addresses, cartKey, selectedAddressId, sellerGroups]);
 
     const [pickingAddress, setPickingAddress] = useState(false);
     const [activeAddressId, setActiveAddressId] = useState<number | null>(initialForm.address_id);
@@ -351,67 +349,68 @@ export default function Checkout({
                                     </div>
                                 </label>
 
-                                {bankAccounts.length > 0 && (
-                                    <label
-                                        className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
-                                            paymentOption === 'bank_transfer'
-                                                ? 'border-sky-400 bg-sky-50/60 ring-1 ring-sky-200'
-                                                : 'border-gray-100 hover:border-sky-200'
-                                        }`}
-                                    >
-                                        <input
-                                            type="radio"
-                                            name="payment_option"
-                                            value="bank_transfer"
-                                            checked={paymentOption === 'bank_transfer'}
-                                            onChange={() => selectPaymentOption('bank_transfer')}
-                                            className="mt-1"
-                                        />
-                                        <PaymentMethodIcon method="bank" />
-                                        <div className="min-w-0 flex-1">
-                                            <p className="font-medium text-gray-900">I already paid by bank transfer</p>
-                                            <p className="mt-0.5 text-xs text-gray-600">
-                                                Deposit to our bank account, then upload your payment slip when placing the order.
-                                            </p>
-                                        </div>
-                                    </label>
-                                )}
+                                <label
+                                    className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
+                                        paymentOption === 'bank_transfer'
+                                            ? 'border-sky-400 bg-sky-50/60 ring-1 ring-sky-200'
+                                            : 'border-gray-100 hover:border-sky-200'
+                                    }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="payment_option"
+                                        value="bank_transfer"
+                                        checked={paymentOption === 'bank_transfer'}
+                                        onChange={() => selectPaymentOption('bank_transfer')}
+                                        className="mt-1"
+                                    />
+                                    <PaymentMethodIcon method="bank" />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="font-medium text-gray-900">Bank Transfer</p>
+                                        <p className="mt-0.5 text-xs text-gray-600">
+                                            Pay into our bank account and upload your deposit slip below.
+                                        </p>
+                                    </div>
+                                </label>
                             </div>
 
                             {paymentOption === 'bank_transfer' && bankAccounts.length > 0 && (
-                                <>
-                                    <div className="mt-4 rounded-xl border border-sky-100 bg-sky-50/50 p-4 text-sm">
-                                        <p className="font-medium text-gray-900">Pay into one of these accounts</p>
-                                        <p className="mt-1 text-xs text-gray-500">
-                                            Transfer the order total, then upload your receipt below.
-                                        </p>
-                                        <ul className="mt-3 space-y-2">
-                                            {bankAccounts.map((account, index) => (
-                                                <li key={`${account.account_number}-${index}`} className="rounded-lg bg-white p-3 ring-1 ring-gray-100">
-                                                    <p className="font-medium text-gray-900">{account.bank_name ?? account.label ?? 'Bank account'}</p>
-                                                    <p className="text-gray-700">{account.account_name}</p>
-                                                    <p className="font-mono text-sm text-gray-900">{account.account_number}</p>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-
-                                    <div className="mt-4">
-                                        <DocumentUploadField
-                                            id="bank_slip"
-                                            label="Bank deposit slip"
-                                            hint="Upload a photo or PDF of your bank transfer receipt. Admin will verify it before processing."
-                                            required
-                                            value={bankSlip}
-                                            onChange={(file) => {
-                                                setBankSlip(file);
-                                                setBankSlipError(null);
-                                            }}
-                                        />
-                                        <InputError message={bankSlipError ?? undefined} className="mt-2" />
-                                    </div>
-                                </>
+                                <div className="mt-4 rounded-xl border border-sky-100 bg-sky-50/50 p-4 text-sm">
+                                    <p className="font-medium text-gray-900">Pay into one of these accounts</p>
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Transfer the order total, then upload your receipt below.
+                                    </p>
+                                    <ul className="mt-3 space-y-2">
+                                        {bankAccounts.map((account, index) => (
+                                            <li key={`${account.account_number}-${index}`} className="rounded-lg bg-white p-3 ring-1 ring-gray-100">
+                                                <p className="font-medium text-gray-900">{account.bank_name ?? account.label ?? 'Bank account'}</p>
+                                                <p className="text-gray-700">{account.account_name}</p>
+                                                <p className="font-mono text-sm text-gray-900">{account.account_number}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
+
+                            <div className="mt-4">
+                                <DocumentUploadField
+                                    id="bank_slip"
+                                    label="Bank deposit slip"
+                                    hint={
+                                        paymentOption === 'bank_transfer'
+                                            ? 'Upload a photo or PDF of your bank transfer receipt. Admin will verify it before processing.'
+                                            : 'Select Bank Transfer above to enable slip upload.'
+                                    }
+                                    required={paymentOption === 'bank_transfer'}
+                                    disabled={paymentOption !== 'bank_transfer'}
+                                    value={bankSlip}
+                                    onChange={(file) => {
+                                        setBankSlip(file);
+                                        setBankSlipError(null);
+                                    }}
+                                />
+                                <InputError message={bankSlipError ?? undefined} className="mt-2" />
+                            </div>
                         </div>
                     </div>
 

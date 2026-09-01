@@ -350,9 +350,44 @@ export function buyerFulfillmentLabel(
     return formatOrderStatus(status);
 }
 
+export function productEffectivePrice(product: { price: number; discount_price?: number | null }): number {
+    const price = Number(product.price) || 0;
+    const discount = product.discount_price != null ? Number(product.discount_price) : null;
+
+    if (discount !== null && discount > 0 && discount < price) {
+        return discount;
+    }
+
+    return price;
+}
+
+export function productHasDiscount(product: { price: number; discount_price?: number | null }): boolean {
+    const price = Number(product.price) || 0;
+    const discount = product.discount_price != null ? Number(product.discount_price) : null;
+
+    return discount !== null && discount > 0 && discount < price;
+}
+
+/** Integer percent for badges; floors so 99.9% never rounds up to 100%. */
+export function productDiscountPercent(product: { price: number; discount_price?: number | null }): number {
+    if (!productHasDiscount(product)) {
+        return 0;
+    }
+
+    const price = Number(product.price) || 0;
+    const discount = Number(product.discount_price);
+    const raw = (1 - discount / price) * 100;
+
+    return Math.min(99, Math.floor(raw));
+}
+
+const PRODUCT_IMAGE_PLACEHOLDER_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" fill="none"><rect width="400" height="300" fill="#F3F4F6"/><rect x="150" y="100" width="100" height="80" rx="8" fill="#E5E7EB"/><circle cx="175" cy="125" r="12" fill="#D1D5DB"/><path d="M150 170 L200 140 L250 170 L250 180 L150 180 Z" fill="#D1D5DB"/><text x="200" y="220" text-anchor="middle" fill="#9CA3AF" font-family="sans-serif" font-size="14">No image</text></svg>';
+
+export const PRODUCT_IMAGE_PLACEHOLDER = `data:image/svg+xml,${encodeURIComponent(PRODUCT_IMAGE_PLACEHOLDER_SVG)}`;
+
 export function productImageUrl(path: string | undefined): string {
-    if (!path) return '/images/product-placeholder.svg';
-    if (path.startsWith('http') || path.startsWith('blob:')) return path;
+    if (!path) return PRODUCT_IMAGE_PLACEHOLDER;
+    if (path.startsWith('http') || path.startsWith('blob:') || path.startsWith('data:')) return path;
     return `/storage/${path}`;
 }
 

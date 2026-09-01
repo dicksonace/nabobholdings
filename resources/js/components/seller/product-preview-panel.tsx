@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import ProductCard from '@/components/shop/product-card';
-import { Category, getCurrencySymbol, Product, SellerProfile, productImageUrl } from '@/types/marketplace';
+import { Category, getCurrencySymbol, Product, SellerProfile, productImageUrl, PRODUCT_IMAGE_PLACEHOLDER } from '@/types/marketplace';
 
 export interface ProductPreviewData {
     name: string;
@@ -24,6 +24,8 @@ interface ProductPreviewPanelProps {
     profile?: SellerProfile | null;
     previewMode: 'grid' | 'detail';
     onPreviewModeChange: (mode: 'grid' | 'detail') => void;
+    /** Hide delivery/shipping badges until the seller reaches the shipping step. */
+    showShippingBadges?: boolean;
 }
 
 export default function ProductPreviewPanel({
@@ -32,10 +34,13 @@ export default function ProductPreviewPanel({
     profile,
     previewMode,
     onPreviewModeChange,
+    showShippingBadges = true,
 }: ProductPreviewPanelProps) {
     const category = categories.find((c) => String(c.id) === data.category_id);
     const price = parseFloat(data.price) || 0;
     const discount = data.discount_price ? parseFloat(data.discount_price) : null;
+    const hasDiscount = discount !== null && !Number.isNaN(discount) && discount > 0 && discount < price;
+    const effectivePrice = hasDiscount ? discount! : price;
 
     const previewProduct = useMemo((): Product => ({
         id: 0,
@@ -45,10 +50,10 @@ export default function ProductPreviewPanel({
         slug: 'preview',
         description: data.description,
         price,
-        discount_price: discount && discount < price ? discount : null,
+        discount_price: hasDiscount ? discount : null,
         quantity: parseInt(data.quantity, 10) || 0,
         status: 'approved',
-        free_shipping: data.free_shipping,
+        free_shipping: showShippingBadges ? data.free_shipping : false,
         in_ghana: true,
         rating: 0,
         review_count: 0,
@@ -67,7 +72,7 @@ export default function ProductPreviewPanel({
             name: profile.business_name ?? 'Seller',
             seller_profile: profile,
         } : undefined,
-    }), [data, categories, category, profile, price, discount]);
+    }), [data, categories, category, profile, price, discount, hasDiscount, showShippingBadges]);
 
     return (
         <div className="sticky top-20 rounded-2xl border border-gray-200 bg-white shadow-sm lg:top-24">
@@ -101,24 +106,35 @@ export default function ProductPreviewPanel({
                     <div className="space-y-4">
                         <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-slate-50 to-orange-50/30 p-6">
                             {data.imagePreviews[0] ? (
-                                <img src={productImageUrl(data.imagePreviews[0])} alt="" className="max-h-full max-w-full object-contain" />
+                                <img
+                                    src={productImageUrl(data.imagePreviews[0])}
+                                    alt={data.name || 'Product preview'}
+                                    className="max-h-full max-w-full object-contain"
+                                    onError={(e) => {
+                                        e.currentTarget.src = PRODUCT_IMAGE_PLACEHOLDER;
+                                    }}
+                                />
                             ) : (
-                                <p className="text-sm text-gray-400">Add images</p>
+                                <img
+                                    src={PRODUCT_IMAGE_PLACEHOLDER}
+                                    alt=""
+                                    className="max-h-full max-w-full object-contain opacity-80"
+                                />
                             )}
                         </div>
                         <div>
                             {category && <p className="text-xs font-semibold uppercase text-blue-500">{category.name}</p>}
                             <h2 className="text-lg font-bold text-gray-900">{data.name || 'Product name'}</h2>
                             <p className="mt-2 text-2xl font-bold text-orange-500">
-                                {getCurrencySymbol()} {(discount && discount < price ? discount : price).toFixed(2)}
+                                {getCurrencySymbol()} {effectivePrice.toFixed(2)}
                             </p>
-                            {discount && discount < price && (
+                            {hasDiscount && (
                                 <p className="text-sm text-gray-400 line-through">{getCurrencySymbol()} {price.toFixed(2)}</p>
                             )}
                         </div>
-                        {data.free_shipping ? (
+                        {showShippingBadges && data.free_shipping ? (
                             <p className="text-sm text-emerald-600">✓ Free delivery</p>
-                        ) : data.delivery_fee ? (
+                        ) : showShippingBadges && data.delivery_fee ? (
                             <p className="text-sm text-gray-600">Delivery: {getCurrencySymbol()} {parseFloat(data.delivery_fee).toFixed(2)}</p>
                         ) : null}
                         {data.delivery_days && (

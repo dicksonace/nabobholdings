@@ -6,8 +6,9 @@ import ProductEngagementStats from '@/components/shop/product-engagement-stats';
 import RatingDisplay from '@/components/shop/rating-display';
 import SellerStoreLink from '@/components/shop/seller-store-link';
 import WishlistButton from '@/components/shop/wishlist-button';
-import { formatPrice, Product, productImageUrl } from '@/types/marketplace';
+import { formatPrice, Product, productDiscountPercent, productEffectivePrice, productHasDiscount, productImageUrl, PRODUCT_IMAGE_PLACEHOLDER } from '@/types/marketplace';
 import { SharedData } from '@/types';
+import { useEffect, useState } from 'react';
 
 interface ProductCardProps {
     product: Product;
@@ -17,10 +18,15 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, onAddToCart, variant = 'grid' }: ProductCardProps) {
     const { canShop = true } = usePage<SharedData>().props;
-    const price = product.discount_price ?? product.price;
-    const hasDiscount = product.discount_price && product.discount_price < product.price;
-    const discountPct = hasDiscount ? Math.round((1 - product.discount_price! / product.price) * 100) : 0;
+    const hasDiscount = productHasDiscount(product);
+    const price = productEffectivePrice(product);
+    const discountPct = productDiscountPercent(product);
     const image = product.images?.[0];
+    const [imageSrc, setImageSrc] = useState(() => productImageUrl(image?.path));
+
+    useEffect(() => {
+        setImageSrc(productImageUrl(image?.path));
+    }, [image?.path]);
     const sellerName = product.seller?.seller_profile?.business_name ?? product.seller?.name;
     const showAdd = Boolean(onAddToCart) && canShop;
     const views = product.views ?? 0;
@@ -31,7 +37,12 @@ export default function ProductCard({ product, onAddToCart, variant = 'grid' }: 
             <div className="group flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:border-orange-100 hover:shadow-md sm:flex-row sm:gap-4 sm:p-4">
                 <Link href={route('products.show', product.slug)} className="relative shrink-0 self-center sm:self-auto">
                     <div className="flex h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 p-3 sm:h-36 sm:w-36">
-                        <img src={productImageUrl(image?.path)} alt={product.name} className="max-h-full max-w-full object-contain transition-transform group-hover:scale-105" />
+                        <img
+                            src={imageSrc}
+                            alt={product.name}
+                            className="max-h-full max-w-full object-contain transition-transform group-hover:scale-105"
+                            onError={() => setImageSrc(PRODUCT_IMAGE_PLACEHOLDER)}
+                        />
                     </div>
                     {hasDiscount && (
                         <span className="absolute top-2 left-2 rounded-md bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">-{discountPct}%</span>
@@ -104,10 +115,11 @@ export default function ProductCard({ product, onAddToCart, variant = 'grid' }: 
                         </div>
                         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_30%_20%,rgba(251,146,60,0.08),transparent_50%)]" />
                         <img
-                            src={productImageUrl(image?.path)}
+                            src={imageSrc}
                             alt={product.name}
                             className="relative z-10 max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110"
                             loading="lazy"
+                            onError={() => setImageSrc(PRODUCT_IMAGE_PLACEHOLDER)}
                         />
                     </div>
                 </Link>

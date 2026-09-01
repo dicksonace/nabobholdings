@@ -515,6 +515,7 @@ export default function CreateProduct({ categories, profile }: CreateProductProp
                             profile={profile}
                             previewMode={previewMode}
                             onPreviewModeChange={setPreviewMode}
+                            showShippingBadges={step >= 2}
                         />
                     </div>
                 </div>

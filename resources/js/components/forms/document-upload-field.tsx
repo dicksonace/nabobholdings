@@ -19,6 +19,7 @@ interface DocumentUploadFieldProps {
     onClearExisting?: () => void;
     error?: string;
     className?: string;
+    disabled?: boolean;
 }
 
 function formatFileSize(bytes: number): string {
@@ -52,6 +53,7 @@ export default function DocumentUploadField({
     onClearExisting,
     error,
     className,
+    disabled = false,
 }: DocumentUploadFieldProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [dragOver, setDragOver] = useState(false);
@@ -131,35 +133,45 @@ export default function DocumentUploadField({
 
     return (
         <div className={cn('space-y-2', className)}>
-            <Label htmlFor={id} className="text-sm font-medium text-gray-900">
+            <Label htmlFor={id} className={cn('text-sm font-medium text-gray-900', disabled && 'text-gray-500')}>
                 {label}
-                {required && <span className="ml-0.5 text-red-500">*</span>}
+                {required && !disabled && <span className="ml-0.5 text-red-500">*</span>}
             </Label>
 
             <div
                 role="button"
-                tabIndex={0}
+                tabIndex={disabled ? -1 : 0}
                 onKeyDown={(e) => {
+                    if (disabled) return;
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         inputRef.current?.click();
                     }
                 }}
                 onDragOver={(e) => {
+                    if (disabled) return;
                     e.preventDefault();
                     setDragOver(true);
                 }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={(e) => {
+                    if (disabled) return;
                     e.preventDefault();
                     setDragOver(false);
                     handleFiles(e.dataTransfer.files);
                 }}
-                onClick={() => inputRef.current?.click()}
+                onClick={() => {
+                    if (!disabled) {
+                        inputRef.current?.click();
+                    }
+                }}
                 className={cn(
-                    'cursor-pointer rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors sm:px-6',
-                    dragOver ? 'border-orange-400 bg-orange-50' : 'border-gray-200 bg-gray-50 hover:border-orange-300 hover:bg-orange-50/40',
-                    displayError && 'border-red-300 bg-red-50/40',
+                    'rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors sm:px-6',
+                    disabled
+                        ? 'cursor-not-allowed border-gray-200 bg-gray-100 opacity-60'
+                        : 'cursor-pointer border-gray-200 bg-gray-50 hover:border-orange-300 hover:bg-orange-50/40',
+                    !disabled && dragOver && 'border-orange-400 bg-orange-50',
+                    !disabled && displayError && 'border-red-300 bg-red-50/40',
                 )}
             >
                 {hasSelection ? (
@@ -219,6 +231,7 @@ export default function DocumentUploadField({
                     type="file"
                     accept={accept}
                     className="hidden"
+                    disabled={disabled}
                     onChange={(e) => handleFiles(e.target.files)}
                 />
             </div>
