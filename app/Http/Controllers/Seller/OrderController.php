@@ -307,6 +307,11 @@ class OrderController extends Controller
     private function serializeOrderItem(OrderItem $orderItem): array
     {
         $order = $orderItem->order;
+        $order->loadMissing('checkout');
+        $paymentMethod = $order->payment_method;
+        if ($paymentMethod === 'cash' && filled($order->checkout?->bank_slip_path)) {
+            $paymentMethod = 'bank_transfer';
+        }
 
         return [
             'id' => $orderItem->id,
@@ -335,7 +340,7 @@ class OrderController extends Controller
                 'order_number' => $order->order_number,
                 'created_at' => $order->created_at?->toIso8601String(),
                 'payment_status' => $order->payment_status?->value ?? 'pending',
-                'payment_method' => $order->payment_method,
+                'payment_method' => $paymentMethod,
                 'payment_channel' => $order->payment_channel?->value,
                 'direct_payment_reference' => $order->direct_payment_reference,
                 'direct_payment_proof_path' => $order->direct_payment_proof_path,
