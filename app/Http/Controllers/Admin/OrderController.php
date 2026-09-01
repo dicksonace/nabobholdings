@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Checkout;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\OrderService;
@@ -310,5 +311,60 @@ class OrderController extends Controller
             'order' => $order,
             'checkout' => $order->checkout,
         ]);
+    }
+
+    public function codBankSlips(Request $request): Response
+    {
+        $status = $request->string('status')->toString();
+        if (! in_array($status, ['all', 'pending', 'verified'], true)) {
+            $status = 'pending';
+        }
+
+        $query = Checkout::query()
+            ->whereNotNull('bank_slip_path')
+            ->with(['buyer', 'orders'])
+            ->latest();
+
+        if ($status === 'pending') {
+            $query->whereNull('bank_slip_verified_at');
+        } elseif ($status === 'verified') {
+            $query->whereNotNull('bank_slip_verified_at');
+        }
+
+        $checkouts = $query->paginate(20)->withQueryString()->through(function (Checkout $checkout) {
+            return [
+                'id' => $checkout->id,
+                'checkout_number' => $checkout->checkout_number,
+                'total' => (float) $checkout->total,
+                'discount_amount' => (float) $checkout->discount_amount,
+                'created_at' => $checkout->created_at?->toIso8601String(),
+                'bank_slip_path' => $checkout->bank_slip_path,
+                'bank_slip_verified_at' => $checkout->bank_slip_verified_at?->toIso8601String(),
+                'buyer' => [
+                    'name' => $checkout->buyer?->name,
+                    'email' => $checkout->buyer?->email,
+                    'mobile' => $checkout->buyer?->mobile,
+                ],
+                'orders_count' => $checkout->orders->count(),
+            ];
+        });
+
+        return Inertia::render('admin/orders/cod-bank-slips', [
+            'checkouts' => $checkouts,
+            'status' => $status,
+            'pending_count' => Checkout::query()->whereNotNull('bank_slip_path')->whereNull('bank_slip_verified_at')->count(),
+        ]);
+    }
+
+    public function verifyBankSlip(Request $request, Checkout $checkout): RedirectResponse
+    {
+        abort_unless($checkout->bank_slip_path, 404);
+
+        $checkout->update([
+            'bank_slip_verified_at' => now(),
+            'bank_slip_verified_by' => $request->user()->id,
+        ]);
+
+        return back()->with('success', 'Bank slip marked as verified.');
     }
 }

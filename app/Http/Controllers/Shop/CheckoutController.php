@@ -11,6 +11,7 @@ use App\Models\Checkout;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\PaystackService;
+use App\Services\PlatformSettings;
 use App\Services\WalletService;
 use App\Support\DirectCheckoutDraft;
 use Illuminate\Http\JsonResponse;
@@ -93,19 +94,36 @@ class CheckoutController extends Controller
             'paystackPublicKey' => config('services.paystack.public_key'),
             'addresses' => $addresses,
             'selectedAddressId' => $selected['id'] ?? null,
+            'bankAccounts' => collect(PlatformSettings::manualFundingAccounts()['accounts'] ?? [])
+                ->where('type', 'bank')
+                ->values()
+                ->all(),
         ]);
+    }
+
+    public function preview(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'seller_coupons' => ['nullable', 'array'],
+            'seller_coupons.*' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        return response()->json(
+            $this->orderService->previewCheckoutTotals(
+                $request->user(),
+                $validated['seller_coupons'] ?? [],
+            ),
+        );
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'address_id' => ['required', 'integer'],
-            'payment_method' => ['required', 'in:momo,card,cash,wallet'],
-            'seller_payments' => ['nullable', 'array'],
-            'seller_payments.*.channel' => ['required_with:seller_payments', 'in:marketplace,direct'],
-            'seller_payments.*.method_id' => ['nullable', 'integer'],
+            'payment_method' => ['required', 'in:cash'],
             'seller_coupons' => ['nullable', 'array'],
             'seller_coupons.*' => ['nullable', 'string', 'max:30'],
+            'bank_slip' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
         ]);
 
         $address = BuyerAddress::query()
@@ -114,31 +132,20 @@ class CheckoutController extends Controller
             ->firstOrFail();
 
         $shipping = $address->toShippingArray();
-        $sellerPayments = $request->input('seller_payments', []);
         $sellerCoupons = $request->input('seller_coupons', []);
-        $paymentMethod = $request->string('payment_method')->toString();
-
-        // Pay-to-seller only: show bank/MoMo details without creating an order until proof is submitted.
-        if ($paymentMethod !== 'cash'
-            && $this->orderService->cartIsDirectOnly($request->user(), $sellerPayments)) {
-            DirectCheckoutDraft::put(
-                $request,
-                $address->id,
-                $shipping,
-                $sellerPayments,
-                $sellerCoupons,
-            );
-
-            return redirect()->route('checkout.direct-pay');
-        }
+        $paymentMethod = 'cash';
+        $bankSlipPath = $request->hasFile('bank_slip')
+            ? $request->file('bank_slip')->store('cod-bank-slips', 'public')
+            : null;
 
         try {
             $checkout = $this->orderService->createCheckoutFromCart(
                 $request->user(),
                 $shipping,
                 $paymentMethod,
-                $sellerPayments,
+                [],
                 $sellerCoupons,
+                $bankSlipPath,
             );
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
@@ -148,33 +155,12 @@ class CheckoutController extends Controller
 
         DirectCheckoutDraft::clear($request);
 
-        if ($paymentMethod === 'cash') {
-            $this->orderService->confirmCashOnDelivery($checkout);
+        $this->orderService->confirmCashOnDelivery($checkout);
 
-            return redirect()->route('checkouts.show', $checkout)
-                ->with('success', 'Order placed! Pay on delivery.');
-        }
-
-        if ($paymentMethod === 'wallet') {
-            try {
-                $this->orderService->payCheckoutWithWallet($checkout, $request->user());
-            } catch (ValidationException $e) {
-                return back()->withErrors($e->errors())->withInput();
-            }
-
-            $hasDirect = $checkout->fresh('orders')->orders
-                ->contains(fn ($order) => $order->payment_channel === PaymentChannel::Direct);
-
-            if ($hasDirect) {
-                return redirect()->route('checkout.payment', $checkout)
-                    ->with('success', 'Wallet payment applied. Complete direct seller payments below.');
-            }
-
-            return redirect()->route('checkouts.show', $checkout)
-                ->with('success', 'Order paid from your wallet.');
-        }
-
-        return redirect()->route('checkout.payment', $checkout);
+        return redirect()->route('checkouts.show', $checkout)
+            ->with('success', $bankSlipPath
+                ? 'Order placed! Pay on delivery. Your bank slip was uploaded for admin review.'
+                : 'Order placed! Pay on delivery.');
     }
 
     public function directPay(Request $request): Response|RedirectResponse

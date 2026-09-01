@@ -43,14 +43,95 @@ class OrderService
 
     /**
      * @param  array<string, array{channel: string, method_id?: int|null}>  $sellerPayments
+     * @return array{
+     *   subtotal: float,
+     *   shipping_total: float,
+     *   discount_total: float,
+     *   grand_total: float,
+     *   per_seller: array<int|string, array{subtotal: float, discount: float, shipping: float, total: float, error?: string}>
+     * }
      */
-    public function createCheckoutFromCart(User $buyer, array $shipping, string $paymentMethod, array $sellerPayments = [], array $sellerCoupons = []): Checkout
+    public function previewCheckoutTotals(User $buyer, array $sellerCoupons = []): array
     {
+        $grouped = $this->cartGroupedBySeller($buyer);
+        $subtotal = 0.0;
+        $shippingTotal = 0.0;
+        $discountTotal = 0.0;
+        $perSeller = [];
+
+        foreach ($grouped as $sellerId => $items) {
+            $orderSubtotal = (float) $items->sum(fn ($item) => $item->subtotal());
+            $subtotal += $orderSubtotal;
+
+            $couponDiscount = 0.0;
+            $couponError = null;
+            $couponCode = $sellerCoupons[$sellerId] ?? $sellerCoupons[(string) $sellerId] ?? null;
+
+            if ($couponCode) {
+                try {
+                    $result = $this->coupons->validateForSeller($buyer, (int) $sellerId, (string) $couponCode, $orderSubtotal);
+                    $couponDiscount = (float) $result['discount'];
+                    if ($result['coupon']->type === CouponType::FreeShipping) {
+                        $couponDiscount = 0.0;
+                    }
+                } catch (ValidationException $e) {
+                    $couponError = collect($e->errors())->flatten()->first();
+                }
+            }
+
+            $shipping = static::shippingMetaForSellerItems($items);
+            $shippingCost = (float) $shipping['cost'];
+            if ($couponCode && ! $couponError) {
+                try {
+                    $result = $this->coupons->validateForSeller($buyer, (int) $sellerId, (string) $couponCode, $orderSubtotal);
+                    if ($result['coupon']->type === CouponType::FreeShipping) {
+                        $shippingCost = 0.0;
+                    }
+                } catch (ValidationException) {
+                    // already captured
+                }
+            }
+
+            $goodsTotal = max(0, round($orderSubtotal - $couponDiscount, 2));
+            $packageTotal = round($goodsTotal + $shippingCost, 2);
+
+            $discountTotal += $couponDiscount;
+            $shippingTotal += $shippingCost;
+
+            $perSeller[$sellerId] = [
+                'subtotal' => $orderSubtotal,
+                'discount' => $couponDiscount,
+                'shipping' => $shippingCost,
+                'total' => $packageTotal,
+                'error' => $couponError,
+            ];
+        }
+
+        return [
+            'subtotal' => round($subtotal, 2),
+            'shipping_total' => round($shippingTotal, 2),
+            'discount_total' => round($discountTotal, 2),
+            'grand_total' => max(0, round($subtotal - $discountTotal + $shippingTotal, 2)),
+            'per_seller' => $perSeller,
+        ];
+    }
+
+    /**
+     * @param  array<string, array{channel: string, method_id?: int|null}>  $sellerPayments
+     */
+    public function createCheckoutFromCart(
+        User $buyer,
+        array $shipping,
+        string $paymentMethod,
+        array $sellerPayments = [],
+        array $sellerCoupons = [],
+        ?string $bankSlipPath = null,
+    ): Checkout {
         if ($buyer->isSeller()) {
             throw new \RuntimeException(\App\Http\Middleware\PreventSellerShopping::MESSAGE);
         }
 
-        return DB::transaction(function () use ($buyer, $shipping, $paymentMethod, $sellerPayments, $sellerCoupons) {
+        return DB::transaction(function () use ($buyer, $shipping, $paymentMethod, $sellerPayments, $sellerCoupons, $bankSlipPath) {
             $cartItems = CartItem::with(['product.seller.sellerProfile.paymentMethods'])
                 ->where('user_id', $buyer->id)
                 ->get();
@@ -88,6 +169,7 @@ class OrderService
                 'commission_amount' => 0,
                 'discount_amount' => 0,
                 'total' => $subtotal,
+                'bank_slip_path' => $bankSlipPath,
             ]);
 
             $totalDiscount = 0;

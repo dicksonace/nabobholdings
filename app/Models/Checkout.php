@@ -27,6 +27,9 @@ class Checkout extends Model
         'commission_amount',
         'discount_amount',
         'total',
+        'bank_slip_path',
+        'bank_slip_verified_at',
+        'bank_slip_verified_by',
     ];
 
     protected function casts(): array
@@ -39,6 +42,7 @@ class Checkout extends Model
             'commission_amount' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'total' => 'decimal:2',
+            'bank_slip_verified_at' => 'datetime',
         ];
     }
 

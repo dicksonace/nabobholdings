@@ -31,6 +31,7 @@ export type AdminNavKey =
     | 'promotions'
     | 'reviews'
     | 'buyers'
+    | 'cod-bank-slips'
     | 'wallet'
     | 'wallet-transactions'
     | 'wallet-withdrawals'
@@ -66,6 +67,7 @@ const sectionMap: Record<AdminNavKey, string> = {
     promotions: 'marketing',
     reviews: 'customers',
     buyers: 'customers',
+    'cod-bank-slips': 'finance',
     wallet: 'finance',
     'wallet-transactions': 'finance',
     'wallet-withdrawals': 'finance',
@@ -222,19 +224,13 @@ export function adminNavGroups(active: AdminNavKey, role: string = 'admin'): Pan
             icon: Wallet,
             defaultOpen: section === 'finance',
             items: [
-                { key: 'wallet', label: 'Store Wallet', href: route('manage.wallet'), mobile: true },
-                { key: 'wallet-transactions', label: 'Transactions', href: route('manage.wallet.transactions') },
-                { key: 'wallet-withdrawals', label: 'My Withdrawals', href: route('manage.wallet.withdrawals') },
-                { key: 'payment-methods', label: 'Payment Methods', href: route('manage.payment-methods.index') },
                 {
-                    key: 'withdrawals-buyers',
-                    label: 'Buyer Withdrawals',
-                    href: route('admin.withdrawals.index', { status: 'pending', role: 'buyer' }),
-                    badgeKey: 'pending_withdrawals',
+                    key: 'cod-bank-slips',
+                    label: 'Buyer payment slips',
+                    href: route('admin.orders.cod-bank-slips'),
+                    mobile: true,
+                    defaultOnPath: true,
                 },
-                { key: 'manual-top-ups', label: 'Manual Top-ups', href: route('admin.manual-top-ups.index'), badgeKey: 'pending_manual_top_ups' },
-                { key: 'manual-funding-settings', label: 'Receive Accounts', href: route('admin.manual-funding.settings') },
-                { key: 'wallet-funding', label: 'Adjust Buyer Wallets', href: route('admin.wallet-funding.index') },
             ],
         });
     }

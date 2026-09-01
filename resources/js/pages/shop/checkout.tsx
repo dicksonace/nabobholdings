@@ -1,11 +1,10 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ChevronRight, LoaderCircle, MapPin, Pencil } from 'lucide-react';
 import { FormEventHandler, useEffect, useMemo, useState } from 'react';
 
-import InputError from '@/components/input-error';
-import DirectPaymentDetails from '@/components/shop/direct-payment-details';
+import DocumentUploadField from '@/components/forms/document-upload-field';
 import PaymentMethodIcon from '@/components/shop/payment-method-icon';
-import SellerPaymentMethodPicker from '@/components/shop/seller-payment-method-picker';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,35 +15,36 @@ import {
     loadCheckoutDraft,
     saveCheckoutDraft,
 } from '@/lib/checkout-draft';
-import { isBankPaymentMethod } from '@/lib/payment-method-display';
 import { CartItem, formatPrice, productImageUrl, Wallet } from '@/types/marketplace';
 import { BuyerAddress } from '@/types/buyer-address';
+import { SharedData } from '@/types';
 
-interface SellerPaymentMethod {
-    id: number;
+interface BankAccount {
     type: string;
-    label: string | null;
+    label?: string;
     account_name: string;
-    account_number: string | null;
-    network: string | null;
-    bank_name: string | null;
-    instructions: string | null;
-    display_label?: string;
+    account_number: string;
+    bank_name?: string | null;
 }
 
 interface SellerGroup {
     seller_id: number;
     seller_name: string;
     store_slug?: string | null;
-    accept_marketplace_payments: boolean;
-    accept_direct_payments: boolean;
-    payment_methods: SellerPaymentMethod[];
     items: CartItem[];
     subtotal: number;
     shipping_cost: number;
     shipping_label: string;
     shipping_note?: string | null;
     package_total: number;
+}
+
+interface CouponPreview {
+    subtotal: number;
+    shipping_total: number;
+    discount_total: number;
+    grand_total: number;
+    per_seller: Record<string, { subtotal: number; discount: number; shipping: number; total: number; error?: string }>;
 }
 
 interface CheckoutProps {
@@ -55,6 +55,7 @@ interface CheckoutProps {
     wallet: Wallet;
     addresses: BuyerAddress[];
     selectedAddressId: number | null;
+    bankAccounts: BankAccount[];
 }
 
 export default function Checkout({
@@ -62,55 +63,20 @@ export default function Checkout({
     subtotal,
     shippingTotal,
     grandTotal,
-    wallet,
     addresses,
     selectedAddressId,
+    bankAccounts,
 }: CheckoutProps) {
+    const { csrfToken } = usePage<SharedData>().props;
     const cartKey = useMemo(() => checkoutCartKey(sellerGroups), [sellerGroups]);
 
     const initialForm = useMemo(() => {
-        const sellerPayments: Record<string, { channel: string; method_id?: number }> = {};
-        sellerGroups.forEach((group) => {
-            if (group.accept_direct_payments && !group.accept_marketplace_payments) {
-                sellerPayments[String(group.seller_id)] = {
-                    channel: 'direct',
-                    method_id: group.payment_methods[0]?.id,
-                };
-            } else {
-                sellerPayments[String(group.seller_id)] = { channel: 'marketplace' };
-            }
-        });
-
         const draft = loadCheckoutDraft(cartKey);
         const addressIds = new Set(addresses.map((a) => a.id));
         const restoredAddressId =
             draft?.address_id != null && addressIds.has(draft.address_id)
                 ? draft.address_id
                 : selectedAddressId;
-
-        const allowedMethods = new Set(['momo', 'card', 'cash', 'wallet']);
-        const paymentMethod =
-            draft?.payment_method && allowedMethods.has(draft.payment_method)
-                ? draft.payment_method
-                : 'momo';
-
-        if (draft?.seller_payments) {
-            sellerGroups.forEach((group) => {
-                const key = String(group.seller_id);
-                const saved = draft.seller_payments[key];
-                if (!saved) return;
-
-                if (saved.channel === 'direct' && group.accept_direct_payments) {
-                    const methodId =
-                        saved.method_id && group.payment_methods.some((m) => m.id === saved.method_id)
-                            ? saved.method_id
-                            : group.payment_methods[0]?.id;
-                    sellerPayments[key] = { channel: 'direct', method_id: methodId };
-                } else if (saved.channel === 'marketplace' && group.accept_marketplace_payments) {
-                    sellerPayments[key] = { channel: 'marketplace' };
-                }
-            });
-        }
 
         const sellerCoupons: Record<string, string> = {};
         if (draft?.seller_coupons) {
@@ -125,85 +91,105 @@ export default function Checkout({
 
         return {
             address_id: restoredAddressId,
-            payment_method: paymentMethod,
-            seller_payments: sellerPayments,
+            payment_method: 'cash' as const,
             seller_coupons: sellerCoupons,
         };
     }, [addresses, cartKey, selectedAddressId, sellerGroups]);
 
     const [pickingAddress, setPickingAddress] = useState(false);
     const [activeAddressId, setActiveAddressId] = useState<number | null>(initialForm.address_id);
-
-    const { data, setData, errors } = useForm(initialForm);
+    const [bankSlip, setBankSlip] = useState<File | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [couponPreview, setCouponPreview] = useState<CouponPreview | null>(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
 
-    useEffect(() => {
-        saveCheckoutDraft({
-            cartKey,
-            address_id: data.address_id,
-            payment_method: data.payment_method,
-            seller_payments: data.seller_payments,
-            seller_coupons: data.seller_coupons,
-        });
-    }, [cartKey, data.address_id, data.payment_method, data.seller_coupons, data.seller_payments]);
+    const [sellerCoupons, setSellerCoupons] = useState<Record<string, string>>(initialForm.seller_coupons);
 
     const selected =
-        addresses.find((a) => a.id === (activeAddressId ?? data.address_id))
+        addresses.find((a) => a.id === (activeAddressId ?? initialForm.address_id))
         ?? addresses.find((a) => a.is_default)
         ?? addresses[0]
         ?? null;
 
-    const setSellerChannel = (sellerId: number, channel: string, methodId?: number) => {
-        setData('seller_payments', {
-            ...data.seller_payments,
-            [String(sellerId)]: { channel, method_id: methodId },
+    useEffect(() => {
+        saveCheckoutDraft({
+            cartKey,
+            address_id: selected?.id ?? null,
+            payment_method: 'cash',
+            seller_payments: {},
+            seller_coupons: sellerCoupons,
         });
-    };
+    }, [cartKey, selected?.id, sellerCoupons]);
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            const hasCodes = Object.values(sellerCoupons).some((code) => code.trim() !== '');
+            if (!hasCodes) {
+                setCouponPreview(null);
+                return;
+            }
+
+            setPreviewLoading(true);
+            fetch(route('checkout.preview'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': csrfToken ?? '',
+                },
+                body: JSON.stringify({ seller_coupons: sellerCoupons }),
+            })
+                .then(async (res) => {
+                    if (!res.ok) {
+                        throw new Error('Preview failed');
+                    }
+                    return res.json() as Promise<CouponPreview>;
+                })
+                .then((data) => setCouponPreview(data))
+                .catch(() => setCouponPreview(null))
+                .finally(() => setPreviewLoading(false));
+        }, 350);
+
+        return () => window.clearTimeout(timer);
+    }, [csrfToken, sellerCoupons]);
+
+    const displaySubtotal = couponPreview?.subtotal ?? subtotal;
+    const displayShipping = couponPreview?.shipping_total ?? shippingTotal;
+    const displayDiscount = couponPreview?.discount_total ?? 0;
+    const displayTotal = couponPreview?.grand_total ?? grandTotal;
 
     const chooseAddress = (id: number) => {
         setActiveAddressId(id);
-        setData('address_id', id);
         setPickingAddress(false);
     };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        if (! selected) {
+        if (!selected) {
             router.visit(route('addresses.create', { return: 'checkout' }));
             return;
         }
+
         setSubmitting(true);
-        router.post(
-            route('checkout.store'),
-            {
-                address_id: selected.id,
-                payment_method: data.payment_method,
-                seller_payments: data.seller_payments,
-                seller_coupons: data.seller_coupons,
-            },
-            {
-                onSuccess: () => clearCheckoutDraft(),
-                onFinish: () => setSubmitting(false),
-            },
-        );
-    };
 
-    const marketplaceTotal = sellerGroups.reduce((sum, group) => {
-        const choice = data.seller_payments[String(group.seller_id)] ?? { channel: 'marketplace' };
-        const usesMarketplace = choice.channel === 'marketplace' && group.accept_marketplace_payments;
-        return usesMarketplace ? sum + group.package_total : sum;
-    }, 0);
-
-    const hasMarketplaceOrders = marketplaceTotal > 0;
-    const walletBalance = Number(wallet.available_balance);
-    const walletCoversMarketplace = walletBalance >= marketplaceTotal;
-    const canUseWallet = hasMarketplaceOrders && walletCoversMarketplace;
-
-    useEffect(() => {
-        if (data.payment_method === 'wallet' && !canUseWallet) {
-            setData('payment_method', 'momo');
+        const formData = new FormData();
+        formData.append('address_id', String(selected.id));
+        formData.append('payment_method', 'cash');
+        Object.entries(sellerCoupons).forEach(([sellerId, code]) => {
+            if (code.trim()) {
+                formData.append(`seller_coupons[${sellerId}]`, code.trim().toUpperCase());
+            }
+        });
+        if (bankSlip) {
+            formData.append('bank_slip', bankSlip);
         }
-    }, [canUseWallet, data.payment_method, setData]);
+
+        router.post(route('checkout.store'), formData, {
+            forceFormData: true,
+            onSuccess: () => clearCheckoutDraft(),
+            onFinish: () => setSubmitting(false),
+        });
+    };
 
     return (
         <ShopLayout>
@@ -236,7 +222,7 @@ export default function Checkout({
                                 )}
                             </div>
 
-                            {! selected ? (
+                            {!selected ? (
                                 <div className="mt-4 text-center">
                                     <p className="text-sm text-gray-500">Add a delivery address to continue.</p>
                                     <Button asChild className="mt-4 bg-orange-500 hover:bg-orange-600">
@@ -278,31 +264,14 @@ export default function Checkout({
                                 </ul>
                             ) : (
                                 <div className="mt-4 space-y-1 text-sm text-gray-700">
-                                    <p>
-                                        <span className="text-gray-500">Name:</span> {selected.full_name}
-                                    </p>
-                                    <p>
-                                        <span className="text-gray-500">Zone:</span> {selected.region}
-                                    </p>
-                                    <p>
-                                        <span className="text-gray-500">Town:</span> {selected.city}
-                                    </p>
-                                    <p>
-                                        <span className="text-gray-500">Address:</span> {selected.address_line}
-                                    </p>
+                                    <p><span className="text-gray-500">Name:</span> {selected.full_name}</p>
+                                    <p><span className="text-gray-500">Zone:</span> {selected.region}</p>
+                                    <p><span className="text-gray-500">Town:</span> {selected.city}</p>
+                                    <p><span className="text-gray-500">Address:</span> {selected.address_line}</p>
                                     {selected.additional_details && (
-                                        <p>
-                                            <span className="text-gray-500">Details:</span> {selected.additional_details}
-                                        </p>
+                                        <p><span className="text-gray-500">Details:</span> {selected.additional_details}</p>
                                     )}
-                                    <p>
-                                        <span className="text-gray-500">Mobile:</span> {selected.phone}
-                                    </p>
-                                    {selected.secondary_phone && (
-                                        <p>
-                                            <span className="text-gray-500">Secondary mobile:</span> {selected.secondary_phone}
-                                        </p>
-                                    )}
+                                    <p><span className="text-gray-500">Mobile:</span> {selected.phone}</p>
                                     <Button asChild size="sm" variant="outline" className="mt-3">
                                         <Link href={route('addresses.edit', { address: selected.id, return: 'checkout' })}>
                                             <Pencil className="mr-1 h-3.5 w-3.5" />
@@ -311,144 +280,88 @@ export default function Checkout({
                                     </Button>
                                 </div>
                             )}
-                            <InputError message={errors.address_id} className="mt-2" />
                         </div>
 
                         <div className="rounded-xl bg-white p-6 shadow-sm">
                             <h2 className="font-semibold text-gray-900">Payment</h2>
                             <p className="mt-1 text-sm text-gray-500">
-                                Pay with your wallet or via Paystack. Direct seller payments stay on the next step.
+                                Cash on delivery — pay the seller when your order arrives.
                             </p>
-                            <div className="mt-3 space-y-2">
-                                {hasMarketplaceOrders && (
-                                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 hover:bg-gray-50 ${data.payment_method === 'wallet' ? 'border-orange-300 bg-orange-50/40' : ''} ${!canUseWallet ? 'opacity-70' : ''}`}>
-                                        <PaymentMethodIcon method="wallet" />
-                                        <div className="min-w-0 flex-1">
-                                            <span className="font-medium">My Wallet</span>
-                                            <p className="text-sm text-gray-500">
-                                                Balance: {formatPrice(walletBalance)}
-                                                {marketplaceTotal > 0 && (
-                                                    <> · Nabob Holdings portion: {formatPrice(marketplaceTotal)}</>
-                                                )}
-                                            </p>
-                                            {!walletCoversMarketplace && (
-                                                <p className="mt-1 text-xs text-amber-600">
-                                                    Insufficient balance.{' '}
-                                                    <Link href={route('wallet.index')} className="underline">Add funds</Link>
-                                                </p>
-                                            )}
-                                        </div>
-                                        <input
-                                            type="radio"
-                                            name="payment_method"
-                                            value="wallet"
-                                            checked={data.payment_method === 'wallet'}
-                                            onChange={() => setData('payment_method', 'wallet')}
-                                            disabled={!canUseWallet}
-                                            className="mt-1"
-                                        />
-                                    </label>
-                                )}
-                                {([
-                                    { value: 'momo' as const, label: 'Mobile Money', hint: 'MTN MoMo via Paystack' },
-                                    { value: 'card' as const, label: 'Visa / Mastercard', hint: 'Pay securely via Paystack' },
-                                ]).map((method) => (
-                                    <label
-                                        key={method.value}
-                                        className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 hover:bg-gray-50 ${
-                                            data.payment_method === method.value ? 'border-orange-300 bg-orange-50/40' : ''
-                                        }`}
-                                    >
-                                        <PaymentMethodIcon method={method.value} />
-                                        <div className="min-w-0 flex-1">
-                                            <span className="font-medium text-gray-900">{method.label}</span>
-                                            <p className="text-xs text-gray-500">{method.hint}</p>
-                                        </div>
-                                        <input
-                                            type="radio"
-                                            name="payment_method"
-                                            value={method.value}
-                                            checked={data.payment_method === method.value}
-                                            onChange={() => setData('payment_method', method.value)}
-                                        />
-                                    </label>
-                                ))}
-                                <label
-                                    className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 hover:bg-gray-50 ${
-                                        data.payment_method === 'cash' ? 'border-orange-300 bg-orange-50/40' : ''
-                                    }`}
-                                >
+                            <div className="mt-3 rounded-xl border border-orange-200 bg-orange-50/40 p-3">
+                                <div className="flex items-start gap-3">
                                     <PaymentMethodIcon method="cash" />
                                     <div className="min-w-0 flex-1">
-                                        <span className="font-medium text-gray-900">Cash on Delivery</span>
-                                        <p className="mt-0.5 text-xs text-gray-500">
-                                            Pay when the seller brings the item.
-                                        </p>
-                                        <p className="mt-1 text-xs text-gray-500">
-                                            Note: Select a seller near your area, or check store information if near you.
+                                        <p className="font-medium text-gray-900">Cash on Delivery</p>
+                                        <p className="mt-0.5 text-xs text-gray-600">
+                                            Pay when the seller delivers. You can optionally upload a bank deposit slip if you paid in advance.
                                         </p>
                                         {sellerGroups.some((g) => g.store_slug) && (
-                                            <div
-                                                className="mt-2 flex flex-wrap gap-1.5"
-                                                onClick={(e) => e.preventDefault()}
-                                            >
-                                                {sellerGroups
-                                                    .filter((g) => g.store_slug)
-                                                    .map((g) => (
-                                                        <Link
-                                                            key={g.seller_id}
-                                                            href={route('store.show', g.store_slug!)}
-                                                            className="inline-flex items-center gap-0.5 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-orange-600 ring-1 ring-orange-100 hover:bg-orange-100"
-                                                        >
-                                                            Visit {g.seller_name}
-                                                            <ChevronRight className="h-3 w-3" />
-                                                        </Link>
-                                                    ))}
+                                            <div className="mt-2 flex flex-wrap gap-1.5">
+                                                {sellerGroups.filter((g) => g.store_slug).map((g) => (
+                                                    <Link
+                                                        key={g.seller_id}
+                                                        href={route('store.show', g.store_slug!)}
+                                                        className="inline-flex items-center gap-0.5 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-orange-600 ring-1 ring-orange-100 hover:bg-orange-50"
+                                                    >
+                                                        Visit {g.seller_name}
+                                                        <ChevronRight className="h-3 w-3" />
+                                                    </Link>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
-                                    <input
-                                        type="radio"
-                                        name="payment_method"
-                                        value="cash"
-                                        checked={data.payment_method === 'cash'}
-                                        onChange={() => setData('payment_method', 'cash')}
-                                        className="mt-1"
-                                    />
-                                </label>
+                                </div>
                             </div>
-                            <InputError message={errors.payment_method} />
+
+                            {bankAccounts.length > 0 && (
+                                <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm">
+                                    <p className="font-medium text-gray-900">Bank transfer (optional)</p>
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Deposit to one of these accounts, then upload your slip below.
+                                    </p>
+                                    <ul className="mt-3 space-y-2">
+                                        {bankAccounts.map((account, index) => (
+                                            <li key={`${account.account_number}-${index}`} className="rounded-lg bg-white p-3 ring-1 ring-gray-100">
+                                                <p className="font-medium text-gray-900">{account.bank_name ?? account.label ?? 'Bank account'}</p>
+                                                <p className="text-gray-700">{account.account_name}</p>
+                                                <p className="font-mono text-sm text-gray-900">{account.account_number}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            <div className="mt-4">
+                                <DocumentUploadField
+                                    id="bank_slip"
+                                    label="Bank deposit slip (optional)"
+                                    hint="Upload a photo or PDF of your bank transfer receipt. Admin will verify it."
+                                    required={false}
+                                    value={bankSlip}
+                                    onChange={setBankSlip}
+                                />
+                            </div>
                         </div>
                     </div>
 
                     <div className="space-y-4">
-                        {sellerGroups.map((group) => {
-                            const choice = data.seller_payments[String(group.seller_id)] ?? { channel: 'marketplace' };
+                        {sellerGroups.map((group, index) => {
+                            const sellerKey = String(group.seller_id);
+                            const preview = couponPreview?.per_seller?.[sellerKey] ?? couponPreview?.per_seller?.[group.seller_id];
 
                             return (
                                 <div key={group.seller_id} className="rounded-xl bg-white p-6 shadow-sm">
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="min-w-0 flex-1">
                                             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                                Package · {sellerGroups.findIndex((g) => g.seller_id === group.seller_id) + 1} of {sellerGroups.length}
+                                                Package · {index + 1} of {sellerGroups.length}
                                             </p>
                                             <h2 className="font-semibold text-gray-900">{group.seller_name}</h2>
-                                            {data.payment_method === 'cash' && (
-                                                <p className="mt-0.5 text-xs text-teal-700">Cash on delivery · pay this seller on arrival</p>
-                                            )}
+                                            <p className="mt-0.5 text-xs text-teal-700">Cash on delivery · pay on arrival</p>
                                         </div>
-                                        <div className="flex shrink-0 flex-col items-end gap-2">
-                                            <span className="text-sm font-medium text-orange-500">{formatPrice(group.package_total)}</span>
-                                            {group.store_slug && (
-                                                <Link
-                                                    href={route('store.show', group.store_slug)}
-                                                    className="inline-flex items-center gap-0.5 rounded-full bg-orange-50 px-2.5 py-1.5 text-xs font-semibold text-orange-600 ring-1 ring-orange-100 hover:bg-orange-100"
-                                                >
-                                                    Visit
-                                                    <ChevronRight className="h-3.5 w-3.5" />
-                                                </Link>
-                                            )}
-                                        </div>
+                                        <span className="text-sm font-medium text-orange-500">
+                                            {formatPrice(preview?.total ?? group.package_total)}
+                                        </span>
                                     </div>
                                     <div className="mt-3 space-y-2">
                                         {group.items.map((item) => (
@@ -464,101 +377,37 @@ export default function Checkout({
                                     <div className="mt-3 space-y-1 border-t pt-3 text-sm">
                                         <div className="flex justify-between text-gray-600">
                                             <span>Items</span>
-                                            <span>{formatPrice(group.subtotal)}</span>
+                                            <span>{formatPrice(preview?.subtotal ?? group.subtotal)}</span>
                                         </div>
+                                        {(preview?.discount ?? 0) > 0 && (
+                                            <div className="flex justify-between text-emerald-700">
+                                                <span>Coupon discount</span>
+                                                <span>-{formatPrice(preview?.discount ?? 0)}</span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between text-gray-600">
-                                            <span>
-                                                {group.shipping_label}
-                                                {group.shipping_note ? (
-                                                    <span className="mt-0.5 block text-xs text-gray-400">{group.shipping_note}</span>
-                                                ) : null}
-                                            </span>
-                                            <span>{group.shipping_cost > 0 ? formatPrice(group.shipping_cost) : group.shipping_label === 'Arrange with seller' ? '—' : formatPrice(0)}</span>
+                                            <span>{group.shipping_label}</span>
+                                            <span>{formatPrice(preview?.shipping ?? group.shipping_cost)}</span>
                                         </div>
                                     </div>
-
-                                    {data.payment_method !== 'cash' &&
-                                        (data.payment_method !== 'wallet' || group.accept_direct_payments) &&
-                                        (group.accept_marketplace_payments || group.accept_direct_payments) && (
-                                        <div className="mt-4 border-t pt-4">
-                                            <p className="text-sm font-medium text-gray-700">How to pay this seller</p>
-                                            <div className="mt-2 space-y-2">
-                                                {group.accept_marketplace_payments && (
-                                                    <label
-                                                        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-2.5 text-sm ${
-                                                            choice.channel === 'marketplace' ? 'border-orange-300 bg-orange-50/40' : ''
-                                                        }`}
-                                                    >
-                                                        <PaymentMethodIcon method="card" />
-                                                        <span className="min-w-0 flex-1 font-medium text-gray-900">Pay via Nabob Holdings (secure)</span>
-                                                        <input type="radio" checked={choice.channel === 'marketplace'} onChange={() => setSellerChannel(group.seller_id, 'marketplace')} />
-                                                    </label>
-                                                )}
-                                                {group.accept_direct_payments && (
-                                                    <label
-                                                        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-2.5 text-sm ${
-                                                            choice.channel === 'direct' ? 'border-orange-300 bg-orange-50/40' : ''
-                                                        }`}
-                                                    >
-                                                        {group.payment_methods.every((m) => isBankPaymentMethod(m)) && group.payment_methods.length > 0 ? (
-                                                            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-[10px] font-black text-white shadow-sm">
-                                                                BANK
-                                                            </span>
-                                                        ) : (
-                                                            <PaymentMethodIcon method="momo" />
-                                                        )}
-                                                        <span className="min-w-0 flex-1 font-medium text-gray-900">Pay seller directly</span>
-                                                        <input type="radio" checked={choice.channel === 'direct'} onChange={() => setSellerChannel(group.seller_id, 'direct', group.payment_methods[0]?.id)} />
-                                                    </label>
-                                                )}
-                                                {choice.channel === 'direct' && group.payment_methods.length > 0 && (() => {
-                                                    const selectedId = choice.method_id ?? group.payment_methods[0]?.id;
-                                                    const selectedMethod =
-                                                        group.payment_methods.find((m) => m.id === selectedId)
-                                                        ?? group.payment_methods[0];
-                                                    const selectedIsBank = isBankPaymentMethod(selectedMethod);
-
-                                                    return (
-                                                        <div className="ml-1 space-y-3 border-l-2 border-sky-100 pl-3">
-                                                            <SellerPaymentMethodPicker
-                                                                methods={group.payment_methods}
-                                                                selectedId={selectedId}
-                                                                onSelect={(methodId) => setSellerChannel(group.seller_id, 'direct', methodId)}
-                                                            />
-                                                            {selectedMethod?.account_number && (
-                                                                <DirectPaymentDetails
-                                                                    accountNumber={selectedMethod.account_number}
-                                                                    accountName={selectedMethod.account_name}
-                                                                    network={selectedIsBank ? null : selectedMethod.network}
-                                                                    isBank={selectedIsBank}
-                                                                    bankName={selectedMethod.bank_name}
-                                                                    hint={
-                                                                        selectedIsBank
-                                                                            ? 'After you continue, send the payment to this bank account. You’ll confirm on the next step.'
-                                                                            : 'After you continue, send the payment to this number. You’ll confirm on the next step — no MoMo reference needed.'
-                                                                    }
-                                                                />
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })()}
-                                            </div>
-                                        </div>
-                                    )}
 
                                     <div className="mt-4 border-t pt-4">
                                         <Label className="text-sm">Coupon code (optional)</Label>
                                         <Input
                                             className="mt-1 font-mono uppercase"
                                             placeholder="SAVE10"
-                                            value={data.seller_coupons[String(group.seller_id)] ?? ''}
-                                            onChange={(e) => setData('seller_coupons', {
-                                                ...data.seller_coupons,
-                                                [String(group.seller_id)]: e.target.value.toUpperCase(),
-                                            })}
+                                            value={sellerCoupons[sellerKey] ?? ''}
+                                            onChange={(e) =>
+                                                setSellerCoupons({
+                                                    ...sellerCoupons,
+                                                    [sellerKey]: e.target.value.toUpperCase(),
+                                                })
+                                            }
                                         />
+                                        {preview?.error && (
+                                            <p className="mt-1 text-xs text-red-600">{preview.error}</p>
+                                        )}
                                     </div>
-                                    <InputError message={errors.coupon} />
                                 </div>
                             );
                         })}
@@ -567,29 +416,38 @@ export default function Checkout({
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between text-gray-600">
                                     <span>Items ({sellerGroups.length} package{sellerGroups.length === 1 ? '' : 's'})</span>
-                                    <span>{formatPrice(subtotal)}</span>
+                                    <span>{formatPrice(displaySubtotal)}</span>
                                 </div>
+                                {displayDiscount > 0 && (
+                                    <div className="flex justify-between text-emerald-700">
+                                        <span>Coupon discount</span>
+                                        <span>-{formatPrice(displayDiscount)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between text-gray-600">
                                     <span>Delivery</span>
-                                    <span>{shippingTotal > 0 ? formatPrice(shippingTotal) : formatPrice(0)}</span>
+                                    <span>{formatPrice(displayShipping)}</span>
                                 </div>
                                 <div className="flex justify-between border-t pt-2 text-lg font-bold">
                                     <span>Total</span>
-                                    <span className="text-orange-500">{formatPrice(grandTotal)}</span>
+                                    <span className="text-orange-500">
+                                        {previewLoading ? '…' : formatPrice(displayTotal)}
+                                    </span>
                                 </div>
                             </div>
                             <Button
                                 type="submit"
                                 disabled={submitting || !selected}
-                                className="mt-6 w-full bg-orange-500 py-6 hover:bg-orange-600"
+                                className="mt-6 w-full bg-orange-500 py-6 hover:bg-orange-600 disabled:opacity-60"
                             >
                                 {submitting && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                                {data.payment_method === 'cash'
-                                    ? 'Place Order'
-                                    : data.payment_method === 'wallet'
-                                      ? 'Pay with Wallet'
-                                      : 'Continue to Payment'}
+                                Place Order
                             </Button>
+                            {!selected && (
+                                <p className="mt-2 text-center text-xs text-amber-700">
+                                    Add a delivery address above to enable Place Order.
+                                </p>
+                            )}
                         </div>
                     </div>
                 </form>
