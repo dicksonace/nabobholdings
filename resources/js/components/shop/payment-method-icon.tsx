@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 interface PaymentMethodIconProps {
-    method: 'momo' | 'card' | 'cash' | 'wallet';
+    method: 'momo' | 'card' | 'cash' | 'wallet' | 'bank';
     className?: string;
 }
 
@@ -60,6 +60,20 @@ export default function PaymentMethodIcon({ method, className }: PaymentMethodIc
                 aria-hidden
             >
                 ₵
+            </span>
+        );
+    }
+
+    if (method === 'bank') {
+        return (
+            <span
+                className={cn(
+                    'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-[10px] font-bold text-sky-700 shadow-sm',
+                    className,
+                )}
+                aria-hidden
+            >
+                BANK
             </span>
         );
     }

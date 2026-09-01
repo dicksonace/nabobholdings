@@ -18,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -120,10 +121,16 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'address_id' => ['required', 'integer'],
-            'payment_method' => ['required', 'in:cash'],
+            'payment_method' => ['required', 'in:cod,bank_transfer'],
             'seller_coupons' => ['nullable', 'array'],
             'seller_coupons.*' => ['nullable', 'string', 'max:30'],
-            'bank_slip' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
+            'bank_slip' => [
+                Rule::requiredIf(fn () => $request->input('payment_method') === 'bank_transfer'),
+                'nullable',
+                'file',
+                'mimes:jpg,jpeg,png,webp,pdf',
+                'max:5120',
+            ],
         ]);
 
         $address = BuyerAddress::query()
@@ -134,9 +141,12 @@ class CheckoutController extends Controller
         $shipping = $address->toShippingArray();
         $sellerCoupons = $request->input('seller_coupons', []);
         $paymentMethod = 'cash';
-        $bankSlipPath = $request->hasFile('bank_slip')
-            ? $request->file('bank_slip')->store('cod-bank-slips', 'public')
-            : null;
+        $checkoutOption = $request->string('payment_method')->toString();
+        $bankSlipPath = null;
+
+        if ($checkoutOption === 'bank_transfer') {
+            $bankSlipPath = $request->file('bank_slip')->store('cod-bank-slips', 'public');
+        }
 
         try {
             $checkout = $this->orderService->createCheckoutFromCart(
@@ -158,9 +168,9 @@ class CheckoutController extends Controller
         $this->orderService->confirmCashOnDelivery($checkout);
 
         return redirect()->route('checkouts.show', $checkout)
-            ->with('success', $bankSlipPath
-                ? 'Order placed! Pay on delivery. Your bank slip was uploaded for admin review.'
-                : 'Order placed! Pay on delivery.');
+            ->with('success', $checkoutOption === 'bank_transfer'
+                ? 'Order placed! We received your bank slip and will verify your payment.'
+                : 'Order placed! Pay on delivery when your order arrives.');
     }
 
     public function directPay(Request $request): Response|RedirectResponse

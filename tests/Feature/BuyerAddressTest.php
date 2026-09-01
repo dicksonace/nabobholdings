@@ -138,7 +138,7 @@ class BuyerAddressTest extends TestCase
         $this->actingAs($buyer)
             ->post(route('checkout.store'), [
                 'address_id' => $address->id,
-                'payment_method' => 'cash',
+                'payment_method' => 'cod',
                 'seller_payments' => [],
             ])
             ->assertRedirect();

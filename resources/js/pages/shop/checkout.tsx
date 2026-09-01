@@ -19,6 +19,8 @@ import { CartItem, formatPrice, productImageUrl, Wallet } from '@/types/marketpl
 import { BuyerAddress } from '@/types/buyer-address';
 import { SharedData } from '@/types';
 
+type CheckoutPaymentOption = 'cod' | 'bank_transfer';
+
 interface BankAccount {
     type: string;
     label?: string;
@@ -89,16 +91,23 @@ export default function Checkout({
             });
         }
 
+        const restoredPayment: CheckoutPaymentOption =
+            draft?.payment_method === 'bank_transfer' && bankAccounts.length > 0
+                ? 'bank_transfer'
+                : 'cod';
+
         return {
             address_id: restoredAddressId,
-            payment_method: 'cash' as const,
+            payment_option: restoredPayment,
             seller_coupons: sellerCoupons,
         };
-    }, [addresses, cartKey, selectedAddressId, sellerGroups]);
+    }, [addresses, bankAccounts.length, cartKey, selectedAddressId, sellerGroups]);
 
     const [pickingAddress, setPickingAddress] = useState(false);
     const [activeAddressId, setActiveAddressId] = useState<number | null>(initialForm.address_id);
     const [bankSlip, setBankSlip] = useState<File | null>(null);
+    const [bankSlipError, setBankSlipError] = useState<string | null>(null);
+    const [paymentOption, setPaymentOption] = useState<CheckoutPaymentOption>(initialForm.payment_option);
     const [submitting, setSubmitting] = useState(false);
     const [couponPreview, setCouponPreview] = useState<CouponPreview | null>(null);
     const [previewLoading, setPreviewLoading] = useState(false);
@@ -115,11 +124,19 @@ export default function Checkout({
         saveCheckoutDraft({
             cartKey,
             address_id: selected?.id ?? null,
-            payment_method: 'cash',
+            payment_method: paymentOption,
             seller_payments: {},
             seller_coupons: sellerCoupons,
         });
-    }, [cartKey, selected?.id, sellerCoupons]);
+    }, [cartKey, paymentOption, selected?.id, sellerCoupons]);
+
+    const selectPaymentOption = (option: CheckoutPaymentOption) => {
+        setPaymentOption(option);
+        setBankSlipError(null);
+        if (option === 'cod') {
+            setBankSlip(null);
+        }
+    };
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
@@ -170,17 +187,23 @@ export default function Checkout({
             return;
         }
 
+        if (paymentOption === 'bank_transfer' && !bankSlip) {
+            setBankSlipError('Upload your bank deposit slip to continue.');
+            return;
+        }
+
         setSubmitting(true);
+        setBankSlipError(null);
 
         const formData = new FormData();
         formData.append('address_id', String(selected.id));
-        formData.append('payment_method', 'cash');
+        formData.append('payment_method', paymentOption);
         Object.entries(sellerCoupons).forEach(([sellerId, code]) => {
             if (code.trim()) {
                 formData.append(`seller_coupons[${sellerId}]`, code.trim().toUpperCase());
             }
         });
-        if (bankSlip) {
+        if (paymentOption === 'bank_transfer' && bankSlip) {
             formData.append('bank_slip', bankSlip);
         }
 
@@ -285,23 +308,39 @@ export default function Checkout({
                         <div className="rounded-xl bg-white p-6 shadow-sm">
                             <h2 className="font-semibold text-gray-900">Payment</h2>
                             <p className="mt-1 text-sm text-gray-500">
-                                Cash on delivery — pay the seller when your order arrives.
+                                Choose how you will pay for this order.
                             </p>
-                            <div className="mt-3 rounded-xl border border-orange-200 bg-orange-50/40 p-3">
-                                <div className="flex items-start gap-3">
+
+                            <div className="mt-4 space-y-3">
+                                <label
+                                    className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
+                                        paymentOption === 'cod'
+                                            ? 'border-orange-400 bg-orange-50/60 ring-1 ring-orange-200'
+                                            : 'border-gray-100 hover:border-orange-200'
+                                    }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="payment_option"
+                                        value="cod"
+                                        checked={paymentOption === 'cod'}
+                                        onChange={() => selectPaymentOption('cod')}
+                                        className="mt-1"
+                                    />
                                     <PaymentMethodIcon method="cash" />
                                     <div className="min-w-0 flex-1">
                                         <p className="font-medium text-gray-900">Cash on Delivery</p>
                                         <p className="mt-0.5 text-xs text-gray-600">
-                                            Pay when the seller delivers. You can optionally upload a bank deposit slip if you paid in advance.
+                                            Pay the seller when your order is delivered. No bank slip needed.
                                         </p>
-                                        {sellerGroups.some((g) => g.store_slug) && (
+                                        {paymentOption === 'cod' && sellerGroups.some((g) => g.store_slug) && (
                                             <div className="mt-2 flex flex-wrap gap-1.5">
                                                 {sellerGroups.filter((g) => g.store_slug).map((g) => (
                                                     <Link
                                                         key={g.seller_id}
                                                         href={route('store.show', g.store_slug!)}
                                                         className="inline-flex items-center gap-0.5 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-orange-600 ring-1 ring-orange-100 hover:bg-orange-50"
+                                                        onClick={(e) => e.stopPropagation()}
                                                     >
                                                         Visit {g.seller_name}
                                                         <ChevronRight className="h-3 w-3" />
@@ -310,37 +349,69 @@ export default function Checkout({
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                </label>
+
+                                {bankAccounts.length > 0 && (
+                                    <label
+                                        className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
+                                            paymentOption === 'bank_transfer'
+                                                ? 'border-sky-400 bg-sky-50/60 ring-1 ring-sky-200'
+                                                : 'border-gray-100 hover:border-sky-200'
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="payment_option"
+                                            value="bank_transfer"
+                                            checked={paymentOption === 'bank_transfer'}
+                                            onChange={() => selectPaymentOption('bank_transfer')}
+                                            className="mt-1"
+                                        />
+                                        <PaymentMethodIcon method="bank" />
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-medium text-gray-900">I already paid by bank transfer</p>
+                                            <p className="mt-0.5 text-xs text-gray-600">
+                                                Deposit to our bank account, then upload your payment slip when placing the order.
+                                            </p>
+                                        </div>
+                                    </label>
+                                )}
                             </div>
 
-                            {bankAccounts.length > 0 && (
-                                <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm">
-                                    <p className="font-medium text-gray-900">Bank transfer (optional)</p>
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        Deposit to one of these accounts, then upload your slip below.
-                                    </p>
-                                    <ul className="mt-3 space-y-2">
-                                        {bankAccounts.map((account, index) => (
-                                            <li key={`${account.account_number}-${index}`} className="rounded-lg bg-white p-3 ring-1 ring-gray-100">
-                                                <p className="font-medium text-gray-900">{account.bank_name ?? account.label ?? 'Bank account'}</p>
-                                                <p className="text-gray-700">{account.account_name}</p>
-                                                <p className="font-mono text-sm text-gray-900">{account.account_number}</p>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                            {paymentOption === 'bank_transfer' && bankAccounts.length > 0 && (
+                                <>
+                                    <div className="mt-4 rounded-xl border border-sky-100 bg-sky-50/50 p-4 text-sm">
+                                        <p className="font-medium text-gray-900">Pay into one of these accounts</p>
+                                        <p className="mt-1 text-xs text-gray-500">
+                                            Transfer the order total, then upload your receipt below.
+                                        </p>
+                                        <ul className="mt-3 space-y-2">
+                                            {bankAccounts.map((account, index) => (
+                                                <li key={`${account.account_number}-${index}`} className="rounded-lg bg-white p-3 ring-1 ring-gray-100">
+                                                    <p className="font-medium text-gray-900">{account.bank_name ?? account.label ?? 'Bank account'}</p>
+                                                    <p className="text-gray-700">{account.account_name}</p>
+                                                    <p className="font-mono text-sm text-gray-900">{account.account_number}</p>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="mt-4">
+                                        <DocumentUploadField
+                                            id="bank_slip"
+                                            label="Bank deposit slip"
+                                            hint="Upload a photo or PDF of your bank transfer receipt. Admin will verify it before processing."
+                                            required
+                                            value={bankSlip}
+                                            onChange={(file) => {
+                                                setBankSlip(file);
+                                                setBankSlipError(null);
+                                            }}
+                                        />
+                                        <InputError message={bankSlipError ?? undefined} className="mt-2" />
+                                    </div>
+                                </>
                             )}
-
-                            <div className="mt-4">
-                                <DocumentUploadField
-                                    id="bank_slip"
-                                    label="Bank deposit slip (optional)"
-                                    hint="Upload a photo or PDF of your bank transfer receipt. Admin will verify it."
-                                    required={false}
-                                    value={bankSlip}
-                                    onChange={setBankSlip}
-                                />
-                            </div>
                         </div>
                     </div>
 
@@ -357,7 +428,11 @@ export default function Checkout({
                                                 Package · {index + 1} of {sellerGroups.length}
                                             </p>
                                             <h2 className="font-semibold text-gray-900">{group.seller_name}</h2>
-                                            <p className="mt-0.5 text-xs text-teal-700">Cash on delivery · pay on arrival</p>
+                                            <p className="mt-0.5 text-xs text-teal-700">
+                                                {paymentOption === 'bank_transfer'
+                                                    ? 'Bank transfer · slip pending verification'
+                                                    : 'Cash on delivery · pay on arrival'}
+                                            </p>
                                         </div>
                                         <span className="text-sm font-medium text-orange-500">
                                             {formatPrice(preview?.total ?? group.package_total)}
