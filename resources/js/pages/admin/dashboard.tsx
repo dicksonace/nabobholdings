@@ -17,6 +17,7 @@ import { ComponentType } from 'react';
 
 import { DonutChart, RankBars, TrendChart } from '@/components/admin/dashboard-charts';
 import AdminLayout from '@/layouts/admin-layout';
+import { momoNetworkLabel } from '@/lib/momo-networks';
 import { formatPrice, Order, SellerProfile } from '@/types/marketplace';
 
 interface Breakdown {
@@ -32,7 +33,9 @@ interface PendingWithdrawalRow {
     momo_number: string | null;
     account_name: string | null;
     created_at: string | null;
-    user: { name: string; email: string; role?: string } | null;
+    user: { name: string; email: string; role?: string; mobile?: string | null } | null;
+    seller?: { business_name: string } | null;
+    wallet: { available_balance: number; pending_balance: number };
 }
 
 interface AdminDashboardProps {
@@ -143,19 +146,49 @@ export default function AdminDashboard({
     ];
 
     const chips: Chip[] = [
-        { label: 'Paid orders', value: stats.paid_orders, icon: CheckCircle2, color: 'text-green-500' },
-        { label: 'Delivered', value: stats.delivered_orders, icon: CheckCircle2, color: 'text-emerald-500' },
-        { label: 'Cancelled', value: stats.cancelled_orders, icon: XCircle, color: 'text-rose-500' },
-        { label: 'Orders (7d)', value: stats.orders_week, icon: ShoppingCart, color: 'text-orange-500' },
+        {
+            label: 'Paid orders',
+            value: stats.paid_orders,
+            icon: CheckCircle2,
+            color: 'text-green-500',
+            href: route('admin.orders.index', { payment_status: 'paid' }),
+        },
+        {
+            label: 'Delivered',
+            value: stats.delivered_orders,
+            icon: CheckCircle2,
+            color: 'text-emerald-500',
+            href: route('admin.orders.index', { status: 'delivered' }),
+        },
+        {
+            label: 'Cancelled',
+            value: stats.cancelled_orders,
+            icon: XCircle,
+            color: 'text-rose-500',
+            href: route('admin.orders.index', { status: 'cancelled' }),
+        },
+        {
+            label: 'Orders (7d)',
+            value: stats.orders_week,
+            icon: ShoppingCart,
+            color: 'text-orange-500',
+            href: route('admin.orders.index', { period: '7d' }),
+        },
         { label: 'Total users', value: stats.total_users, icon: Users, color: 'text-gray-500', href: route('admin.buyers.index') },
-        { label: 'New users (mo)', value: stats.new_users_month, icon: UserPlus, color: 'text-sky-500' },
+        {
+            label: 'New users (mo)',
+            value: stats.new_users_month,
+            icon: UserPlus,
+            color: 'text-sky-500',
+            href: route('admin.buyers.index', { period: 'month' }),
+        },
         { label: 'Buyers', value: stats.total_buyers, icon: Users, color: 'text-blue-500', href: route('admin.buyers.index') },
         {
             label: 'Products',
             value: stats.total_products,
             icon: Package,
             color: 'text-indigo-500',
-            href: route('manage.products.index'),
+            href: route('manage.products.index', { status: 'approved' }),
         },
         {
             label: 'Live products',
@@ -164,7 +197,13 @@ export default function AdminDashboard({
             color: 'text-green-500',
             href: route('manage.products.index', { status: 'approved' }),
         },
-        { label: 'Out of stock', value: stats.out_of_stock, icon: PackageX, color: 'text-rose-500' },
+        {
+            label: 'Out of stock',
+            value: stats.out_of_stock,
+            icon: PackageX,
+            color: 'text-rose-500',
+            href: route('manage.products.index', { status: 'sold_out' }),
+        },
         {
             label: 'Pending payouts',
             value: formatPrice(stats.pending_withdrawals_amount),
@@ -214,7 +253,7 @@ export default function AdminDashboard({
                         </div>
                     );
                     return chip.href ? (
-                        <Link key={chip.label} href={chip.href}>
+                        <Link key={chip.label} href={chip.href} className="block cursor-pointer">
                             {inner}
                         </Link>
                     ) : (
@@ -286,22 +325,56 @@ export default function AdminDashboard({
                     {pendingWithdrawals.length === 0 ? (
                         <p className="mt-4 text-sm text-gray-500">No pending withdrawal requests.</p>
                     ) : (
-                        <div className="mt-4 divide-y">
+                        <div className="mt-4 space-y-3">
                             {pendingWithdrawals.map((w) => (
                                 <Link
                                     key={w.id}
                                     href={route('admin.withdrawals.index', { status: 'pending' })}
-                                    className="flex justify-between gap-3 py-3 text-sm hover:bg-gray-50"
+                                    className="block rounded-xl border border-gray-100 bg-gray-50/80 p-4 transition hover:border-orange-200 hover:bg-orange-50/40"
                                 >
-                                    <div className="min-w-0">
-                                        <p className="font-medium">{w.user?.name ?? 'User'}</p>
-                                        <p className="truncate text-gray-500">
-                                            {w.momo_number}
-                                            {w.network ? ` · ${w.network}` : ''}
-                                            {w.user?.role ? ` · ${w.user.role}` : ''}
-                                        </p>
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <p className="text-lg font-bold text-gray-900">{formatPrice(w.amount)}</p>
+                                                <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                                                    Pending
+                                                </span>
+                                                {w.user?.role && (
+                                                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium capitalize text-slate-700">
+                                                        {w.user.role}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="mt-2 text-sm font-semibold text-gray-900">
+                                                {w.seller?.business_name ?? w.user?.name ?? 'User'}
+                                            </p>
+                                            <p className="text-sm text-gray-600">
+                                                {w.user?.email}
+                                                {w.user?.mobile ? ` · ${w.user.mobile}` : ''}
+                                            </p>
+                                        </div>
+                                        <dl className="grid shrink-0 gap-2 text-xs sm:min-w-[220px] sm:text-right">
+                                            <div>
+                                                <dt className="text-gray-500">Payment method</dt>
+                                                <dd className="font-medium text-gray-900">
+                                                    {momoNetworkLabel(w.network ?? '')}
+                                                    {w.momo_number ? ` · ${w.momo_number}` : ''}
+                                                </dd>
+                                            </div>
+                                            {w.account_name && (
+                                                <div>
+                                                    <dt className="text-gray-500">Account name</dt>
+                                                    <dd className="font-medium text-gray-900">{w.account_name}</dd>
+                                                </div>
+                                            )}
+                                            <div>
+                                                <dt className="text-gray-500">Available balance</dt>
+                                                <dd className="font-semibold text-emerald-700">
+                                                    {formatPrice(w.wallet.available_balance)}
+                                                </dd>
+                                            </div>
+                                        </dl>
                                     </div>
-                                    <p className="shrink-0 font-medium text-orange-500">{formatPrice(w.amount)}</p>
                                 </Link>
                             ))}
                         </div>

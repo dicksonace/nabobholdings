@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Checkout;
 use App\Models\Order;
@@ -9,6 +11,7 @@ use App\Models\OrderItem;
 use App\Services\OrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,14 +19,40 @@ class OrderController extends Controller
 {
     public function __construct(private OrderService $orders) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $orders = Order::with(['buyer', 'items', 'checkout:id,checkout_number'])
-            ->latest()
-            ->paginate(15);
+        $paymentStatus = $request->string('payment_status')->toString();
+        $status = $request->string('status')->toString();
+        $period = $request->string('period')->toString();
+
+        $query = Order::with(['buyer', 'items', 'checkout:id,checkout_number']);
+
+        if ($paymentStatus !== '' && in_array($paymentStatus, array_column(PaymentStatus::cases(), 'value'), true)) {
+            $query->where('payment_status', $paymentStatus);
+        }
+
+        if ($status !== '' && in_array($status, array_column(OrderStatus::cases(), 'value'), true)) {
+            $query->where('status', $status);
+        }
+
+        $now = Carbon::now();
+        if ($period === '7d') {
+            $query->where('created_at', '>=', $now->copy()->subDays(6)->startOfDay());
+        } elseif ($period === 'today') {
+            $query->where('created_at', '>=', $now->copy()->startOfDay());
+        } elseif ($period === 'month') {
+            $query->where('created_at', '>=', $now->copy()->startOfMonth());
+        }
+
+        $orders = $query->latest()->paginate(15)->withQueryString();
 
         return Inertia::render('admin/orders/index', [
             'orders' => $orders,
+            'filters' => [
+                'payment_status' => $paymentStatus !== '' ? $paymentStatus : null,
+                'status' => $status !== '' ? $status : null,
+                'period' => $period !== '' ? $period : null,
+            ],
         ]);
     }
 

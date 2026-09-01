@@ -31,7 +31,9 @@ class ProductController extends Controller
         } elseif ($status && in_array($status, ['approved', 'pending', 'rejected', 'draft'], true)) {
             $query->where('status', $status);
         } elseif ($status === 'sold_out') {
-            $query->where('quantity', 0)->where('is_preorder', false);
+            $query->where('status', ProductStatus::Approved)
+                ->where('is_preorder', false)
+                ->where('quantity', '<=', 0);
         }
 
         if ($search = $request->string('search')->trim()->toString()) {

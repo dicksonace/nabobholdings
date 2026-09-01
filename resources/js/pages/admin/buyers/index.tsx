@@ -19,15 +19,24 @@ interface BuyerRow {
 interface BuyersIndexProps {
     buyers: Paginated<BuyerRow>;
     search?: string | null;
+    period?: string | null;
 }
 
-export default function AdminBuyersIndex({ buyers, search }: BuyersIndexProps) {
+function periodLabel(period?: string | null): string | null {
+    if (period === 'month') return 'new this month';
+    if (period === '7d') return 'joined in the last 7 days';
+    return null;
+}
+
+export default function AdminBuyersIndex({ buyers, search, period }: BuyersIndexProps) {
     const [query, setQuery] = useState(search ?? '');
 
     const submitSearch = (e: FormEvent) => {
         e.preventDefault();
-        router.get(route('admin.buyers.index'), { search: query || undefined }, { preserveState: true, replace: true });
+        router.get(route('admin.buyers.index'), { search: query || undefined, period: period || undefined }, { preserveState: true, replace: true });
     };
+
+    const activePeriod = periodLabel(period);
 
     return (
         <AdminLayout title="Buyers" active="buyers">
@@ -36,6 +45,17 @@ export default function AdminBuyersIndex({ buyers, search }: BuyersIndexProps) {
             <p className="mb-4 text-sm text-gray-500">
                 View shopper accounts, wallet balances, and order history.
             </p>
+
+            {activePeriod && (
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+                    <span>
+                        Showing buyers <strong>{activePeriod}</strong>
+                    </span>
+                    <Link href={route('admin.buyers.index')} className="font-medium text-sky-700 hover:underline">
+                        Show all buyers
+                    </Link>
+                </div>
+            )}
 
             <form onSubmit={submitSearch} className="mb-6">
                 <div className="relative max-w-md">

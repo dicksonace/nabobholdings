@@ -67,11 +67,22 @@ class DashboardController extends Controller
             'pending_sellers' => SellerProfile::where('status', SellerStatus::Pending)->count(),
             'suspended_sellers' => SellerProfile::where('status', SellerStatus::Suspended)->count(),
 
-            // Products
-            'total_products' => Product::count(),
-            'live_products' => Product::where('status', ProductStatus::Approved)->count(),
+            // Products (catalog: approved only; live + out of stock = total)
+            'live_products' => Product::query()
+                ->where('status', ProductStatus::Approved)
+                ->where(fn ($q) => $q->where('is_preorder', true)->orWhere('quantity', '>', 0))
+                ->count(),
+            'out_of_stock' => Product::query()
+                ->where('status', ProductStatus::Approved)
+                ->where('is_preorder', false)
+                ->where('quantity', '<=', 0)
+                ->count(),
+            'total_products' => Product::where('status', ProductStatus::Approved)->count(),
             'pending_products' => Product::where('status', ProductStatus::Pending)->count(),
-            'out_of_stock' => Product::where('quantity', '<=', 0)->count(),
+            'hidden_products' => Product::whereIn('status', [
+                ProductStatus::Draft,
+                ProductStatus::Rejected,
+            ])->count(),
 
             // Withdrawals
             'pending_withdrawals' => Withdrawal::where('status', WithdrawalStatus::Pending)->count(),
@@ -189,24 +200,38 @@ class DashboardController extends Controller
 
         $recentOrders = Order::with('buyer')->latest()->limit(6)->get();
         $pendingSellers = SellerProfile::with('user')->where('status', SellerStatus::Pending)->latest()->limit(5)->get();
-        $pendingWithdrawals = Withdrawal::with('user:id,name,email,role')
+        $pendingWithdrawals = Withdrawal::with(['user.wallet', 'user.sellerProfile'])
             ->where('status', WithdrawalStatus::Pending)
             ->latest()
             ->limit(5)
             ->get()
-            ->map(fn (Withdrawal $w) => [
-                'id' => $w->id,
-                'amount' => (float) $w->amount,
-                'network' => $w->network,
-                'momo_number' => $w->momo_number,
-                'account_name' => $w->account_name,
-                'created_at' => $w->created_at?->toIso8601String(),
-                'user' => $w->user ? [
-                    'name' => $w->user->name,
-                    'email' => $w->user->email,
-                    'role' => $w->user->role?->value,
-                ] : null,
-            ]);
+            ->map(function (Withdrawal $w) {
+                $user = $w->user;
+                $profile = $user?->sellerProfile;
+                $wallet = $user?->wallet;
+
+                return [
+                    'id' => $w->id,
+                    'amount' => (float) $w->amount,
+                    'network' => $w->network,
+                    'momo_number' => $w->momo_number,
+                    'account_name' => $w->account_name,
+                    'created_at' => $w->created_at?->toIso8601String(),
+                    'user' => $user ? [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'mobile' => $user->mobile,
+                        'role' => $user->role?->value,
+                    ] : null,
+                    'seller' => $profile ? [
+                        'business_name' => $profile->displayName(),
+                    ] : null,
+                    'wallet' => [
+                        'available_balance' => (float) ($wallet?->available_balance ?? 0),
+                        'pending_balance' => (float) ($wallet?->pending_balance ?? 0),
+                    ],
+                ];
+            });
 
         return Inertia::render('admin/dashboard', [
             'stats' => $stats,

@@ -17,6 +17,7 @@ class BuyerController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->string('search')->trim()->toString();
+        $period = $request->string('period')->toString();
 
         $buyers = User::query()
             ->where('role', UserRole::Buyer)
@@ -29,6 +30,8 @@ class BuyerController extends Controller
                         ->orWhere('mobile', 'like', "%{$search}%");
                 });
             })
+            ->when($period === 'month', fn ($query) => $query->where('created_at', '>=', now()->startOfMonth()))
+            ->when($period === '7d', fn ($query) => $query->where('created_at', '>=', now()->subDays(6)->startOfDay()))
             ->latest()
             ->paginate(20)
             ->withQueryString();
@@ -36,6 +39,7 @@ class BuyerController extends Controller
         return Inertia::render('admin/buyers/index', [
             'buyers' => $buyers,
             'search' => $search !== '' ? $search : null,
+            'period' => $period !== '' ? $period : null,
         ]);
     }
 
