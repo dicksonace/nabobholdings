@@ -63,7 +63,9 @@ function PanelShell({
                     className="w-full"
                     onClick={() => {
                         onNavigate?.();
-                        router.post(route('logout'));
+                        const logoutRedirect =
+                            panelId === 'admin' ? route('admin.login', undefined, false) : route('login', undefined, false);
+                        router.post(route('logout', { redirect: logoutRedirect }));
                     }}
                 >
                     <LogOut className="mr-2 h-4 w-4" />

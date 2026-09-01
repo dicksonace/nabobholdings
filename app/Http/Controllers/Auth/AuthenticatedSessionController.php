@@ -101,6 +101,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = $request->user();
+        $loginRoute = match (true) {
+            $user?->isBackOffice(), $user?->isSeller() => route('admin.login', absolute: false),
+            default => route('login', absolute: false),
+        };
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
@@ -111,6 +117,6 @@ class AuthenticatedSessionController extends Controller
             return redirect($redirect);
         }
 
-        return redirect('/');
+        return redirect($loginRoute);
     }
 }

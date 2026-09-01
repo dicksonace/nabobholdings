@@ -49,6 +49,16 @@ class AuthenticationTest extends TestCase
         $response = $this->actingAs($user)->post('/logout');
 
         $this->assertGuest();
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('login', absolute: false));
+    }
+
+    public function test_admin_logout_redirects_to_admin_login_page()
+    {
+        $admin = User::factory()->create(['role' => \App\Enums\UserRole::Admin]);
+
+        $response = $this->actingAs($admin)->post('/logout');
+
+        $this->assertGuest();
+        $response->assertRedirect(route('admin.login', absolute: false));
     }
 }
