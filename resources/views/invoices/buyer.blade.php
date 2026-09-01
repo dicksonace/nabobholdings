@@ -84,8 +84,7 @@
     <table>
         <tr>
             <td class="top" style="width: 55%;">
-                <div class="brand">City<span>Shop</span></div>
-                <div class="muted">cityunlock.net</div>
+                @include('partials.pdf-brand')
             </td>
             <td class="top right" style="width: 45%;">
                 <div style="font-size: 11pt; font-weight: bold;">{{ $invoice->invoice_number }}</div>

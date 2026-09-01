@@ -45,6 +45,32 @@ class PlatformSettings
     }
 
     /**
+     * Split brand name for styled wordmarks (first word + remainder).
+     *
+     * @return array{first: string, rest: string}
+     */
+    public static function brandNameParts(): array
+    {
+        $name = static::brandName();
+        $parts = preg_split('/\s+/', trim($name), 2) ?: [];
+
+        return [
+            'first' => (string) ($parts[0] ?? $name),
+            'rest' => (string) ($parts[1] ?? ''),
+        ];
+    }
+
+    /**
+     * Public site hostname for PDFs and print views (e.g. nabobholdings.com).
+     */
+    public static function siteHost(): string
+    {
+        $host = parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        return is_string($host) && $host !== '' ? $host : 'nabobholdings.com';
+    }
+
+    /**
      * Stored disk path of the uploaded brand logo (public disk), or null for the text logo.
      */
     public static function brandLogoPath(): ?string

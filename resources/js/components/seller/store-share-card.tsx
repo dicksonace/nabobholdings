@@ -71,7 +71,16 @@ export default function StoreShareCard({ slug, storeName, storeUrl }: StoreShare
             </div>
 
             <p className="mt-3 text-xs text-gray-400">
-                Example: <span className="font-mono text-gray-600">cityunlock.net/store/{slug}</span>
+                Example:{' '}
+                <span className="font-mono text-gray-600">
+                    {(() => {
+                        try {
+                            return `${new URL(storeUrl).host}/store/${slug}`;
+                        } catch {
+                            return `nabobholdings.com/store/${slug}`;
+                        }
+                    })()}
+                </span>
             </p>
         </div>
     );

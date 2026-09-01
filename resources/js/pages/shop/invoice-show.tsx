@@ -1,8 +1,10 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Download, Printer } from 'lucide-react';
 
+import NabobBrand from '@/components/nabob-brand';
 import { Button } from '@/components/ui/button';
 import ShopLayout from '@/layouts/shop-layout';
+import { SharedData } from '@/types';
 import { formatPrice, productImageUrl } from '@/types/marketplace';
 
 interface InvoiceLine {
@@ -59,6 +61,15 @@ function lineImageSrc(image?: string | null): string | null {
 }
 
 export default function InvoiceShow({ invoice, sellerContacts, sellerContact }: InvoiceShowProps) {
+    const { appUrl } = usePage<SharedData>().props;
+    const siteHost = (() => {
+        try {
+            return appUrl ? new URL(appUrl).host : 'nabobholdings.com';
+        } catch {
+            return 'nabobholdings.com';
+        }
+    })();
+
     const contacts =
         sellerContacts && sellerContacts.length > 0
             ? sellerContacts
@@ -106,10 +117,8 @@ export default function InvoiceShow({ invoice, sellerContacts, sellerContact }: 
                 <article className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:border-0 sm:p-8 sm:shadow-sm">
                     <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-100 pb-4">
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">
-                                City<span className="text-orange-500">Shop</span>
-                            </p>
-                            <p className="mt-0.5 text-sm text-gray-500">cityunlock.net</p>
+                            <NabobBrand asLink={false} showText size="lg" />
+                            <p className="mt-0.5 text-sm text-gray-500">{siteHost}</p>
                         </div>
                         <div className="text-right">
                             <p className="text-lg font-bold text-gray-900">{invoice.invoice_number}</p>

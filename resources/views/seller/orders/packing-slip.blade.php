@@ -162,14 +162,14 @@
     $money = fn (float $n) => \App\Services\PlatformSettings::formatMoney($n);
     $storeAddress = $storeAddress ?? null;
     $storeLocation = $storeLocation ?? null;
+    $siteHost = \App\Services\PlatformSettings::siteHost();
 @endphp
 
 {{-- Header: brand | packing slip meta --}}
 <table>
     <tr>
         <td class="top wrap" width="55%">
-            <div class="brand">City<span>Shop</span></div>
-            <div class="muted">cityunlock.net</div>
+            @include('partials.pdf-brand')
         </td>
         <td class="top right wrap" width="45%">
             <div class="doc-title">Packing slip</div>
@@ -293,7 +293,7 @@
 <table class="footer">
     <tr>
         <td class="top wrap" width="60%">For packing &amp; delivery only · Not a tax invoice</td>
-        <td class="top right wrap" width="40%">{{ $storeName }} · cityunlock.net</td>
+        <td class="top right wrap" width="40%">{{ $storeName }} · {{ $siteHost }}</td>
     </tr>
 </table>
 </body>

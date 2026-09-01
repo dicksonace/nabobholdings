@@ -127,6 +127,9 @@ class SellerOrderPrintTest extends TestCase
         $this->assertStringContainsString('Ace Gadgets', $html);
         $this->assertStringContainsString('12 Market Road, Accra', $html);
         $this->assertStringContainsString('0248000111', $html);
+        $this->assertStringNotContainsString('CityShop', $html);
+        $this->assertStringNotContainsString('cityunlock.net', $html);
+        $this->assertStringContainsString('Nabob Holdings', $html);
 
         $print = $this->actingAs($seller)->get(route('manage.orders.print', $item));
         $print->assertOk();
