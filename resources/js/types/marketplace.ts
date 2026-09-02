@@ -267,6 +267,47 @@ export const codOrderFulfillmentSteps = [
     { key: 'delivered', label: 'Complete' },
 ] as const;
 
+export const bankTransferFulfillmentSteps = [
+    { key: 'pending', label: 'Bank transfer' },
+    { key: 'processing', label: 'Processing' },
+    { key: 'call_confirmed', label: 'Seller called' },
+    { key: 'packed', label: 'Packing' },
+    { key: 'shipped', label: 'Package on the way' },
+    { key: 'delivered', label: 'Complete' },
+] as const;
+
+export function offlineFulfillmentSteps(paymentMethod?: string | null) {
+    return paymentMethod === 'bank_transfer' ? bankTransferFulfillmentSteps : codOrderFulfillmentSteps;
+}
+
+export interface OfflineSellerFlowStep {
+    status: string;
+    label: string;
+    hint: string;
+}
+
+export function offlineSellerFlow(paymentMethod?: string | null): OfflineSellerFlowStep[] {
+    if (paymentMethod === 'bank_transfer') {
+        return [
+            { status: 'pending', label: 'Bank transfer', hint: 'New bank transfer order — start processing when ready.' },
+            { status: 'processing', label: 'Start processing', hint: 'Bank transfer order — begin preparing after payment is verified.' },
+            { status: 'call_confirmed', label: 'Call buyer', hint: 'Call the buyer to confirm the order, then continue.' },
+            { status: 'packed', label: 'Mark as packing', hint: 'Pack the item after you spoke with the buyer.' },
+            { status: 'shipped', label: 'Package on the way', hint: 'Optional: add driver & vehicle if someone else is delivering.' },
+            { status: 'delivered', label: 'Complete delivery', hint: 'Buyer received the order — mark complete.' },
+        ];
+    }
+
+    return [
+        { status: 'pending', label: 'Cash on delivery', hint: 'New COD order — start processing when ready.' },
+        { status: 'processing', label: 'Start processing', hint: 'Cash on delivery order — begin preparing.' },
+        { status: 'call_confirmed', label: 'Call buyer', hint: 'Call the buyer to confirm the order, then continue.' },
+        { status: 'packed', label: 'Mark as packing', hint: 'Pack the item after you spoke with the buyer.' },
+        { status: 'shipped', label: 'Package on the way', hint: 'Optional: add driver & vehicle if someone else is delivering.' },
+        { status: 'delivered', label: 'Complete (cash collected)', hint: 'Buyer paid cash on delivery — mark the order complete.' },
+    ];
+}
+
 export function formatOrderStatus(status: string | { value?: string } | null | undefined): string {
     const key = typeof status === 'string' ? status : status?.value ?? '';
     if (!key) {

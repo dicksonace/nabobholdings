@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import SellerLayout from '@/layouts/seller-layout';
-import { formatPrice, formatOrderStatus, isOfflineCheckoutPayment, OrderItem, productImageUrl } from '@/types/marketplace';
+import { formatPrice, formatOrderStatus, isOfflineCheckoutPayment, offlineSellerFlow, OrderItem, productImageUrl } from '@/types/marketplace';
 
 interface DisputeInfo {
     id: number;
@@ -58,21 +58,11 @@ const paidSellerFlow: { status: string; label: string; hint: string }[] = [
     { status: 'awaiting_confirmation', label: 'Mark as delivered', hint: 'You handed the item to the buyer — they must confirm receipt.' },
 ];
 
-const codSellerFlow: { status: string; label: string; hint: string }[] = [
-    { status: 'pending', label: 'Cash on delivery', hint: 'New COD order — start processing when ready.' },
-    { status: 'processing', label: 'Start processing', hint: 'Cash on delivery order — begin preparing.' },
-    { status: 'call_confirmed', label: 'Call buyer', hint: 'Call the buyer to confirm the order, then continue.' },
-    { status: 'packed', label: 'Mark as packing', hint: 'Pack the item after you spoke with the buyer.' },
-    { status: 'shipped', label: 'Package on the way', hint: 'Optional: add driver & vehicle if someone else is delivering.' },
-    { status: 'delivered', label: 'Complete (cash collected)', hint: 'Buyer paid cash on delivery — mark the order complete.' },
-];
-
-function nextSellerStatus(current: string, isCod: boolean): string | null {
-    if (!isCod && current === 'pending') return 'processing';
-    const flow = isCod ? codSellerFlow : paidSellerFlow;
-    const idx = flow.findIndex((s) => s.status === current);
-    if (idx === -1 || idx >= flow.length - 1) return null;
-    return flow[idx + 1].status;
+function nextSellerStatus(current: string, sellerFlow: { status: string }[], usesOfflineFlow: boolean): string | null {
+    if (!usesOfflineFlow && current === 'pending') return 'processing';
+    const idx = sellerFlow.findIndex((s) => s.status === current);
+    if (idx === -1 || idx >= sellerFlow.length - 1) return null;
+    return sellerFlow[idx + 1].status;
 }
 
 export default function SellerOrderShow({
@@ -131,8 +121,8 @@ export default function SellerOrderShow({
     const isCod = order.payment_method === 'cash';
     const isBankTransfer = order.payment_method === 'bank_transfer';
     const usesCodFlow = isOfflineCheckoutPayment(order.payment_method);
-    const sellerFlow = usesCodFlow ? codSellerFlow : paidSellerFlow;
-    const next = nextSellerStatus(itemStatus, usesCodFlow);
+    const sellerFlow = usesCodFlow ? offlineSellerFlow(order.payment_method) : paidSellerFlow;
+    const next = nextSellerStatus(itemStatus, sellerFlow, usesCodFlow);
     const isTerminal = usesCodFlow
         ? ['cancelled', 'delivered', 'refunded'].includes(itemStatus)
         : ['cancelled', 'delivered', 'refunded', 'awaiting_confirmation'].includes(itemStatus);
@@ -656,6 +646,16 @@ export default function SellerOrderShow({
                                 </p>
                                 <p className="mt-1 text-xs text-teal-700">
                                     Call the buyer to confirm, pack, send the package, then mark complete when cash is collected.
+                                </p>
+                            </>
+                        ) : isBankTransfer ? (
+                            <>
+                                <h3 className="font-semibold text-gray-900">Bank transfer</h3>
+                                <p className="mt-2 text-sm text-gray-600">
+                                    Buyer paid by bank transfer · <span className="capitalize">{order.payment_status}</span>
+                                </p>
+                                <p className="mt-1 text-xs text-sky-700">
+                                    Nabob Holdings verifies the deposit slip. Call the buyer, pack, deliver, then mark complete.
                                 </p>
                             </>
                         ) : order.payment_channel === 'direct' ? (
