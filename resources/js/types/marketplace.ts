@@ -23,6 +23,7 @@ export interface ProductImage {
 
 export interface Product {
     id: number;
+    category_id?: number | null;
     name: string;
     slug: string;
     description?: string;

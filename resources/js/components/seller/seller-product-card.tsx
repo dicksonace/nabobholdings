@@ -65,12 +65,12 @@ export default function SellerProductCard({ product, onDuplicate, onToggleVisibi
                 </div>
 
                 <div className="mt-3 flex items-center justify-between gap-2">
-                    <Link href={route('manage.products.edit', product.id)} className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full">
+                    <Button asChild variant="outline" size="sm" className="flex-1">
+                        <Link href={route('manage.products.edit', product.id)}>
                             <Pencil className="mr-1 h-3.5 w-3.5" />
                             Edit
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="icon" className="h-8 w-8 shrink-0">

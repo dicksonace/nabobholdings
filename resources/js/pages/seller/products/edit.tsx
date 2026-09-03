@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import SellerLayout from '@/layouts/seller-layout';
 import { Category, getCurrencySymbol, Product } from '@/types/marketplace';
+import { SharedData } from '@/types';
 
 interface EditProductProps {
     product: Product;
@@ -18,6 +19,7 @@ interface EditProductProps {
 }
 
 export default function EditProduct({ product, categories }: EditProductProps) {
+    const { flash } = usePage<SharedData>().props;
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [removeIds, setRemoveIds] = useState<number[]>([]);
     const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -35,12 +37,12 @@ export default function EditProduct({ product, categories }: EditProductProps) {
     const { data, setData, post, processing, errors, transform } = useForm({
         name: product.name,
         description: product.description ?? '',
-        category_id: product.category?.id?.toString() ?? '',
+        category_id: product.category?.id?.toString() ?? (product.category_id ? String(product.category_id) : ''),
         sku: product.sku ?? '',
         brand: product.brand ?? '',
-        price: product.price.toString(),
-        discount_price: product.discount_price?.toString() ?? '',
-        quantity: product.quantity.toString(),
+        price: String(product.price ?? ''),
+        discount_price: product.discount_price != null && Number(product.discount_price) > 0 ? String(product.discount_price) : '',
+        quantity: String(product.quantity ?? 0),
         weight: '',
         free_shipping: product.free_shipping,
         delivery_fee: (product as Product & { delivery_fee?: number }).delivery_fee?.toString() ?? '',
@@ -63,6 +65,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
     transform((formData) => {
         const payload: Record<string, unknown> = {
             ...formData,
+            discount_price: formData.discount_price === '' ? null : formData.discount_price,
             images: imageFiles,
             image_count: imageFiles.length,
             remove_images: removeIds,
@@ -97,13 +100,41 @@ export default function EditProduct({ product, categories }: EditProductProps) {
             return;
         }
         setFormHint(null);
-        post(route('manage.products.update', product.id), { forceFormData: true });
+        post(route('manage.products.update', product.id), {
+            forceFormData: true,
+            onError: () => {
+                setFormHint('Could not save — check the highlighted fields below.');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+        });
     };
+
+    const errorList = Object.values(errors).filter(Boolean) as string[];
 
     return (
         <SellerLayout title="Edit Product" active="products">
             <Head title="Edit Product" />
             <form onSubmit={submit} className="max-w-3xl space-y-6 rounded-xl bg-white p-6 shadow-sm">
+                <div className="flex items-center justify-between gap-3">
+                    <h1 className="text-lg font-semibold text-gray-900">Edit product</h1>
+                    <Link href={route('manage.products.index')} className="text-sm text-orange-600 hover:underline">
+                        Back to products
+                    </Link>
+                </div>
+
+                {(flash.error || formHint || errorList.length > 0) && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                        {flash.error && <p className="font-medium">{flash.error}</p>}
+                        {formHint && <p className="font-medium">{formHint}</p>}
+                        {errorList.length > 0 && (
+                            <ul className="mt-2 list-disc space-y-1 pl-5">
+                                {errorList.slice(0, 5).map((msg) => (
+                                    <li key={msg}>{msg}</li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
                 <ImageUploader
                     maxImages={6}
                     existingImages={product.images ?? []}
@@ -171,6 +202,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
                                 </option>
                             ))}
                         </select>
+                        <InputError message={errors.category_id} />
                     </div>
                     <div>
                         <Label>Price ({getCurrencySymbol()})</Label>
@@ -289,7 +321,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
 
                 <Button
                     type="submit"
-                    disabled={processing || totalImages === 0}
+                    disabled={processing}
                     className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
                 >
                     {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}

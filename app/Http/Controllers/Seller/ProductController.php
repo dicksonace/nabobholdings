@@ -148,9 +148,11 @@ class ProductController extends Controller
     {
         abort_unless($product->seller_id === $request->user()->id, 403);
 
+        $product->load(['images', 'category.parent']);
+
         return Inertia::render('seller/products/edit', [
-            'product' => $product->load(['images', 'category']),
-            'categories' => $this->categoryOptions(),
+            'product' => $product,
+            'categories' => $this->categoryOptions($product->category),
             'profile' => $request->user()->sellerProfile,
         ]);
     }
@@ -159,12 +161,18 @@ class ProductController extends Controller
     {
         abort_unless($product->seller_id === $request->user()->id, 403);
 
+        if ($request->server('CONTENT_LENGTH') && empty($request->all()) && empty($request->allFiles())) {
+            return back()->withErrors([
+                'images' => 'Upload was too large and could not be received. Use smaller photos (under 5MB each) and a video under 50MB / 1 minute.',
+            ])->withInput();
+        }
+
         $videoUploadError = $this->videoUploadError($request);
         if ($videoUploadError) {
             return back()->withErrors(['video' => $videoUploadError])->withInput();
         }
 
-        $validated = $this->validateProduct($request, false);
+        $validated = $this->validateProduct($request, false, $product->category_id);
 
         $videoError = $this->videoDurationError($request);
         if ($videoError) {
@@ -367,11 +375,15 @@ class ProductController extends Controller
         ]);
     }
 
-    private function validateProduct(Request $request, bool $creating): array
+    private function validateProduct(Request $request, bool $creating, ?int $currentCategoryId = null): array
     {
         $imageRules = $creating
             ? ['required', 'array', 'min:1', 'max:6']
             : ['nullable', 'array', 'max:6'];
+
+        if ($request->input('discount_price') === '' || $request->input('discount_price') === null) {
+            $request->merge(['discount_price' => null]);
+        }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -382,14 +394,16 @@ class ProductController extends Controller
             'category_id' => [
                 'required',
                 'integer',
-                function (string $attribute, mixed $value, \Closure $fail) {
-                    $ok = Category::query()
+                function (string $attribute, mixed $value, \Closure $fail) use ($currentCategoryId) {
+                    $query = Category::query()
                         ->whereKey($value)
-                        ->where('is_active', true)
-                        ->whereDoesntHave('children')
-                        ->exists();
+                        ->where('is_active', true);
 
-                    if (! $ok) {
+                    if ((int) $value !== (int) $currentCategoryId) {
+                        $query->whereDoesntHave('children');
+                    }
+
+                    if (! $query->exists()) {
                         $fail('Choose a product category (not a top-level group).');
                     }
                 },
@@ -527,13 +541,20 @@ class ProductController extends Controller
         return null;
     }
 
-    private function categoryOptions()
+    private function categoryOptions(?Category $include = null)
     {
-        return Category::query()
+        $options = Category::query()
             ->activeOrdered()
             ->whereDoesntHave('children')
             ->with('parent:id,name')
-            ->get(['id', 'name', 'slug', 'icon', 'parent_id', 'spec_schema'])
+            ->get(['id', 'name', 'slug', 'icon', 'parent_id', 'spec_schema']);
+
+        if ($include && ! $options->contains('id', $include->id)) {
+            $include->loadMissing('parent:id,name');
+            $options->push($include);
+        }
+
+        return $options
             ->sortBy(fn (Category $category) => strtolower(
                 ($category->parent?->name ? $category->parent->name.' ' : '').$category->name
             ))
