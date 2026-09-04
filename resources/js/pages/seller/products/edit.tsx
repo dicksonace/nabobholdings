@@ -63,16 +63,27 @@ export default function EditProduct({ product, categories }: EditProductProps) {
     });
 
     transform((formData) => {
+        const asFlag = (value: boolean) => (value ? '1' : '0');
         const payload: Record<string, unknown> = {
             ...formData,
             discount_price: formData.discount_price === '' ? null : formData.discount_price,
+            free_shipping: asFlag(formData.free_shipping),
+            is_negotiable: asFlag(formData.is_negotiable),
+            cash_on_delivery: asFlag(formData.cash_on_delivery),
+            pickup_available: asFlag(formData.pickup_available),
+            ships_nationwide: asFlag(formData.ships_nationwide),
+            in_ghana: asFlag(formData.in_ghana),
             images: imageFiles,
-            image_count: imageFiles.length,
             remove_images: removeIds,
             shipping_type: shippingType,
             video_duration: videoDuration,
-            remove_video: removeVideo,
+            remove_video: asFlag(removeVideo),
         };
+
+        // Only send image_count when new files are attached (0 was failing server min:1).
+        if (imageFiles.length > 0) {
+            payload.image_count = imageFiles.length;
+        }
 
         if (videoFile) {
             payload.video = videoFile;
@@ -313,9 +324,16 @@ export default function EditProduct({ product, categories }: EditProductProps) {
                     </div>
                 </div>
 
-                {formHint && (
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
-                        {formHint}
+                {(formHint || errorList.length > 0) && (
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-900">
+                        {formHint && <p>{formHint}</p>}
+                        {errorList.length > 0 && (
+                            <ul className="mt-1 list-disc space-y-0.5 pl-5 font-normal">
+                                {errorList.slice(0, 5).map((msg) => (
+                                    <li key={msg}>{msg}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 )}
 
@@ -325,7 +343,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
                     className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
                 >
                     {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                    Update Product
+                    {processing ? 'Saving…' : 'Update Product'}
                 </Button>
             </form>
         </SellerLayout>

@@ -385,6 +385,23 @@ class ProductController extends Controller
             $request->merge(['discount_price' => null]);
         }
 
+        // Inertia forceFormData sends booleans as "true"/"false" strings, which fail Laravel's boolean rule.
+        foreach ([
+            'is_negotiable',
+            'free_shipping',
+            'cash_on_delivery',
+            'pickup_available',
+            'ships_nationwide',
+            'in_ghana',
+            'remove_video',
+        ] as $booleanField) {
+            if ($request->exists($booleanField)) {
+                $request->merge([
+                    $booleanField => filter_var($request->input($booleanField), FILTER_VALIDATE_BOOLEAN),
+                ]);
+            }
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -430,7 +447,10 @@ class ProductController extends Controller
             'specifications' => ['nullable', 'array'],
             'images' => $imageRules,
             'images.*' => ['image', 'max:5120'],
-            'image_count' => ['nullable', 'integer', 'min:1', 'max:6'],
+            // Updates often send image_count=0 when keeping existing photos — do not require min:1.
+            'image_count' => $creating
+                ? ['nullable', 'integer', 'min:1', 'max:6']
+                : ['nullable', 'integer', 'min:0', 'max:6'],
             'remove_images' => ['nullable', 'array'],
             'remove_images.*' => ['integer', 'exists:product_images,id'],
             'video' => ['nullable', 'file', 'mimes:mp4,webm,mov,qt,m4v,3gp,3gpp', 'max:51200'],
