@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shop;
 use App\Enums\InvoiceType;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Models\User;
 use App\Services\BuyerInvoicePrintService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,8 +19,7 @@ class InvoiceController extends Controller
 
     public function show(Request $request, Invoice $invoice): InertiaResponse|RedirectResponse|Response
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
-        abort_unless(in_array($invoice->type, [InvoiceType::Customer, InvoiceType::CustomerMaster], true), 403);
+        $this->authorizeInvoiceAccess($request->user(), $invoice);
 
         // Mobile browsers often break window.print() — open the PDF printer instead.
         if ($request->boolean('print') || $request->query('print') === '1') {
@@ -39,17 +39,31 @@ class InvoiceController extends Controller
 
     public function print(Request $request, Invoice $invoice): Response
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
-        abort_unless(in_array($invoice->type, [InvoiceType::Customer, InvoiceType::CustomerMaster], true), 403);
+        $this->authorizeInvoiceAccess($request->user(), $invoice);
 
         return $this->printService->stream($invoice);
     }
 
     public function pdf(Request $request, Invoice $invoice): Response
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
-        abort_unless(in_array($invoice->type, [InvoiceType::Customer, InvoiceType::CustomerMaster], true), 403);
+        $this->authorizeInvoiceAccess($request->user(), $invoice);
 
         return $this->printService->pdf($invoice);
+    }
+
+    private function authorizeInvoiceAccess(User $user, Invoice $invoice): void
+    {
+        if ($user->isBackOffice()) {
+            return;
+        }
+
+        abort_unless($invoice->user_id === $user->id, 403);
+
+        // Buyers get customer invoices; sellers get their seller copy.
+        if ($user->isSeller() && $invoice->type === InvoiceType::Seller) {
+            return;
+        }
+
+        abort_unless(in_array($invoice->type, [InvoiceType::Customer, InvoiceType::CustomerMaster], true), 403);
     }
 }

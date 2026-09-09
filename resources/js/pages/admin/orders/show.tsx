@@ -215,14 +215,39 @@ export default function AdminOrderShow({ order, checkout }: AdminOrderShowProps)
             {checkout?.invoices && checkout.invoices.length > 0 && (
                 <div className="mt-6 rounded-xl bg-white p-6 shadow-sm">
                     <h2 className="font-semibold">Invoices</h2>
+                    <p className="mt-1 text-sm text-gray-500">
+                        Official checkout slips — open, print, or download as PDF.
+                    </p>
                     <ul className="mt-4 divide-y text-sm">
                         {checkout.invoices.map((inv) => (
-                            <li key={inv.id} className="flex justify-between py-2">
-                                <span>
-                                    {inv.invoice_number}{' '}
-                                    <span className="text-gray-400">({inv.type.replace(/_/g, ' ')})</span>
-                                </span>
-                                <span>{formatPrice(inv.total)}</span>
+                            <li key={inv.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                                <div>
+                                    <p className="font-medium text-gray-900">{inv.invoice_number}</p>
+                                    <p className="text-xs capitalize text-gray-400">{inv.type.replace(/_/g, ' ')}</p>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="font-medium text-gray-900">{formatPrice(inv.total)}</span>
+                                    <Link
+                                        href={route('invoices.show', inv.id)}
+                                        className="rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-600 hover:bg-orange-100"
+                                    >
+                                        View
+                                    </Link>
+                                    <a
+                                        href={route('invoices.print', inv.id)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="rounded-lg bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Print
+                                    </a>
+                                    <a
+                                        href={route('invoices.pdf', inv.id)}
+                                        className="rounded-lg bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Download PDF
+                                    </a>
+                                </div>
                             </li>
                         ))}
                     </ul>
