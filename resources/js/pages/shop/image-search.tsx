@@ -17,7 +17,7 @@ interface ImageSearchPageProps {
     results: ImageSearchResult[];
     preview: string | null;
     keywords: string[];
-    method: 'visual' | 'ai_visual' | null;
+    method: 'visual' | 'ai_visual' | 'ai_keyword' | null;
     visionEnabled: boolean;
     seller_id?: number | null;
     store_slug?: string | null;
@@ -116,7 +116,7 @@ export default function ImageSearchPage({
                                     className="mt-3 w-full rounded-xl object-contain"
                                 />
                             )}
-                            {method === 'ai_visual' && keywords.length > 0 && (
+                            {(method === 'ai_visual' || method === 'ai_keyword') && keywords.length > 0 && (
                                 <div className="mt-4">
                                     <p className="flex items-center gap-1 text-xs font-medium text-emerald-600">
                                         <Sparkles className="h-3.5 w-3.5" />
@@ -152,9 +152,10 @@ export default function ImageSearchPage({
                                         <div>
                                             <p className="text-sm font-semibold text-emerald-900">Deep Search complete</p>
                                             <p className="text-xs text-emerald-700/90">
-                                                <span className="font-semibold">{results.length}</span> similar product{results.length !== 1 ? 's' : ''} ranked by visual match
-                                                {method === 'visual' && ' · color & pattern matching'}
-                                                {method === 'ai_visual' && ' · AI vision'}
+                                                <span className="font-semibold">{results.length}</span> similar product{results.length !== 1 ? 's' : ''}
+                                                {method === 'visual' && ' ranked by visual match · color & pattern matching'}
+                                                {method === 'ai_visual' && ' ranked by visual match · AI vision'}
+                                                {method === 'ai_keyword' && ' matched from what AI saw in your photo'}
                                             </p>
                                         </div>
                                     </div>

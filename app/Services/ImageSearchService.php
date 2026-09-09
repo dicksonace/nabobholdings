@@ -16,13 +16,13 @@ class ImageSearchService
     private const BINS = 64;
 
     /** Max bit differences allowed between query and product image (0 = identical). */
-    private const MAX_DHASH_DISTANCE = 8;
+    private const MAX_DHASH_DISTANCE = 18;
 
     /** Minimum combined visual score (0–1) to count as a match. */
-    private const MIN_MATCH_SCORE = 0.82;
+    private const MIN_MATCH_SCORE = 0.68;
 
-    /** If the best candidate is below this, return nothing. */
-    private const MIN_BEST_SCORE = 0.85;
+    /** If the best candidate is below this, try keyword fallback (when available). */
+    private const MIN_BEST_SCORE = 0.70;
 
     private const MAX_RESULTS = 24;
 
@@ -37,7 +37,7 @@ class ImageSearchService
         $preview = 'data:'.$file->getMimeType().';base64,'.base64_encode($contents ?: '');
 
         if (! $this->isValidSignature($querySignature)) {
-            return $this->emptyResult($preview, $keywords);
+            return $this->keywordFallbackOrEmpty($preview, $keywords, $sellerId);
         }
 
         $candidatesQuery = Product::with(['images', 'seller.sellerProfile', 'category'])
@@ -71,10 +71,11 @@ class ImageSearchService
 
             $textScore = $keywords ? $this->keywordMatchScore($product, $keywords) : 0.0;
 
-            // Visual match is required; AI keywords only help rank among already-similar images.
-            $finalScore = $keywords && $textScore > 0
-                ? min(1.0, ($bestImageScore * 0.85) + ($textScore * 0.15))
-                : $bestImageScore;
+            // Keywords may boost ranking, but must never dilute a strong visual match.
+            $finalScore = $bestImageScore;
+            if ($keywords && $textScore > 0) {
+                $finalScore = min(1.0, $bestImageScore + (0.12 * $textScore * (1.0 - $bestImageScore)));
+            }
 
             $scored[] = [
                 'product' => $product,
@@ -84,7 +85,7 @@ class ImageSearchService
         }
 
         if ($scored === []) {
-            return $this->emptyResult($preview, $keywords);
+            return $this->keywordFallbackOrEmpty($preview, $keywords, $sellerId);
         }
 
         usort($scored, fn ($a, $b) => $b['score'] <=> $a['score']);
@@ -92,11 +93,11 @@ class ImageSearchService
         $bestScore = $scored[0]['score'];
 
         if ($bestScore < self::MIN_BEST_SCORE) {
-            return $this->emptyResult($preview, $keywords);
+            return $this->keywordFallbackOrEmpty($preview, $keywords, $sellerId);
         }
 
         // Only keep results close to the best match — drop weak tail.
-        $cutoff = $bestScore * 0.94;
+        $cutoff = $bestScore * 0.88;
         $filtered = array_values(array_filter($scored, fn ($row) => $row['score'] >= $cutoff));
 
         return [
@@ -152,10 +153,19 @@ class ImageSearchService
         $histogram = $signature['histogram'] ?? null;
         $dhash = $signature['dhash'] ?? null;
 
-        return is_array($histogram)
-            && count($histogram) === self::BINS
-            && is_string($dhash)
-            && strlen($dhash) === self::BINS;
+        if (! is_array($histogram)
+            || count($histogram) !== self::BINS
+            || ! is_string($dhash)
+            || strlen($dhash) !== self::BINS) {
+            return false;
+        }
+
+        // Reject failed-decode fingerprints (all-zero hash + empty histogram).
+        if ($dhash === str_repeat('0', self::BINS) && array_sum($histogram) < 1e-9) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -433,6 +443,84 @@ class ImageSearchService
             'preview' => $preview,
             'keywords' => $keywords ?? [],
             'method' => $keywords ? 'ai_visual' : 'visual',
+        ];
+    }
+
+    /**
+     * When visual fingerprints miss (common for phone vs studio photos), fall back to
+     * AI/product keywords so a watch photo can still surface watches in the catalog.
+     *
+     * @param  string[]|null  $keywords
+     * @return array{products: Collection, preview: string, keywords: string[], method: string}
+     */
+    private function keywordFallbackOrEmpty(string $preview, ?array $keywords, ?int $sellerId): array
+    {
+        if (! $keywords) {
+            return $this->emptyResult($preview, $keywords);
+        }
+
+        $query = Product::with(['images', 'seller.sellerProfile', 'category'])
+            ->visibleInShop();
+
+        if ($sellerId) {
+            $query->where('seller_id', $sellerId);
+        }
+
+        $search = implode(' ', $keywords);
+        app(ProductSearchService::class)->apply($query, $search);
+        app(ProductSearchService::class)->applySortByRelevance($query);
+
+        $products = $query->limit(self::MAX_RESULTS)->get();
+
+        if ($products->isEmpty()) {
+            // Soft fallback: score candidates by keyword overlap if full-text found nothing.
+            $candidates = Product::with(['images', 'seller.sellerProfile', 'category'])
+                ->visibleInShop()
+                ->when($sellerId, fn ($q) => $q->where('seller_id', $sellerId))
+                ->latest('id')
+                ->limit(250)
+                ->get();
+
+            $scored = [];
+            foreach ($candidates as $product) {
+                $textScore = $this->keywordMatchScore($product, $keywords);
+                if ($textScore < 0.25) {
+                    continue;
+                }
+                $scored[] = [
+                    'product' => $product,
+                    'score' => round($textScore, 4),
+                    'match_percent' => $this->scoreToPercent($textScore),
+                ];
+            }
+
+            usort($scored, fn ($a, $b) => $b['score'] <=> $a['score']);
+
+            if ($scored === []) {
+                return $this->emptyResult($preview, $keywords);
+            }
+
+            return [
+                'products' => collect(array_slice($scored, 0, self::MAX_RESULTS)),
+                'preview' => $preview,
+                'keywords' => $keywords,
+                'method' => 'ai_keyword',
+            ];
+        }
+
+        return [
+            'products' => $products->map(function (Product $product) use ($keywords) {
+                $textScore = max(0.35, $this->keywordMatchScore($product, $keywords));
+
+                return [
+                    'product' => $product,
+                    'score' => round($textScore, 4),
+                    'match_percent' => $this->scoreToPercent($textScore),
+                ];
+            })->values(),
+            'preview' => $preview,
+            'keywords' => $keywords,
+            'method' => 'ai_keyword',
         ];
     }
 

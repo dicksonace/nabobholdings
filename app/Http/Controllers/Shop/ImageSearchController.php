@@ -36,6 +36,9 @@ class ImageSearchController extends Controller
         ]);
 
         $sellerId = isset($validated['seller_id']) ? (int) $validated['seller_id'] : ($request->integer('seller_id') ?: null);
+        $scope = $this->storeScope($request, $sellerId);
+        $sellerId = $scope['seller_id'];
+
         $result = $this->imageSearch->search($validated['image'], $sellerId);
 
         $products = $result['products']->map(fn ($row) => [
@@ -49,7 +52,7 @@ class ImageSearchController extends Controller
             'keywords' => $result['keywords'],
             'method' => $result['method'],
             'visionEnabled' => (bool) config('services.openai.key'),
-            ...$this->storeScope($request, $sellerId),
+            ...$scope,
         ]);
     }
 
