@@ -87,8 +87,7 @@ class ChatService
                 MessageType::CallEnd,
             ], true);
 
-            if (! $isCallSignal && $type !== MessageType::CallLog) {
-                $isCall = str_starts_with($type->value, 'call');
+            if ($recipient && ! $isCallSignal && $type !== MessageType::CallLog) {
                 $notificationBody = match (true) {
                     $type === MessageType::Text => $body,
                     $type === MessageType::Image => 'Sent a photo',
@@ -108,7 +107,7 @@ class ChatService
                 ]);
             }
 
-            if ($type === MessageType::CallOffer) {
+            if ($recipient && $type === MessageType::CallOffer) {
                 AppNotification::create([
                     'user_id' => $recipient->id,
                     'type' => 'call',

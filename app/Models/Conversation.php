@@ -48,7 +48,7 @@ class Conversation extends Model
         return $this->hasOne(Message::class)->latestOfMany();
     }
 
-    public function otherParticipant(User $user): User
+    public function otherParticipant(User $user): ?User
     {
         return $this->buyer_id === $user->id ? $this->seller : $this->buyer;
     }

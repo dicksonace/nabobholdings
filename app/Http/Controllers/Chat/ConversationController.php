@@ -26,10 +26,14 @@ class ConversationController extends Controller
             'latestMessage.sender:id,name',
         ])
             ->where(fn ($q) => $q->where('buyer_id', $userId)->orWhere('seller_id', $userId))
+            ->whereHas('buyer')
+            ->whereHas('seller')
             ->orderByDesc('last_message_at')
             ->orderByDesc('updated_at')
             ->get()
-            ->map(fn (Conversation $c) => $this->formatConversation($c, $request->user()));
+            ->map(fn (Conversation $c) => $this->formatConversation($c, $request->user()))
+            ->filter()
+            ->values();
 
         if ($request->wantsJson()) {
             return response()->json(['conversations' => $conversations]);
@@ -59,8 +63,13 @@ class ConversationController extends Controller
             ->map(fn ($m) => ChatService::formatMessage($m, $request->user()));
 
         if ($request->wantsJson()) {
+            $formatted = $this->formatConversation($conversation, $request->user(), detailed: true);
+            if (! $formatted) {
+                return response()->json(['message' => 'This conversation is no longer available.'], 404);
+            }
+
             return response()->json([
-                'conversation' => $this->formatConversation($conversation, $request->user(), detailed: true),
+                'conversation' => $formatted,
                 'messages' => $messages,
             ]);
         }
@@ -103,8 +112,13 @@ class ConversationController extends Controller
                 ->get()
                 ->map(fn ($m) => ChatService::formatMessage($m, $request->user()));
 
+            $formatted = $this->formatConversation($conversation, $request->user(), detailed: true);
+            if (! $formatted) {
+                return response()->json(['message' => 'This conversation is no longer available.'], 404);
+            }
+
             return response()->json([
-                'conversation' => $this->formatConversation($conversation, $request->user(), detailed: true),
+                'conversation' => $formatted,
                 'messages' => $messages,
             ]);
         }
@@ -130,6 +144,13 @@ class ConversationController extends Controller
         }
 
         $other = $conversation->otherParticipant($request->user());
+        if (! $other) {
+            return response()->json([
+                'messages' => $messages,
+                'other' => null,
+            ]);
+        }
+
         $other->loadMissing('sellerProfile');
 
         return response()->json([
@@ -150,9 +171,16 @@ class ConversationController extends Controller
         ]);
     }
 
-    private function formatConversation(Conversation $conversation, User $user, bool $detailed = false): array
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function formatConversation(Conversation $conversation, User $user, bool $detailed = false): ?array
     {
         $other = $conversation->otherParticipant($user);
+        if (! $other) {
+            return null;
+        }
+
         $other->loadMissing('sellerProfile');
 
         $latest = $conversation->latestMessage;
@@ -161,7 +189,7 @@ class ConversationController extends Controller
             ->whereNull('read_at')
             ->count();
 
-        $data = [
+        return [
             'id' => $conversation->id,
             'product' => $conversation->product ? [
                 'id' => $conversation->product->id,
@@ -194,7 +222,5 @@ class ConversationController extends Controller
             'unread_count' => $unread,
             'last_message_at' => $conversation->last_message_at?->toIso8601String(),
         ];
-
-        return $data;
     }
 }

@@ -29,11 +29,11 @@ export default function AdminChatsIndex({ conversations, search }: ChatsIndexPro
     };
 
     return (
-        <AdminLayout title="Buyer–Seller Chats" active="chats">
-            <Head title="Chats" />
+        <AdminLayout title="Customer Chats" active="chats">
+            <Head title="Customer Chats" />
 
             <p className="mb-4 text-sm text-gray-500">
-                Monitor conversations between buyers and sellers. Message content is encrypted at rest in the database.
+                Monitor conversations between buyers and sellers.
             </p>
 
             <form onSubmit={submitSearch} className="mb-6">

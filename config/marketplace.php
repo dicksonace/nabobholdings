@@ -28,7 +28,7 @@ return [
             'items' => [
                 [
                     'question' => 'How do I place an order?',
-                    'answer' => 'Browse products, add items to your cart, then proceed to checkout. Enter your delivery details, choose a payment method, and complete payment via Paystack. You will receive an order confirmation by email and SMS.',
+                    'answer' => 'Browse products, add items to your cart, then proceed to checkout. Enter your delivery details, choose how you want to pay (cash on delivery or bank transfer), and confirm the order. You will receive confirmation by email and SMS.',
                 ],
                 [
                     'question' => 'Do I need an account to shop?',
@@ -36,7 +36,7 @@ return [
                 ],
                 [
                     'question' => 'What payment methods are accepted?',
-                    'answer' => 'We accept Mobile Money (MTN, Telecel, AirtelTigo), bank cards, and bank transfers through Paystack. All payments are processed securely at checkout.',
+                    'answer' => 'At checkout you can pay with cash on delivery (COD) or bank transfer (upload your transfer receipt for verification). You can also use your Nabob Holdings wallet balance when available. Available options may vary by store and product.',
                 ],
                 [
                     'question' => 'Can I cancel my order?',
@@ -74,7 +74,11 @@ return [
                 ],
                 [
                     'question' => 'What is my buyer wallet for?',
-                    'answer' => 'Your wallet holds refunds and top-ups. You can use wallet balance at checkout or withdraw to Mobile Money after admin approval.',
+                    'answer' => 'Your wallet holds refunds and approved top-ups. You can use wallet balance at checkout or request a withdrawal after admin approval.',
+                ],
+                [
+                    'question' => 'How does bank transfer checkout work?',
+                    'answer' => 'Choose bank transfer at checkout, transfer the order total to the account details shown, then upload a clear photo or PDF of your receipt. Our team verifies the slip before the order is processed.',
                 ],
             ],
         ],
@@ -104,7 +108,7 @@ return [
                 ],
                 [
                     'question' => 'Is my payment information safe?',
-                    'answer' => 'Yes. Nabob Holdings does not store your card or Mobile Money PIN. All payments are handled by Paystack, a PCI-DSS compliant payment processor.',
+                    'answer' => 'Yes. Nabob Holdings does not store your banking PINs or card secrets. Bank transfer checkouts use your uploaded receipt for verification only, and wallet activity stays inside your Nabob Holdings account.',
                 ],
                 [
                     'question' => 'How do I contact support?',

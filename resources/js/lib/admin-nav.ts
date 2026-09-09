@@ -248,7 +248,7 @@ export function adminNavGroups(active: AdminNavKey, role: string = 'admin'): Pan
                 badgeKey: 'open_disputes',
                 defaultOnPath: true,
             },
-            { key: 'chats', label: 'Customer Chats', href: route('chat.index'), badgeKey: 'unread_chat_messages' },
+            { key: 'chats', label: 'Customer Chats', href: route('admin.chats.index'), badgeKey: 'unread_chat_messages' },
             { key: 'buyer-announcements', label: 'Message Buyers', href: route('admin.buyer-announcements.index') },
             { key: 'messages', label: 'Contact Messages', href: route('admin.contact-messages.index'), badgeKey: 'unread_messages' },
         ],

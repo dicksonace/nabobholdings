@@ -21,6 +21,8 @@ class ChatOversightController extends Controller
                 'product:id,name,slug',
                 'latestMessage.sender:id,name',
             ])
+            ->whereHas('buyer')
+            ->whereHas('seller')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     $query->whereHas('buyer', function ($buyer) use ($search) {
