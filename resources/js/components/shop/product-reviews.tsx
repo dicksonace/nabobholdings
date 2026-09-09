@@ -2,6 +2,7 @@ import { Link, useForm, usePage } from '@inertiajs/react';
 import { MessageSquare, PenLine, Star } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
+import RatingDisplay from '@/components/shop/rating-display';
 import { Button } from '@/components/ui/button';
 import { Paginated, ProductReview } from '@/types/marketplace';
 import { SharedData } from '@/types';
@@ -13,6 +14,8 @@ interface ReviewableOrder {
 
 interface ProductReviewsProps {
     productSlug: string;
+    productRating: number;
+    productReviewCount: number;
     reviews: Paginated<ProductReview>;
     reviewable?: ReviewableOrder | null;
 }
@@ -34,13 +37,19 @@ function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md
 
 function formatReviewDate(value?: string): string {
     if (!value) return '';
-    return new Date(value).toLocaleDateString('en-GH', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(value).toLocaleDateString('en-LK', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export default function ProductReviews({ productSlug, reviews, reviewable }: ProductReviewsProps) {
+export default function ProductReviews({
+    productSlug,
+    productRating,
+    productReviewCount,
+    reviews,
+    reviewable,
+}: ProductReviewsProps) {
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, post, processing, reset } = useForm({
+    const { data, setData, post, processing, reset, errors } = useForm({
         order_item_id: reviewable?.order_item_id ?? 0,
         rating: 5,
         comment: '',
@@ -54,10 +63,7 @@ export default function ProductReviews({ productSlug, reviews, reviewable }: Pro
         });
     };
 
-    const averageRating =
-        reviews.data.length > 0
-            ? reviews.data.reduce((sum, r) => sum + r.rating, 0) / reviews.data.length
-            : 0;
+    const totalReviews = Math.max(productReviewCount, reviews.total);
 
     return (
         <section id="customer-reviews" className="mt-12 scroll-mt-24 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
@@ -66,16 +72,11 @@ export default function ProductReviews({ productSlug, reviews, reviewable }: Pro
                     <MessageSquare className="h-5 w-5 text-orange-500" />
                     <h2 className="text-xl font-bold text-gray-900">Customer Reviews & Ratings</h2>
                 </div>
-                {reviews.total > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <StarRating rating={Math.round(averageRating)} size="md" />
-                        <span>{averageRating.toFixed(1)} · {reviews.total} review{reviews.total !== 1 ? 's' : ''}</span>
-                    </div>
-                )}
+                <RatingDisplay rating={productRating} reviewCount={totalReviews} size="md" />
             </div>
 
             <p className="mt-2 text-sm text-gray-500">
-                Rate with stars and leave a written comment after your order is delivered.
+                Only verified buyers can leave a star rating and comment after delivery. Ratings update from real reviews only.
             </p>
 
             {auth.user && reviewable && (
@@ -101,8 +102,13 @@ export default function ProductReviews({ productSlug, reviews, reviewable }: Pro
                         required
                         maxLength={1000}
                     />
+                    {(errors.rating || errors.comment || errors.order_item_id) && (
+                        <p className="mt-2 text-sm text-red-600">
+                            {errors.rating || errors.comment || errors.order_item_id}
+                        </p>
+                    )}
                     <Button type="submit" size="sm" disabled={processing} className="mt-3 bg-orange-500 hover:bg-orange-600">
-                        Post Review
+                        {processing ? 'Posting…' : 'Post Review'}
                     </Button>
                 </form>
             )}
@@ -112,7 +118,7 @@ export default function ProductReviews({ productSlug, reviews, reviewable }: Pro
                     <p className="font-medium text-gray-800">How to leave a review</p>
                     <ol className="mt-2 list-inside list-decimal space-y-1 text-gray-500">
                         <li>Buy this product and complete checkout</li>
-                        <li>Wait until the seller marks your order as <strong>Delivered</strong></li>
+                        <li>Wait until the order is marked as <strong>Delivered</strong></li>
                         <li>Come back here — a star rating and comment box will appear</li>
                     </ol>
                     <Link href={route('orders.index')} className="mt-3 inline-block text-orange-500 hover:underline">
@@ -129,7 +135,7 @@ export default function ProductReviews({ productSlug, reviews, reviewable }: Pro
 
             <div className="mt-6 divide-y">
                 {reviews.data.length === 0 ? (
-                    <p className="py-8 text-center text-sm text-gray-500">No reviews yet. Be the first to share your experience!</p>
+                    <p className="py-8 text-center text-sm text-gray-500">No reviews yet. Be the first verified buyer to share your experience!</p>
                 ) : (
                     reviews.data.map((review) => (
                         <article key={review.id} className="py-5">
@@ -144,6 +150,15 @@ export default function ProductReviews({ productSlug, reviews, reviewable }: Pro
                             </div>
                             {review.comment && (
                                 <p className="mt-2 text-sm leading-relaxed text-gray-600">{review.comment}</p>
+                            )}
+                            {review.seller_reply && (
+                                <div className="mt-3 rounded-lg border border-orange-100 bg-orange-50/70 px-3 py-2">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">Seller reply</p>
+                                    <p className="mt-1 text-sm text-gray-700">{review.seller_reply}</p>
+                                    {review.seller_replied_at && (
+                                        <p className="mt-1 text-xs text-gray-400">{formatReviewDate(review.seller_replied_at)}</p>
+                                    )}
+                                </div>
                             )}
                         </article>
                     ))

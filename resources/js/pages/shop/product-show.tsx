@@ -335,6 +335,8 @@ export default function ProductShow({ product, related, reviews, reviewable }: P
 
                 <ProductReviews
                     productSlug={product.slug}
+                    productRating={Number(product.rating ?? 0)}
+                    productReviewCount={Number(product.review_count ?? 0)}
                     reviews={reviews}
                     reviewable={reviewable}
                 />

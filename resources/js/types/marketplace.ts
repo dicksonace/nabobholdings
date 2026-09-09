@@ -217,6 +217,8 @@ export interface ProductReview {
     id: number;
     rating: number;
     comment?: string | null;
+    seller_reply?: string | null;
+    seller_replied_at?: string | null;
     created_at?: string;
     user?: { name: string };
 }

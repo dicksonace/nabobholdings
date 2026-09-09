@@ -141,8 +141,8 @@ class BulkProductsSeeder extends Seeder
                 'is_preorder' => $this->randomBool(20),
                 'free_shipping' => $this->randomBool(45),
                 'in_ghana' => $this->randomBool(70),
-                'rating' => $this->randomFloat(3.5, 5.0, 1),
-                'review_count' => $this->randomInt(0, 120),
+                'rating' => 0,
+                'review_count' => 0,
             ]);
 
             $imageCount = $this->randomInt(2, 4);

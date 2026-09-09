@@ -102,8 +102,8 @@ class CatalogDemoProductsSeeder extends Seeder
             'free_shipping' => $item['free_shipping'] ?? false,
             'in_ghana' => true,
             'ships_nationwide' => true,
-            'rating' => $item['rating'] ?? round(random_int(42, 50) / 10, 1),
-            'review_count' => $item['review_count'] ?? random_int(2, 48),
+            'rating' => 0,
+            'review_count' => 0,
             'views' => random_int(80, 2400),
         ];
 

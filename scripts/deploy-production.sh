@@ -56,6 +56,9 @@ fi
 echo "==> Sync catalog categories (Sahan tree)"
 $PHP_BIN artisan catalog:sync-categories --deactivate-old
 
+echo "==> Sync product ratings from real reviews"
+$PHP_BIN artisan ratings:sync
+
 echo "==> Cache for production"
 $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
