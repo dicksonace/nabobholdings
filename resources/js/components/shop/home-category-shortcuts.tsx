@@ -97,7 +97,11 @@ export default function HomeCategoryShortcuts({
             label: 'New Arrival',
             icon: Sparkles,
             color: 'bg-orange-100 text-orange-600',
-            onClick: () => applyFilters({ sort: 'newest' }, filters),
+            onClick: () =>
+                applyFilters(
+                    { sort: filters.sort === 'newest' ? 'recommended' : 'newest' },
+                    filters,
+                ),
             active: filters.sort === 'newest',
         },
         {
@@ -116,7 +120,14 @@ export default function HomeCategoryShortcuts({
         label: cat.name,
         icon: categoryIcon(cat.slug, cat.name),
         color: iconColors[index % iconColors.length],
-        onClick: () => applyFilters({ category: String(cat.id) }, filters),
+        onClick: () =>
+            applyFilters(
+                {
+                    category:
+                        String(filters.category) === String(cat.id) ? '' : String(cat.id),
+                },
+                filters,
+            ),
         active: String(filters.category) === String(cat.id),
         count: cat.products_count,
     }));
