@@ -125,7 +125,7 @@ export function sellerNavGroups(active: SellerNavKey): PanelNavGroup[] {
             icon: Wallet,
             defaultOpen: section === 'finance',
             items: [
-                { key: 'wallet', label: 'Withdraw to MoMo', href: route('manage.wallet'), mobile: true },
+                { key: 'wallet', label: 'Earnings & withdraw', href: route('manage.wallet'), mobile: true },
                 { key: 'wallet-transactions', label: 'Transactions', href: route('manage.wallet.transactions') },
                 { key: 'wallet-withdrawals', label: 'Withdrawals', href: route('manage.wallet.withdrawals') },
                 { key: 'payment-methods', label: 'Payment Methods', href: route('manage.payment-methods.index') },

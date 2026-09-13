@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -19,7 +18,7 @@ class AdminSellerAnnouncementNotification extends Notification implements Should
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -32,10 +31,4 @@ class AdminSellerAnnouncementNotification extends Notification implements Should
             ->line('Thank you for selling on Nabob Holdings.');
     }
 
-    public function toSms(object $notifiable): string
-    {
-        $snippet = mb_substr($this->body, 0, 120);
-
-        return "Nabob Holdings: {$this->title}. {$snippet}";
-    }
 }

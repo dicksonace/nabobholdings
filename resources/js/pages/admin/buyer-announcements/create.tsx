@@ -93,7 +93,7 @@ export default function CreateBuyerAnnouncement({ buyers }: CreateBuyerAnnouncem
                 <div>
                     <h2 className="text-lg font-semibold text-gray-900">Send message to buyers</h2>
                     <p className="mt-1 text-sm text-gray-500">
-                        Buyers see this in their notification bell. Optionally also email and SMS them.
+                        Buyers see this in their notification bell. Optionally also email them.
                     </p>
                 </div>
 
@@ -213,7 +213,7 @@ export default function CreateBuyerAnnouncement({ buyers }: CreateBuyerAnnouncem
                         className="mt-1"
                     />
                     <span>
-                        <span className="block text-sm font-medium text-gray-900">Also send email & SMS</span>
+                        <span className="block text-sm font-medium text-gray-900">Also send email</span>
                         <span className="text-xs text-gray-500">
                             In-app notification is always created. Turn this on for urgent notices.
                         </span>

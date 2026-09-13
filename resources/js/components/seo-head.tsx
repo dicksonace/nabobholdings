@@ -33,7 +33,7 @@ export default function SeoHead({
     const brandName = page.props.brand?.name ?? 'Nabob Holdings';
     const fallbackDescription =
         page.props.brand?.tagline ??
-        'Shop quality products from Nabob Holdings — secure payments, order tracking, and delivery across Ghana.';
+        'Shop quality products from Nabob Holdings — secure payments, order tracking, and reliable delivery.';
 
     const desc = (description?.trim() || fallbackDescription).slice(0, 300);
     const origin =

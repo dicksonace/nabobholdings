@@ -311,7 +311,11 @@ class PlatformSettings
         }, $decoded['accounts'] ?? []));
 
         $accounts = array_values(array_filter($accounts));
-        $accounts = static::ensureNabobMomoAccounts($accounts);
+        // Prefer bank accounts only — MoMo/Ghana receive numbers are no longer used.
+        $accounts = array_values(array_filter(
+            $accounts,
+            fn (array $account) => ($account['type'] ?? '') === 'bank',
+        ));
 
         return [
             'enabled' => (bool) ($decoded['enabled'] ?? false),
@@ -334,67 +338,23 @@ class PlatformSettings
     }
 
     /**
-     * MTN / Telecel / AirtelTigo receive accounts used for manual deposits.
+     * @deprecated MoMo defaults removed — platform is bank-transfer only.
      *
      * @return list<array<string, mixed>>
      */
     public static function defaultNabobMomoAccounts(): array
     {
-        return [
-            [
-                'type' => 'momo',
-                'label' => 'MTN Mobile Money',
-                'account_name' => 'Nabob Holdings / Robert Asare',
-                'account_number' => '0539790093',
-                'network' => 'mtn',
-                'bank_name' => null,
-            ],
-            [
-                'type' => 'momo',
-                'label' => 'Telecel Cash',
-                'account_name' => 'Nabob Holdings / Robert Asare',
-                'account_number' => '513014',
-                'network' => 'telecel',
-                'bank_name' => null,
-            ],
-            [
-                'type' => 'momo',
-                'label' => 'AirtelTigo Cash',
-                'account_name' => 'Nabob Holdings / Robert Asare',
-                'account_number' => '0273706541',
-                'network' => 'airteltigo',
-                'bank_name' => null,
-            ],
-        ];
+        return [];
     }
 
     /**
-     * Fill in any missing Nabob Holdings MoMo network so buyers never see “Not configured”.
+     * @deprecated No longer injects MoMo accounts.
      *
      * @param  list<array<string, mixed>>  $accounts
      * @return list<array<string, mixed>>
      */
     public static function ensureNabobMomoAccounts(array $accounts): array
     {
-        $byNetwork = [];
-        foreach ($accounts as $account) {
-            if (($account['type'] ?? '') !== 'momo') {
-                continue;
-            }
-            $network = static::normalizeMomoNetwork($account['network'] ?? null);
-            if ($network) {
-                $byNetwork[$network] = true;
-            }
-        }
-
-        foreach (static::defaultNabobMomoAccounts() as $default) {
-            $network = $default['network'];
-            if (! isset($byNetwork[$network])) {
-                $accounts[] = $default;
-                $byNetwork[$network] = true;
-            }
-        }
-
         return array_values($accounts);
     }
 

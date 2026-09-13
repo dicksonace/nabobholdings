@@ -45,10 +45,10 @@ const shortcuts = [
 ] as const;
 
 const quickLinks = [
-    { label: 'Wallet', href: () => route('wallet.index'), icon: Wallet },
     { label: 'Invoices', tab: 'invoices', icon: FileText },
     { label: 'Wishlist', href: () => route('wishlist.index'), icon: Star },
     { label: 'Messages', href: () => route('chat.index'), icon: MessageSquare },
+    { label: 'Addresses', href: () => route('addresses.index'), icon: Package },
 ] as const;
 
 export default function BuyerOrderHub({ counts, activeTab }: BuyerOrderHubProps) {

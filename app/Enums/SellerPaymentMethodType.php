@@ -17,7 +17,6 @@ enum SellerPaymentMethodType: string
     public static function creatable(): array
     {
         return [
-            self::MobileMoney,
             self::Bank,
         ];
     }

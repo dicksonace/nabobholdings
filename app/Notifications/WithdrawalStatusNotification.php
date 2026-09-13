@@ -30,8 +30,8 @@ class WithdrawalStatusNotification extends Notification implements ShouldQueue
                 ->subject("Withdrawal paid ({$amount})")
                 ->greeting('Hello '.$notifiable->name.',')
                 ->line("Your withdrawal of {$amount} has been paid.")
-                ->line('Network: '.strtoupper((string) $this->withdrawal->network))
-                ->line('MoMo: '.$this->withdrawal->momo_number),
+                ->line('Bank: '.(string) $this->withdrawal->network)
+                ->line('Account: '.$this->withdrawal->momo_number),
 
             WithdrawalStatus::Rejected => (new MailMessage)
                 ->subject("Withdrawal rejected ({$amount})")

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use App\Models\Dispute;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,7 +16,7 @@ class DisputeOpenedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -30,8 +29,4 @@ class DisputeOpenedNotification extends Notification implements ShouldQueue
             ->action('View Details', route('orders.show', $this->dispute->order_id));
     }
 
-    public function toSms(object $notifiable): string
-    {
-        return "Nabob Holdings: Dispute opened on order {$this->dispute->order->order_number}. Reason: {$this->dispute->reason}.";
-    }
 }

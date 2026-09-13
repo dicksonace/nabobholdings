@@ -3,6 +3,7 @@ import { Bell, MessageCircle, Package, Shield } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { useChatOptional } from '@/contexts/chat-context';
+import { cn } from '@/lib/utils';
 import { SharedData } from '@/types';
 
 type NotificationData = {
@@ -41,7 +42,7 @@ function NotificationIcon({ type }: { type: string }) {
     return <Bell className="h-4 w-4 text-orange-500" />;
 }
 
-export default function NotificationBell() {
+export default function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
     const { auth, unreadMessages, unreadNotifications } = usePage<
         SharedData & { unreadMessages?: number; unreadNotifications?: number }
     >().props;
@@ -52,6 +53,7 @@ export default function NotificationBell() {
     const panelRef = useRef<HTMLDivElement>(null);
 
     const totalUnread = (unreadMessages ?? 0) + (unreadNotifications ?? 0);
+    const dark = tone === 'dark';
 
     useEffect(() => {
         if (!open || !auth.user) return;
@@ -111,12 +113,20 @@ export default function NotificationBell() {
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="relative rounded-lg p-2 hover:bg-gray-50"
+                className={cn(
+                    'relative inline-flex h-10 w-10 items-center justify-center rounded-full transition active:scale-95',
+                    dark
+                        ? 'text-white/90 hover:bg-white/10'
+                        : 'text-[#0f2744] hover:bg-[#0f2744]/[0.06]',
+                    open && (dark ? 'bg-white/15' : 'bg-[#0f2744]/[0.08]'),
+                )}
                 aria-label="Notifications"
+                aria-expanded={open}
+                title="Notifications"
             >
-                <Bell className="h-5 w-5 text-gray-700" />
+                <Bell className="h-5 w-5" />
                 {totalUnread > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#d97706] px-1 text-[10px] font-bold text-white shadow-sm shadow-amber-600/30">
                         {totalUnread > 9 ? '9+' : totalUnread}
                     </span>
                 )}

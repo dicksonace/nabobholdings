@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -16,7 +15,7 @@ class SellerSuspendedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -29,8 +28,4 @@ class SellerSuspendedNotification extends Notification implements ShouldQueue
             ->line('Contact support if you believe this was a mistake.');
     }
 
-    public function toSms(object $notifiable): string
-    {
-        return 'Nabob Holdings: Your seller account has been suspended. Your products are hidden. Check your email for details.';
-    }
 }

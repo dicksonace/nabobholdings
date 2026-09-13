@@ -31,8 +31,8 @@ class WithdrawalSubmittedNotification extends Notification implements ShouldQueu
                 ->subject("Withdrawal request submitted ({$amount})")
                 ->greeting('Hello '.$notifiable->name.',')
                 ->line("We received your withdrawal request for {$amount}.")
-                ->line('Network: '.strtoupper((string) $this->withdrawal->network))
-                ->line('MoMo: '.$this->withdrawal->momo_number)
+                ->line('Bank: '.(string) $this->withdrawal->network)
+                ->line('Account: '.$this->withdrawal->momo_number)
                 ->line('We will process it shortly and email you when it is paid or if we need more info.');
         }
 
@@ -42,8 +42,8 @@ class WithdrawalSubmittedNotification extends Notification implements ShouldQueu
             ->subject("New withdrawal request ({$amount})")
             ->greeting('Hello,')
             ->line(($user?->name ?? 'A user').' requested a withdrawal of '.$amount.'.')
-            ->line('Network: '.strtoupper((string) $this->withdrawal->network))
-            ->line('MoMo: '.$this->withdrawal->momo_number)
+            ->line('Bank: '.(string) $this->withdrawal->network)
+            ->line('Account: '.$this->withdrawal->momo_number)
             ->action('Review withdrawals', route('admin.withdrawals.index', ['status' => 'pending']));
     }
 }

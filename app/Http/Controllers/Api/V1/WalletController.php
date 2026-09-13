@@ -16,7 +16,7 @@ class WalletController extends Controller
     public function show(Request $request): JsonResponse
     {
         $user = $request->user();
-        abort_unless(in_array($user->role, [UserRole::Buyer, UserRole::Seller], true), 403);
+        abort_unless($user->role === UserRole::Seller, 403);
 
         $wallet = WalletService::ensure($user);
 

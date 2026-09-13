@@ -30,7 +30,7 @@ export function loadCheckoutDraft(cartKey: string): CheckoutDraft | null {
         return {
             cartKey,
             address_id: typeof parsed.address_id === 'number' ? parsed.address_id : null,
-            payment_method: typeof parsed.payment_method === 'string' ? parsed.payment_method : 'momo',
+            payment_method: typeof parsed.payment_method === 'string' ? parsed.payment_method : 'bank_transfer',
             seller_payments:
                 parsed.seller_payments && typeof parsed.seller_payments === 'object'
                     ? parsed.seller_payments

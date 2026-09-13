@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,7 +19,7 @@ class DirectPaymentRejectedNotification extends Notification implements ShouldQu
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -34,8 +33,4 @@ class DirectPaymentRejectedNotification extends Notification implements ShouldQu
             ->action('Resubmit payment', route('checkout.payment', $this->order->checkout_id));
     }
 
-    public function toSms(object $notifiable): string
-    {
-        return "Nabob Holdings: Seller rejected payment claim for order {$this->order->order_number}. Resubmit a valid reference.";
-    }
 }

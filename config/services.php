@@ -41,13 +41,6 @@ return [
         'webhook_secret' => env('PAYSTACK_WEBHOOK_SECRET'),
     ],
 
-    'sms' => [
-        'driver' => env('SMS_DRIVER', 'log'),
-        'hubtel_client_id' => env('HUBTEL_CLIENT_ID'),
-        'hubtel_client_secret' => env('HUBTEL_CLIENT_SECRET'),
-        'hubtel_sender' => env('HUBTEL_SENDER', 'Nabob'),
-    ],
-
     'openai' => [
         'key' => env('OPENAI_API_KEY'),
         'vision_model' => env('OPENAI_VISION_MODEL', 'gpt-4o-mini'),

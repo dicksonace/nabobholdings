@@ -6,13 +6,11 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import MomoNetworkPicker from '@/components/wallet/momo-network-picker';
 import AdminLayout from '@/layouts/admin-layout';
-import { momoNetworkMeta } from '@/lib/momo-networks';
 import { SharedData } from '@/types';
 
 type Account = {
-    type: 'momo' | 'bank';
+    type: 'bank';
     label: string;
     account_name: string;
     account_number: string;
@@ -29,53 +27,22 @@ interface Props {
 }
 
 const emptyAccount = (): Account => ({
-    type: 'momo',
-    label: 'MTN Mobile Money',
-    account_name: 'Nabob Holdings / Robert Asare',
+    type: 'bank',
+    label: 'Bank transfer',
+    account_name: '',
     account_number: '',
-    network: 'mtn',
+    network: null,
     bank_name: '',
 });
 
-/** Starter receive accounts from Nabob Holdings ops — used when none are configured yet. */
-const defaultNabobAccounts = (): Account[] => [
-    {
-        type: 'momo',
-        label: 'MTN Mobile Money',
-        account_name: 'Nabob Holdings / Robert Asare',
-        account_number: '0539790093',
-        network: 'mtn',
-        bank_name: '',
-    },
-    {
-        type: 'momo',
-        label: 'Telecel Cash',
-        account_name: 'Nabob Holdings / Robert Asare',
-        account_number: '513014',
-        network: 'telecel',
-        bank_name: '',
-    },
-    {
-        type: 'momo',
-        label: 'AirtelTigo Cash',
-        account_name: 'Nabob Holdings / Robert Asare',
-        account_number: '0273706541',
-        network: 'airteltigo',
-        bank_name: '',
-    },
-];
-
 function normalizeAccount(account: Account): Account {
-    const type = account.type === 'bank' ? 'bank' : 'momo';
-    const meta = account.network ? momoNetworkMeta(account.network) : undefined;
-
     return {
-        type,
-        label: account.label || (type === 'momo' ? (meta?.label ?? 'Mobile Money') : 'Bank transfer'),
+        type: 'bank',
+        label: account.label || 'Bank transfer',
         account_name: account.account_name || '',
         account_number: account.account_number || '',
-        network: type === 'momo' ? (meta?.id ?? 'mtn') : null,
-        bank_name: type === 'bank' ? (account.bank_name || '') : '',
+        network: null,
+        bank_name: account.bank_name || '',
     };
 }
 
@@ -85,7 +52,7 @@ export default function ManualFundingSettings({ settings }: Props) {
     const form = useForm({
         enabled: settings.enabled,
         instructions: settings.instructions,
-        accounts: (settings.accounts.length > 0 ? settings.accounts : defaultNabobAccounts()).map(normalizeAccount),
+        accounts: (settings.accounts.length > 0 ? settings.accounts : [emptyAccount()]).map(normalizeAccount),
     });
 
     const accounts = form.data.accounts;
@@ -117,8 +84,8 @@ export default function ManualFundingSettings({ settings }: Props) {
             <div className="mb-4">
                 <h1 className="text-lg font-bold text-gray-900">Manual payment receive accounts</h1>
                 <p className="mt-1 text-sm text-gray-500">
-                    Set the MoMo or bank details users see when they top up by manual transfer (large amounts). After they
-                    send money and upload proof, you approve it under Manual Top-ups.
+                    Set the bank account details users see when they top up by manual bank transfer (large amounts). After
+                    they send money and upload proof, you approve it under Manual Top-ups.
                 </p>
             </div>
 
@@ -158,7 +125,7 @@ export default function ManualFundingSettings({ settings }: Props) {
                             onChange={(e) => form.setData('instructions', e.target.value)}
                             rows={3}
                             className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
-                            placeholder="Send payment to one of the accounts below, then submit your proof and MoMo/bank reference."
+                            placeholder="Send payment to one of the bank accounts below, then submit your proof and transfer reference."
                         />
                         <InputError message={form.errors.instructions} />
                     </div>
@@ -197,20 +164,10 @@ export default function ManualFundingSettings({ settings }: Props) {
                                 <div>
                                     <Label>Type</Label>
                                     <select
-                                        value={account.type}
-                                        onChange={(e) =>
-                                            updateAccount(index, {
-                                                type: e.target.value as 'momo' | 'bank',
-                                                label:
-                                                    e.target.value === 'momo'
-                                                        ? account.label || 'NABOB MOMO'
-                                                        : account.label || 'Bank transfer',
-                                                network: e.target.value === 'momo' ? account.network || 'mtn' : null,
-                                            })
-                                        }
-                                        className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+                                        value="bank"
+                                        disabled
+                                        className="mt-1 w-full rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-700"
                                     >
-                                        <option value="momo">Mobile Money</option>
                                         <option value="bank">Bank</option>
                                     </select>
                                     <InputError message={fieldError(`accounts.${index}.type`)} />
@@ -226,29 +183,15 @@ export default function ManualFundingSettings({ settings }: Props) {
                                     <InputError message={fieldError(`accounts.${index}.label`)} />
                                 </div>
 
-                                {account.type === 'momo' && (
-                                    <div className="sm:col-span-2">
-                                        <MomoNetworkPicker
-                                            value={account.network || 'mtn'}
-                                            onChange={(network) => updateAccount(index, { network })}
-                                            label="Mobile money network"
-                                            hint="Pick the network for this receive number — MTN Mobile Money is recommended."
-                                        />
-                                        <InputError message={fieldError(`accounts.${index}.network`)} />
-                                    </div>
-                                )}
-
-                                {account.type === 'bank' && (
-                                    <div>
-                                        <Label>Bank name</Label>
-                                        <Input
-                                            value={account.bank_name ?? ''}
-                                            onChange={(e) => updateAccount(index, { bank_name: e.target.value })}
-                                            className="mt-1"
-                                        />
-                                        <InputError message={fieldError(`accounts.${index}.bank_name`)} />
-                                    </div>
-                                )}
+                                <div>
+                                    <Label>Bank name</Label>
+                                    <Input
+                                        value={account.bank_name ?? ''}
+                                        onChange={(e) => updateAccount(index, { bank_name: e.target.value })}
+                                        className="mt-1"
+                                    />
+                                    <InputError message={fieldError(`accounts.${index}.bank_name`)} />
+                                </div>
                                 <div>
                                     <Label>Account name</Label>
                                     <Input
@@ -260,7 +203,7 @@ export default function ManualFundingSettings({ settings }: Props) {
                                     <InputError message={fieldError(`accounts.${index}.account_name`)} />
                                 </div>
                                 <div>
-                                    <Label>Account / MoMo number</Label>
+                                    <Label>Account number</Label>
                                     <Input
                                         value={account.account_number}
                                         onChange={(e) => updateAccount(index, { account_number: e.target.value })}

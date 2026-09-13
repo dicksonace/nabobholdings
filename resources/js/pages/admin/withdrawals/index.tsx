@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin-layout';
-import { momoNetworkLabel } from '@/lib/momo-networks';
 import { formatPrice, Paginated, productImageUrl } from '@/types/marketplace';
 
 interface AdminWithdrawalRow {
@@ -139,8 +138,9 @@ export default function WithdrawalsIndex({ withdrawals, status, role, counts }: 
             <Head title="Withdrawals" />
 
             <p className="mb-4 text-sm text-gray-500">
-                Manual payouts only: 1) Press <strong>Start</strong> so the seller sees Processing. 2) Send MoMo yourself.
-                3) Mark complete with optional proof photo, or reject with a reason. Target turnaround: about 1 hour.
+                Manual payouts only: 1) Press <strong>Start</strong> so the seller sees Processing. 2) Send the bank
+                transfer yourself. 3) Mark complete with optional proof photo, or reject with a reason. Target turnaround:
+                about 1 hour.
             </p>
 
             {(flash?.success || flash?.error) && (
@@ -206,7 +206,7 @@ export default function WithdrawalsIndex({ withdrawals, status, role, counts }: 
                                             {w.user?.mobile ? ` · ${w.user.mobile}` : ''}
                                         </p>
                                         <p className="mt-1 text-sm text-gray-600">
-                                            Pay to: {momoNetworkLabel(w.network)} · {w.momo_number}
+                                            Pay to: {w.network} · {w.momo_number}
                                             {w.account_name ? ` · ${w.account_name}` : ''}
                                         </p>
 
@@ -370,9 +370,9 @@ export default function WithdrawalsIndex({ withdrawals, status, role, counts }: 
                             </div>
 
                             <div className="rounded-xl border border-sky-100 bg-sky-50 p-4 text-sm">
-                                <p className="font-semibold text-sky-900">Mobile money</p>
-                                <p className="mt-1 text-sky-900">{momoNetworkLabel(detail.network)}</p>
-                                <p className="text-sky-800">{detail.momo_number}</p>
+                                <p className="font-semibold text-sky-900">Bank account</p>
+                                <p className="mt-1 text-sky-900">{detail.network}</p>
+                                <p className="text-sky-800">Account: {detail.momo_number}</p>
                                 <p className="text-sky-800">{detail.account_name}</p>
                             </div>
 
@@ -422,14 +422,14 @@ export default function WithdrawalsIndex({ withdrawals, status, role, counts }: 
                     <form onSubmit={submitComplete} className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
                         <h3 className="font-semibold text-gray-900">Mark payout complete</h3>
                         <p className="mt-1 text-sm text-gray-500">
-                            Seller will see Paid. Attach a MoMo receipt screenshot if you have one.
+                            Seller will see Paid. Attach a bank transfer receipt screenshot if you have one.
                         </p>
                         <div className="mt-4 space-y-3">
                             <div>
                                 <Label>Note to seller (optional)</Label>
                                 <Input
                                     className="mt-1"
-                                    placeholder="e.g. Sent via MTN MoMo"
+                                    placeholder="e.g. Sent via bank transfer"
                                     value={completeNotes}
                                     onChange={(e) => setCompleteNotes(e.target.value)}
                                 />

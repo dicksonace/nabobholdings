@@ -51,6 +51,8 @@ interface SearchBoxProps {
     backHref?: string;
     /** Visual tone for header-over-hero (dark) vs default light surfaces. */
     tone?: 'light' | 'dark';
+    /** Focus the search field when mounted / opened. */
+    autoFocus?: boolean;
 }
 
 export default function SearchBox({
@@ -67,6 +69,7 @@ export default function SearchBox({
     showBack = false,
     backHref,
     tone = 'light',
+    autoFocus = false,
 }: SearchBoxProps) {
     const [query, setQuery] = useState(initialQuery);
     const [open, setOpen] = useState(false);
@@ -75,6 +78,7 @@ export default function SearchBox({
     const [categories, setCategories] = useState<SuggestCategory[]>([]);
     const [stores, setStores] = useState<SuggestStore[]>([]);
     const wrapperRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
     const isStoreSearch = target === 'store' && Boolean(storeSlug);
@@ -113,6 +117,12 @@ export default function SearchBox({
     useEffect(() => {
         setQuery(initialQuery);
     }, [initialQuery]);
+
+    useEffect(() => {
+        if (!autoFocus) return;
+        const id = window.setTimeout(() => inputRef.current?.focus(), 30);
+        return () => window.clearTimeout(id);
+    }, [autoFocus]);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -217,6 +227,7 @@ export default function SearchBox({
                     }`}
                 >
                     <Input
+                        ref={inputRef}
                         type="search"
                         placeholder={placeholder}
                         value={query}

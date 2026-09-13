@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use App\Models\SellerProfile;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,7 +16,7 @@ class SellerApprovedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -30,8 +29,4 @@ class SellerApprovedNotification extends Notification implements ShouldQueue
             ->action('Go to Dashboard', route('manage.dashboard'));
     }
 
-    public function toSms(object $notifiable): string
-    {
-        return 'Nabob Holdings: Your seller application has been approved! Log in to start selling.';
-    }
 }

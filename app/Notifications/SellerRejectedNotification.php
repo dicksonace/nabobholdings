@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -16,7 +15,7 @@ class SellerRejectedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -29,8 +28,4 @@ class SellerRejectedNotification extends Notification implements ShouldQueue
             ->line('You may reapply with updated documents.');
     }
 
-    public function toSms(object $notifiable): string
-    {
-        return 'Nabob Holdings: Your seller application was not approved. Check your email for details.';
-    }
 }

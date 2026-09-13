@@ -83,7 +83,7 @@ export default function Home({
         <ShopLayout overHero>
             <SeoHead
                 title="Shop"
-                description={brand?.tagline ?? 'Shop quality products from Nabob Holdings — secure payments, order tracking, and delivery across Ghana.'}
+                description={brand?.tagline ?? 'Shop quality products from Nabob Holdings — secure payments, order tracking, and reliable delivery.'}
                 url="/"
             />
             <HeroBanner slides={heroSlides} />

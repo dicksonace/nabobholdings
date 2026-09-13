@@ -50,7 +50,7 @@ function paymentLabel(method: AwaitingDirectOrder['payment_method']): string {
     if (method.bank_name || method.type === 'bank') {
         return method.bank_name || 'Bank transfer';
     }
-    return method.network ? `${method.network} MoMo` : 'Mobile Money';
+    return method.network || 'Bank transfer';
 }
 
 export default function AdminAwaitingDirectOrders({

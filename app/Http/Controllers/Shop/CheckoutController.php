@@ -217,7 +217,7 @@ class CheckoutController extends Controller
 
         if ($reference === '' && ! $hasProof) {
             return back()->withErrors([
-                'proof' => 'Upload a payment screenshot, or enter a transaction ID from your MoMo SMS.',
+                'proof' => 'Upload a payment screenshot, or enter a bank transaction / reference ID.',
             ]);
         }
 
@@ -352,9 +352,8 @@ class CheckoutController extends Controller
 
         $channel = $request->input('channel');
         $channels = match ($channel) {
-            'momo', 'mobile_money' => ['mobile_money'],
             'card' => ['card'],
-            default => ['card', 'mobile_money'],
+            default => ['card'],
         };
 
         $reference = 'CSH-'.uniqid();
@@ -419,7 +418,7 @@ class CheckoutController extends Controller
 
         if ($reference === '' && ! $hasProof) {
             return back()->withErrors([
-                'proof' => 'Upload a payment screenshot, or enter a transaction ID from your MoMo SMS.',
+                'proof' => 'Upload a payment screenshot, or enter a bank transaction / reference ID.',
             ]);
         }
 

@@ -28,7 +28,7 @@ return [
             'items' => [
                 [
                     'question' => 'How do I place an order?',
-                    'answer' => 'Browse products, add items to your cart, then proceed to checkout. Enter your delivery details, choose how you want to pay (cash on delivery or bank transfer), and confirm the order. You will receive confirmation by email and SMS.',
+                    'answer' => 'Browse products, add items to your cart, then proceed to checkout. Enter your delivery details, choose how you want to pay (cash on delivery or bank transfer), and confirm the order. You will receive confirmation by email.',
                 ],
                 [
                     'question' => 'Do I need an account to shop?',
@@ -36,7 +36,7 @@ return [
                 ],
                 [
                     'question' => 'What payment methods are accepted?',
-                    'answer' => 'At checkout you can pay with cash on delivery (COD) or bank transfer (upload your transfer receipt for verification). You can also use your Nabob Holdings wallet balance when available. Available options may vary by store and product.',
+                    'answer' => 'At checkout you can pay with cash on delivery (COD) or bank transfer (upload your transfer receipt for verification). Available options may vary by store and product.',
                 ],
                 [
                     'question' => 'Can I cancel my order?',
@@ -61,20 +61,16 @@ return [
                 ],
                 [
                     'question' => 'How do I track my order?',
-                    'answer' => 'When your order is out for delivery, courier details and a tracking number appear under My Orders → order details. You will also receive SMS and email updates when your order status changes.',
+                    'answer' => 'When your order is out for delivery, courier details and a tracking number appear under My Orders → order details. You will also receive email updates when your order status changes.',
                 ],
             ],
         ],
         [
-            'category' => 'Payments & Wallet',
+            'category' => 'Payments',
             'items' => [
                 [
                     'question' => 'When is my payment released?',
-                    'answer' => 'For secured checkout, your payment is held until you confirm delivery (or until auto-confirmation after the waiting period). Then the sale settles in the store wallet.',
-                ],
-                [
-                    'question' => 'What is my buyer wallet for?',
-                    'answer' => 'Your wallet holds refunds and approved top-ups. You can use wallet balance at checkout or request a withdrawal after admin approval.',
+                    'answer' => 'For secured checkout, your payment is held until you confirm delivery (or until auto-confirmation after the waiting period). Then the sale settles to the store.',
                 ],
                 [
                     'question' => 'How does bank transfer checkout work?',
@@ -108,7 +104,7 @@ return [
                 ],
                 [
                     'question' => 'Is my payment information safe?',
-                    'answer' => 'Yes. Nabob Holdings does not store your banking PINs or card secrets. Bank transfer checkouts use your uploaded receipt for verification only, and wallet activity stays inside your Nabob Holdings account.',
+                    'answer' => 'Yes. Nabob Holdings does not store your banking PINs or card secrets. Bank transfer checkouts use your uploaded receipt for verification only.',
                 ],
                 [
                     'question' => 'How do I contact support?',

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use App\Models\Dispute;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,7 +16,7 @@ class DisputeResolvedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -30,8 +29,4 @@ class DisputeResolvedNotification extends Notification implements ShouldQueue
             ->when($this->dispute->resolution_notes, fn ($m) => $m->line($this->dispute->resolution_notes));
     }
 
-    public function toSms(object $notifiable): string
-    {
-        return "Nabob Holdings: Dispute on order {$this->dispute->order->order_number} resolved.";
-    }
 }

@@ -419,7 +419,7 @@ class OrderService
         $trimmed = $reference !== null ? trim($reference) : '';
         if ($trimmed === '' && $proofPath === null) {
             throw ValidationException::withMessages([
-                'proof' => 'Upload a payment screenshot, or enter a transaction ID from your MoMo SMS.',
+                'proof' => 'Upload a payment screenshot, or enter a bank transaction / reference ID.',
             ]);
         }
 

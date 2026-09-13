@@ -80,7 +80,7 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'address_id' => ['required', 'integer'],
-            'payment_method' => ['required', 'in:momo,card,cash,wallet'],
+            'payment_method' => ['required', 'in:card,cash,bank_transfer,cod'],
             'seller_payments' => ['nullable', 'array'],
             'seller_payments.*.channel' => ['required_with:seller_payments', 'in:marketplace,direct'],
             'seller_payments.*.method_id' => ['nullable', 'integer'],
@@ -164,20 +164,9 @@ class CheckoutController extends Controller
 
     public function payWithWallet(Request $request, Checkout $checkout): JsonResponse
     {
-        abort_unless($checkout->buyer_id === $request->user()->id, 403);
-
-        try {
-            $this->orderService->payCheckoutWithWallet($checkout, $request->user());
-        } catch (ValidationException $e) {
-            throw $e;
-        } catch (\RuntimeException $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-
         return response()->json([
-            'message' => 'Paid with wallet.',
-            'checkout' => $this->checkoutPayload($checkout->fresh(['orders.items'])),
-        ]);
+            'message' => 'Wallet payments are no longer available. Use card, cash on delivery, or bank transfer.',
+        ], 410);
     }
 
     public function initializePaystack(Request $request, Checkout $checkout): JsonResponse

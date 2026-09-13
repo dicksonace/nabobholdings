@@ -84,7 +84,7 @@ const ROLES: RoleGuide[] = [
             },
             {
                 title: 'Pay your way',
-                body: 'Pay online via card or Mobile Money (secured by Nabob), pay the store directly, or choose cash on delivery where available.',
+                body: 'Pay online via card (secured by Nabob), pay the store directly by bank transfer, or choose cash on delivery where available.',
             },
             {
                 title: 'Track & confirm delivery',
@@ -104,7 +104,7 @@ const FLOW: { icon: ComponentType<{ className?: string }>; label: string }[] = [
     { icon: PackageCheck, label: 'Store packs & ships' },
     { icon: Truck, label: 'Buyer confirms delivery' },
     { icon: Wallet, label: 'Funds settle in store wallet' },
-    { icon: Banknote, label: 'Owner withdraws (MoMo)' },
+    { icon: Banknote, label: 'Owner withdraws (bank)' },
 ];
 
 export default function AdminGuide() {

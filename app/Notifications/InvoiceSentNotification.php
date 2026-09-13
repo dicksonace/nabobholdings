@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use App\Models\Invoice;
 use App\Services\PlatformSettings;
 use Illuminate\Bus\Queueable;
@@ -18,7 +17,7 @@ class InvoiceSentNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -48,8 +47,4 @@ class InvoiceSentNotification extends Notification implements ShouldQueue
             ->action('View on Nabob Holdings', route('checkouts.show', $checkout));
     }
 
-    public function toSms(object $notifiable): string
-    {
-        return "Nabob Holdings: Invoice {$this->invoice->invoice_number} for ".PlatformSettings::formatMoney((float) $this->invoice->total).'. Payment: '.($this->invoice->payment_status ?? 'pending').'.';
-    }
 }

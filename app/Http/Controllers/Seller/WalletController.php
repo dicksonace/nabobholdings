@@ -158,8 +158,8 @@ class WalletController extends Controller
         }
 
         $validated = $request->validate([
-            'network' => ['required', 'in:mtn,telecel,airteltigo'],
-            'account_number' => ['required', 'string', 'max:20'],
+            'bank_name' => ['required', 'string', 'max:100'],
+            'account_number' => ['required', 'string', 'max:40'],
             'account_name' => ['required', 'string', 'max:255'],
             'is_default' => ['boolean'],
         ]);
@@ -180,14 +180,14 @@ class WalletController extends Controller
 
         SellerPayoutMethod::create([
             'user_id' => $request->user()->id,
-            'type' => 'momo',
-            'network' => $validated['network'],
+            'type' => 'bank',
+            'network' => $validated['bank_name'],
             'account_number' => $validated['account_number'],
             'account_name' => $validated['account_name'],
             'is_default' => ($validated['is_default'] ?? false) || $isFirst,
         ]);
 
-        return back()->with('success', 'Payout method saved.');
+        return back()->with('success', 'Bank payout method saved.');
     }
 
     public function destroyPayoutMethod(Request $request, SellerPayoutMethod $payoutMethod): RedirectResponse
@@ -256,7 +256,7 @@ class WalletController extends Controller
     {
         $validated = $request->validate([
             'amount' => ['required', 'numeric', 'min:5', 'max:50000'],
-            'method' => ['required', 'in:momo,card'],
+            'method' => ['required', 'in:card'],
         ]);
 
         if (! $this->paystack->isConfigured()) {
@@ -314,7 +314,7 @@ class WalletController extends Controller
             }
 
             $amount = round(((int) ($data['amount'] ?? 0)) / 100, 2);
-            $method = (string) ($metadata['method'] ?? 'momo');
+            $method = (string) ($metadata['method'] ?? 'card');
 
             WalletService::creditFromVerifiedTopUp($request->user()->id, $amount, $reference, $method);
 

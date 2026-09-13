@@ -72,7 +72,7 @@ export default function BuyerAnnouncementsIndex({ announcements }: BuyerAnnounce
                                                 {audienceLabels[row.audience] ?? row.audience}
                                             </span>
                                             <span>{row.recipients_count} recipient{row.recipients_count === 1 ? '' : 's'}</span>
-                                            {row.send_email && <span>Email/SMS too</span>}
+                                            {row.send_email && <span>Email too</span>}
                                             {row.admin && <span>By {row.admin.name}</span>}
                                             {row.created_at && <span>{new Date(row.created_at).toLocaleString()}</span>}
                                         </div>

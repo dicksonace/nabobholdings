@@ -167,7 +167,7 @@ function DirectPayPackageCard({ pkg }: { pkg: DirectPayPackage }) {
                     hint={
                         isBank
                             ? `Send ${formatPrice(pkg.package_total)} to the bank account above, then upload a screenshot or transaction ID below.${method.instructions ? ` ${method.instructions}` : ''}`
-                            : `Send ${formatPrice(pkg.package_total)} to the number above, then upload a screenshot or SMS ID below.${method.instructions ? ` ${method.instructions}` : ''}`
+                            : `Send ${formatPrice(pkg.package_total)} to the account above, then upload a screenshot or transaction ID below.${method.instructions ? ` ${method.instructions}` : ''}`
                     }
                 />
             )}
@@ -176,7 +176,7 @@ function DirectPayPackageCard({ pkg }: { pkg: DirectPayPackage }) {
                 <DocumentUploadField
                     id={`proof-${pkg.seller_id}`}
                     label="Upload payment proof"
-                    hint="Upload a screenshot of your MoMo or bank payment confirmation"
+                    hint="Upload a screenshot of your bank payment confirmation"
                     required={false}
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     maxSizeMb={5}
@@ -188,7 +188,7 @@ function DirectPayPackageCard({ pkg }: { pkg: DirectPayPackage }) {
                     <Label htmlFor={`ref-${pkg.seller_id}`}>Transaction ID (optional)</Label>
                     <Input
                         id={`ref-${pkg.seller_id}`}
-                        placeholder="From MoMo or bank SMS — skip if you upload a screenshot"
+                        placeholder="Bank transaction / reference ID — skip if you upload a screenshot"
                         value={data.reference}
                         onChange={(e) => setData('reference', e.target.value)}
                         className="mt-1"

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use App\Models\Checkout;
 use App\Models\Order;
 use App\Services\PlatformSettings;
@@ -23,7 +22,7 @@ class OrderPlacedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -44,12 +43,4 @@ class OrderPlacedNotification extends Notification implements ShouldQueue
             ->action('View Order', $checkout ? route('checkouts.show', $checkout) : route('orders.show', $this->order));
     }
 
-    public function toSms(object $notifiable): string
-    {
-        $checkout = $this->checkout ?? $this->order->checkout;
-        $number = $checkout?->checkout_number ?? $this->order->order_number;
-        $total = $checkout?->total ?? $this->order->total;
-
-        return "Nabob Holdings: Order {$number} placed. Total ".PlatformSettings::formatMoney((float) $total).'.';
-    }
 }

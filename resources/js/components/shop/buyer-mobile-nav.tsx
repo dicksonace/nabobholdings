@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { MessageCircle, Package, Store, UserRound, Wallet } from 'lucide-react';
+import { Heart, MessageCircle, Package, Store, UserRound } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -7,7 +7,7 @@ import { useChatOptional } from '@/contexts/chat-context';
 import { cn } from '@/lib/utils';
 import { SharedData } from '@/types';
 
-type BuyerNavKey = 'shop' | 'wallet' | 'orders' | 'messages' | 'profile';
+type BuyerNavKey = 'shop' | 'wishlist' | 'orders' | 'messages' | 'profile';
 
 const items: {
     key: BuyerNavKey;
@@ -17,15 +17,15 @@ const items: {
     chat?: boolean;
 }[] = [
     { key: 'shop', label: 'Shop', href: route('home'), match: (p) => p === '/' || p.startsWith('/search') || p.startsWith('/products') || p.startsWith('/store') },
-    { key: 'wallet', label: 'Wallet', href: route('wallet.index'), match: (p) => p.startsWith('/wallet') },
+    { key: 'wishlist', label: 'Wishlist', href: route('wishlist.index'), match: (p) => p.startsWith('/wishlist') },
     { key: 'orders', label: 'My Order', href: route('orders.index'), match: (p) => p.startsWith('/my-orders') || p.startsWith('/checkouts') || p.startsWith('/checkout') },
     { key: 'messages', label: 'Message', chat: true, match: (p) => p.startsWith('/messages') },
-    { key: 'profile', label: 'Profile', href: route('account.index'), match: (p) => p.startsWith('/account') || p.startsWith('/settings') || p.startsWith('/addresses') || p.startsWith('/wishlist') },
+    { key: 'profile', label: 'Profile', href: route('account.index'), match: (p) => p.startsWith('/account') || p.startsWith('/settings') || p.startsWith('/addresses') },
 ];
 
 const icons: Record<BuyerNavKey, typeof Store> = {
     shop: Store,
-    wallet: Wallet,
+    wishlist: Heart,
     orders: Package,
     messages: MessageCircle,
     profile: UserRound,

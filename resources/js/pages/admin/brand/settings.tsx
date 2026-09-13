@@ -30,7 +30,6 @@ const CURRENCY_PRESETS = [
     { code: 'USD', symbol: '$', label: 'US Dollar' },
     { code: 'EUR', symbol: '€', label: 'Euro' },
     { code: 'GBP', symbol: '£', label: 'British Pound' },
-    { code: 'GHS', symbol: 'GH₵', label: 'Ghana Cedi' },
     { code: 'NGN', symbol: '₦', label: 'Nigerian Naira' },
     { code: 'KES', symbol: 'KSh', label: 'Kenyan Shilling' },
     { code: 'ZAR', symbol: 'R', label: 'South African Rand' },

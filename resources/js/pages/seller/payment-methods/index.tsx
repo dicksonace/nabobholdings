@@ -46,11 +46,11 @@ export default function PaymentMethodsIndex({ profile, methods, types }: Payment
     });
 
     const methodForm = useForm({
-        type: 'mobile_money',
+        type: 'bank',
         label: '',
         account_name: '',
         account_number: '',
-        network: 'MTN',
+        network: '',
         bank_name: '',
         instructions: '',
         is_default: false,
@@ -169,7 +169,7 @@ export default function PaymentMethodsIndex({ profile, methods, types }: Payment
                                 <>
                                     <div>
                                         <Label>Bank name</Label>
-                                        <Input value={methodForm.data.bank_name} onChange={(e) => methodForm.setData('bank_name', e.target.value)} required className="mt-1" placeholder="e.g. GCB, GTBank, Absa" />
+                                        <Input value={methodForm.data.bank_name} onChange={(e) => methodForm.setData('bank_name', e.target.value)} required className="mt-1" placeholder="e.g. Commercial Bank, Sampath, HNB" />
                                         <InputError message={methodForm.errors.bank_name} />
                                     </div>
                                     <div>

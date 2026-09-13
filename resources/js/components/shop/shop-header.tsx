@@ -10,6 +10,7 @@ import {
     Menu,
     MessageCircle,
     Package,
+    Search,
     ShoppingCart,
     User,
     Wallet,
@@ -45,6 +46,7 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
     const [scrolled, setScrolled] = useState(false);
     const params = new URLSearchParams(page.url.split('?')[1] ?? '');
     const initialSearch = params.get('q') ?? params.get('search') ?? '';
+    const [searchOpen, setSearchOpen] = useState(() => initialSearch.trim().length > 0);
     const component = typeof page.component === 'string' ? page.component : '';
     const showSearchBack = ['shop/store', 'shop/product-show', 'shop/search', 'shop/image-search'].includes(component);
     const floating = scrolled;
@@ -53,7 +55,6 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
 
     const navLinks: NavLink[] = [
         { label: 'Shop', href: route('home') },
-        { label: 'Wallet', href: route('wallet.index'), auth: true, buyerOnly: true },
         { label: 'Wishlist', href: route('wishlist.index'), auth: true, buyerOnly: true },
         { label: 'Addresses', href: route('addresses.index'), auth: true, buyerOnly: true },
         { label: 'My Orders', href: route('orders.index'), auth: true, buyerOnly: true },
@@ -74,7 +75,7 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
               { label: 'Owner Panel', href: isAdmin ? route('admin.dashboard') : route('manage.dashboard'), highlight: true },
               { label: 'Products', href: route('manage.products.index') },
               { label: 'Orders', href: route('manage.orders.index') },
-              { label: 'Wallet', href: route('manage.wallet') },
+              { label: 'Earnings', href: route('manage.wallet') },
               { label: 'Browse shop', href: route('home') },
               { label: 'Contact', href: route('contact') },
               { label: 'FAQ', href: route('faq') },
@@ -94,6 +95,12 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
+    useEffect(() => {
+        if (initialSearch.trim().length > 0) {
+            setSearchOpen(true);
+        }
+    }, [initialSearch]);
 
     const openMessages = (e?: React.MouseEvent) => {
         e?.preventDefault();
@@ -181,7 +188,11 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
     };
 
     // Reserve space so the fixed header does not cover page content.
-    const spacerClass = hideSearch ? 'h-14 sm:h-16' : 'h-[6.75rem] md:h-16';
+    const spacerClass = hideSearch
+        ? 'h-14 sm:h-16'
+        : searchOpen
+          ? 'h-[7.25rem] sm:h-[7.5rem]'
+          : 'h-14 sm:h-16';
 
     return (
         <>
@@ -224,26 +235,27 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                         <div className="flex h-14 items-center gap-3 sm:h-16 sm:gap-5">
                             <NabobBrand size="sm" className="shrink-0" inverted={dark} />
 
-                            <nav className="hidden items-center gap-5 lg:flex">
+                            <nav className="hidden min-w-0 flex-1 items-center gap-5 lg:flex">
                                 {activeNavLinks.map((link) => renderNavLink(link))}
                             </nav>
 
-                    {!hideSearch && (
-                        <div className="mx-auto hidden min-w-0 max-w-xl flex-1 md:flex">
-                            <SearchBox
-                                initialQuery={initialSearch}
-                                className="w-full"
-                                showBack={showSearchBack}
-                                backHref={route('home')}
-                                tone={dark ? 'dark' : 'light'}
-                            />
-                        </div>
-                    )}
-
-                    {hideSearch && <div className="hidden flex-1 lg:block" />}
-
-                    <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
-                        {auth.user ? (
+                            <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-1.5">
+                                {!hideSearch && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchOpen((open) => !open)}
+                                        className={cn(
+                                            iconBtn,
+                                            searchOpen && (dark ? 'bg-white/15 text-white' : 'bg-[#0f2744]/[0.08] text-[#0f2744]'),
+                                        )}
+                                        aria-label={searchOpen ? 'Close search' : 'Open search'}
+                                        aria-expanded={searchOpen}
+                                        title={searchOpen ? 'Close search' : 'Search'}
+                                    >
+                                        {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                                    </button>
+                                )}
+                                {auth.user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button
@@ -288,7 +300,7 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                                             <DropdownMenuItem asChild>
                                                 <Link href={route('manage.wallet')} className="flex w-full cursor-pointer items-center">
                                                     <Wallet className="mr-2 h-4 w-4" />
-                                                    Earnings
+                                                    Earnings & withdrawals
                                                 </Link>
                                             </DropdownMenuItem>
                                         </>
@@ -300,12 +312,6 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                                                 <Link href={route('orders.index')} className="flex w-full cursor-pointer items-center">
                                                     <Package className="mr-2 h-4 w-4" />
                                                     My Orders
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem asChild>
-                                                <Link href={route('wallet.index')} className="flex w-full cursor-pointer items-center">
-                                                    <Wallet className="mr-2 h-4 w-4" />
-                                                    Wallet
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
@@ -382,7 +388,7 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                             </button>
                         )}
 
-                        <NotificationBell />
+                        <NotificationBell tone={dark ? 'dark' : 'light'} />
 
                         {auth.user && !isBackOffice && (
                             <Link href={route('wishlist.index')} className={cn(iconBtn, 'hidden sm:inline-flex')} title="Wishlist">
@@ -411,15 +417,24 @@ export default function ShopHeader({ hideSearch = false, overHero = false }: { h
                     </div>
                 </div>
 
-                {!hideSearch && (
-                    <div className="pb-3 md:hidden">
+                {!hideSearch && searchOpen && (
+                    <div
+                        className={cn(
+                            'animate-in fade-in slide-in-from-top-1 border-t pb-3 pt-3 duration-200',
+                            dark ? 'border-white/10' : 'border-[#0f2744]/8',
+                        )}
+                    >
                         <SearchBox
                             initialQuery={initialSearch}
-                            compact
+                            className="w-full"
                             showBack={showSearchBack}
                             backHref={route('home')}
                             tone={dark ? 'dark' : 'light'}
-                            onSubmitted={() => setMobileMenuOpen(false)}
+                            autoFocus
+                            onSubmitted={() => {
+                                setMobileMenuOpen(false);
+                                setSearchOpen(false);
+                            }}
                         />
                     </div>
                 )}

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use App\Enums\PaymentChannel;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -26,7 +25,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -85,28 +84,4 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
             ->action('Track Order', route('checkouts.show', $this->order->checkout_id ?? $this->order));
     }
 
-    public function toSms(object $notifiable): string
-    {
-        if ($this->orderItem) {
-            if ($this->cashOnDelivery) {
-                return "Nabob Holdings: New Order (Cash on Delivery) {$this->order->order_number} — {$this->orderItem->product_name}. Call buyer, then pack & deliver.";
-            }
-
-            if ($this->paymentClaim) {
-                return "Nabob Holdings: Buyer submitted payment for {$this->order->order_number} — {$this->orderItem->product_name}. Confirm only if received.";
-            }
-
-            if ($this->pendingOrder) {
-                return "Nabob Holdings: New order awaiting payment {$this->order->order_number} — {$this->orderItem->product_name}.";
-            }
-
-            if ($this->order->payment_channel === PaymentChannel::Direct) {
-                return "Nabob Holdings: New order received (Paid to seller) {$this->order->order_number} — {$this->orderItem->product_name}.";
-            }
-
-            return "Nabob Holdings: New order received (Paid · Nabob Holdings secured) {$this->order->order_number} — {$this->orderItem->product_name}.";
-        }
-
-        return "Nabob Holdings: Payment confirmed for order {$this->order->order_number}.";
-    }
 }

@@ -1,4 +1,4 @@
-import { ArrowDownToLine, Smartphone } from 'lucide-react';
+import { ArrowDownToLine, Landmark } from 'lucide-react';
 import { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -11,8 +11,8 @@ interface WithdrawalHighlightProps {
 }
 
 export default function WithdrawalHighlight({
-    title = 'Withdraw to Mobile Money',
-    subtitle = 'Send your balance to MTN MoMo, Telecel Cash, or AirtelTigo Money.',
+    title = 'Withdraw to bank account',
+    subtitle = 'Request a payout to your saved bank account. Admin reviews and pays manually.',
     children,
     className,
 }: WithdrawalHighlightProps) {
@@ -29,11 +29,11 @@ export default function WithdrawalHighlight({
                         <ArrowDownToLine className="h-6 w-6" />
                     </div>
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-orange-100">MoMo payout</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-orange-100">Bank payout</p>
                         <h2 className="text-lg font-bold sm:text-xl">{title}</h2>
                         <p className="mt-1 text-sm text-orange-50">{subtitle}</p>
                     </div>
-                    <Smartphone className="ml-auto hidden h-8 w-8 shrink-0 text-white/40 sm:block" />
+                    <Landmark className="ml-auto hidden h-8 w-8 shrink-0 text-white/40 sm:block" />
                 </div>
             </div>
             <div className="p-5 sm:p-6">{children}</div>

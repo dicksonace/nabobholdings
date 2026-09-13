@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\SmsChannel;
 use App\Models\OrderItem;
 use App\Services\PlatformSettings;
 use Illuminate\Bus\Queueable;
@@ -23,7 +22,7 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', SmsChannel::class];
+        return ['mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -61,19 +60,6 @@ class OrderStatusUpdatedNotification extends Notification implements ShouldQueue
         return $mail->action('View Order', route('orders.show', $this->orderItem->order_id));
     }
 
-    public function toSms(object $notifiable): string
-    {
-        $this->orderItem->loadMissing('order');
-
-        $statusLabel = $this->statusLabel();
-        $message = "Nabob Holdings: {$this->orderItem->product_name} is now {$statusLabel}. Order {$this->orderItem->order->order_number}.";
-
-        if ($this->refunded && $this->refundAmount > 0) {
-            $message .= ' '.PlatformSettings::formatMoney($this->refundAmount).' refunded to your wallet.';
-        }
-
-        return $message;
-    }
 
     private function statusLabel(): string
     {

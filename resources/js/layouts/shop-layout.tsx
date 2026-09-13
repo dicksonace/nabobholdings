@@ -106,9 +106,6 @@ export default function ShopLayout({ children, hideHeaderSearch = false, overHer
                                             <Link href={route('orders.index')}>My Orders</Link>
                                         </li>
                                         <li>
-                                            <Link href={route('wallet.index')}>Wallet</Link>
-                                        </li>
-                                        <li>
                                             <Link href={route('wishlist.index')}>Wishlist</Link>
                                         </li>
                                         <li>

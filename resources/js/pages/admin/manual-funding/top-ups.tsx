@@ -88,7 +88,7 @@ export default function ManualTopUps({ requests, status, counts }: Props) {
             <div className="mb-4">
                 <h1 className="text-lg font-bold text-gray-900">Manual top-up requests</h1>
                 <p className="mt-1 text-sm text-gray-500">
-                    Users send money to your MoMo/bank account, then submit proof. Approve to credit their wallet.
+                    Users send money to your bank account, then submit proof. Approve to credit their wallet.
                 </p>
             </div>
 

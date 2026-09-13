@@ -66,7 +66,7 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
         };
     }, []);
 
-    const payWithPaystack = useCallback(async (channel?: 'card' | 'momo') => {
+    const payWithPaystack = useCallback(async () => {
         if (!paystackConfigured) {
             setError('Paystack is not configured.');
             return;
@@ -80,7 +80,7 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
             const res = await fetch(route('checkout.initialize', checkout.id), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
-                body: JSON.stringify(channel ? { channel } : {}),
+                body: JSON.stringify({ channel: 'card' }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message ?? 'Payment initialization failed');
@@ -93,7 +93,7 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
                 amount: Math.round(data.amount * 100),
                 currency: currency?.code ?? 'LKR',
                 ref: data.reference,
-                channels: data.channels ?? ['card', 'mobile_money'],
+                channels: data.channels ?? ['card'],
                 callback: () => {
                     clearPaymentReference(checkout.id);
                     router.visit(route('checkout.callback', { reference: data.reference }));
@@ -108,7 +108,7 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
             setError(e instanceof Error ? e.message : 'Payment failed');
             setLoading(false);
         }
-    }, [checkout.id, paystackConfigured, paystackPublicKey]);
+    }, [checkout.id, paystackConfigured, paystackPublicKey, currency?.code]);
 
     return (
         <ShopLayout>
@@ -134,32 +134,16 @@ export default function Payment({ checkout, marketplaceTotal, directOrders, pays
                             {checkout.payment_status === 'failed' && (
                                 <p className="mt-2 text-sm text-amber-800">Previous payment failed. Pick a method below to try again.</p>
                             )}
-                            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                            <div className="mt-4">
                                 <Button
-                                    onClick={() => payWithPaystack('momo')}
-                                    disabled={loading}
-                                    className="w-full bg-[#0f2744] hover:bg-[#152a45]"
-                                >
-                                    {loading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                                    Mobile Money
-                                </Button>
-                                <Button
-                                    onClick={() => payWithPaystack('card')}
+                                    onClick={() => payWithPaystack()}
                                     disabled={loading}
                                     className="w-full bg-[#d97706] hover:bg-[#b45309]"
                                 >
                                     {loading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                                    Card
+                                    Pay by card
                                 </Button>
                             </div>
-                            <Button
-                                variant="outline"
-                                onClick={() => payWithPaystack()}
-                                disabled={loading}
-                                className="mt-2 w-full"
-                            >
-                                Pay with any method
-                            </Button>
                         </div>
                     )}
 
@@ -236,7 +220,7 @@ function DirectPaymentCard({ order }: { order: PaymentProps['directOrders'][0] &
                     hint={
                         isBank
                             ? `Send ${formatPrice(order.total)} to the bank account above, then upload a screenshot or transaction ID below.${method.instructions ? ` ${method.instructions}` : ''}`
-                            : `Send ${formatPrice(order.total)} to the number above. Leave the MoMo reference blank if you’re paying by USSD/keypad — then upload a screenshot or SMS ID below.${method.instructions ? ` ${method.instructions}` : ''}`
+                            : `Send ${formatPrice(order.total)} to the account above, then upload a screenshot or transaction ID below.${method.instructions ? ` ${method.instructions}` : ''}`
                     }
                 />
             )}
@@ -253,7 +237,7 @@ function DirectPaymentCard({ order }: { order: PaymentProps['directOrders'][0] &
                     <DocumentUploadField
                         id={`proof-${order.id}`}
                         label="Upload payment proof"
-                        hint="Upload a screenshot of your MoMo or bank payment confirmation"
+                        hint="Upload a screenshot of your bank payment confirmation"
                         required={false}
                         accept="image/jpeg,image/png,image/webp,image/gif"
                         maxSizeMb={5}
@@ -266,7 +250,7 @@ function DirectPaymentCard({ order }: { order: PaymentProps['directOrders'][0] &
                         <Label htmlFor={`ref-${order.id}`}>Transaction ID (optional)</Label>
                         <Input
                             id={`ref-${order.id}`}
-                            placeholder="From MoMo or bank SMS — skip if you upload a screenshot"
+                            placeholder="Bank transaction / reference ID — skip if you upload a screenshot"
                             value={data.reference}
                             onChange={(e) => setData('reference', e.target.value)}
                             className="mt-1"

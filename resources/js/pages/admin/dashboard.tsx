@@ -17,7 +17,6 @@ import { ComponentType } from 'react';
 
 import { DonutChart, RankBars, TrendChart } from '@/components/admin/dashboard-charts';
 import AdminLayout from '@/layouts/admin-layout';
-import { momoNetworkLabel } from '@/lib/momo-networks';
 import { formatPrice, Order, SellerProfile } from '@/types/marketplace';
 
 interface Breakdown {
@@ -357,8 +356,7 @@ export default function AdminDashboard({
                                             <div>
                                                 <dt className="text-gray-500">Payment method</dt>
                                                 <dd className="font-medium text-gray-900">
-                                                    {momoNetworkLabel(w.network ?? '')}
-                                                    {w.momo_number ? ` · ${w.momo_number}` : ''}
+                                                    {[w.network, w.momo_number].filter(Boolean).join(' · ') || '—'}
                                                 </dd>
                                             </div>
                                             {w.account_name && (
@@ -380,7 +378,7 @@ export default function AdminDashboard({
                         </div>
                     )}
                     <p className="mt-3 text-xs text-gray-500">
-                        Flow: Start processing → send MoMo → Mark paid (optional proof).
+                        Flow: Start processing → send bank transfer → Mark paid (optional proof).
                     </p>
                 </div>
 

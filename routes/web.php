@@ -114,8 +114,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wallet/add-funds', [BuyerWalletController::class, 'addFunds'])->name('wallet.add-funds');
     Route::get('/wallet/callback', [BuyerWalletController::class, 'callback'])->name('wallet.callback');
     Route::post('/wallet/withdraw', [BuyerWalletController::class, 'withdraw'])->name('wallet.withdraw');
-    Route::get('/wallet/manual-top-up', [WalletManualTopUpController::class, 'show'])->name('wallet.manual-top-up');
-    Route::post('/wallet/manual-top-up', [WalletManualTopUpController::class, 'store'])->name('wallet.manual-top-up.store');
+    Route::get('/wallet/manual-top-up', fn () => redirect()->route('home'))->name('wallet.manual-top-up');
+    Route::post('/wallet/manual-top-up', fn () => redirect()->route('home'))->name('wallet.manual-top-up.store');
 
     Route::get('/messages', [ChatConversationController::class, 'index'])->name('chat.index');
     Route::post('/messages', [ChatConversationController::class, 'store'])->name('chat.store');

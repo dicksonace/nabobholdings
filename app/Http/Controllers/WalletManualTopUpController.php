@@ -17,13 +17,17 @@ class WalletManualTopUpController extends Controller
     public function show(Request $request): Response|RedirectResponse
     {
         $user = $request->user();
-        abort_unless($user && in_array($user->role, [UserRole::Buyer, UserRole::Seller], true), 403);
+        abort_unless($user && $user->role === UserRole::Seller, 403);
 
         $settings = PlatformSettings::manualFundingAccounts();
+        $settings['accounts'] = array_values(array_filter(
+            $settings['accounts'],
+            fn (array $account) => ($account['type'] ?? '') === 'bank',
+        ));
 
         if (! $settings['enabled'] || count($settings['accounts']) === 0) {
-            return $this->backToWallet($user->role)
-                ->with('error', 'Manual top-up is not available right now. Use online payment or contact support.');
+            return redirect()->route('manage.wallet')
+                ->with('error', 'Manual top-up is not available right now. Contact support.');
         }
 
         $requests = WalletTopUpRequest::where('user_id', $user->id)
@@ -41,26 +45,26 @@ class WalletManualTopUpController extends Controller
                 'reviewed_at' => $item->reviewed_at?->toIso8601String(),
             ]);
 
-        $page = $user->isSeller()
-            ? 'seller/wallet/manual-top-up'
-            : 'shop/wallet/manual-top-up';
-
-        return Inertia::render($page, [
+        return Inertia::render('seller/wallet/manual-top-up', [
             'settings' => $settings,
             'requests' => $requests,
-            'walletRoute' => $user->isSeller() ? route('manage.wallet') : route('wallet.index'),
+            'walletRoute' => route('manage.wallet'),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $user = $request->user();
-        abort_unless($user && in_array($user->role, [UserRole::Buyer, UserRole::Seller], true), 403);
+        abort_unless($user && $user->role === UserRole::Seller, 403);
 
         $settings = PlatformSettings::manualFundingAccounts();
+        $bankAccounts = array_values(array_filter(
+            $settings['accounts'],
+            fn (array $account) => ($account['type'] ?? '') === 'bank',
+        ));
 
-        if (! $settings['enabled'] || count($settings['accounts']) === 0) {
-            return $this->backToWallet($user->role)
+        if (! $settings['enabled'] || count($bankAccounts) === 0) {
+            return redirect()->route('manage.wallet')
                 ->with('error', 'Manual top-up is not available right now.');
         }
 
@@ -75,7 +79,7 @@ class WalletManualTopUpController extends Controller
         $validated = $request->validate([
             'amount' => ['required', 'numeric', 'min:10', 'max:500000'],
             'payment_reference' => ['nullable', 'string', 'max:100'],
-            'network' => ['required', 'string', 'in:mtn,telecel,airteltigo'],
+            'network' => ['nullable', 'string', 'max:50'],
             'user_note' => ['nullable', 'string', 'max:500'],
             'proof' => ['required', 'image', 'max:5120'],
         ]);
@@ -88,25 +92,13 @@ class WalletManualTopUpController extends Controller
             'payment_reference' => trim((string) ($validated['payment_reference'] ?? '')),
             'sender_name' => null,
             'sender_number' => null,
-            'network' => $validated['network'],
+            'network' => $validated['network'] ?? 'bank',
             'proof_path' => $proofPath,
             'user_note' => $validated['user_note'] ?? null,
             'status' => WalletTopUpStatus::Pending,
         ]);
 
-        $redirect = $user->isSeller()
-            ? redirect()->route('manage.wallet.manual-top-up')
-            : redirect()->route('wallet.manual-top-up');
-
-        return $redirect->with('success', 'Payment proof submitted. We will credit your wallet after admin verification.');
-    }
-
-    private function backToWallet(UserRole $role): RedirectResponse
-    {
-        if ($role === UserRole::Seller) {
-            return redirect()->route('manage.wallet');
-        }
-
-        return redirect()->route('wallet.index');
+        return redirect()->route('manage.wallet.manual-top-up')
+            ->with('success', 'Payment proof submitted. We will credit your balance after admin verification.');
     }
 }
